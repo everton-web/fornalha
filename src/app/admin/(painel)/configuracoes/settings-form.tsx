@@ -8,6 +8,7 @@ import { dayName } from "@/lib/hours";
 import type { OpeningHour, Tenant } from "@/lib/types";
 
 import { updateSettings } from "../../settings-actions";
+import { LogoField } from "./logo-field";
 
 export function SettingsForm({
   tenant,
@@ -102,11 +103,11 @@ export function SettingsForm({
               />
             </div>
           </label>
-          <Field
-            label="URL do logo"
-            value={form.logoUrl}
-            onChange={(v) => set("logoUrl", v)}
-            placeholder="https://..."
+          <LogoField
+            tenant={tenant}
+            urlValue={form.logoUrl}
+            onUrlChange={(v) => set("logoUrl", v)}
+            canEdit={canEdit}
           />
           <Field
             label="Telefone"

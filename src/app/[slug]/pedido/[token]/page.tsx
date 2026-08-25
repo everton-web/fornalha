@@ -6,6 +6,7 @@ import { formatTime, money } from "@/lib/format";
 import { getTenantBySlug } from "@/lib/menu";
 import { getOrderByToken } from "@/lib/orders";
 import { PAYMENT_LABEL, STATUS_HINT, STATUS_LABEL, timelineFor } from "@/lib/status";
+import { mapsUrl } from "@/lib/utils";
 
 import { AutoRefresh } from "./auto-refresh";
 
@@ -162,8 +163,17 @@ export default async function OrderPage({
             {order.address_city ? ` — ${order.address_city}` : ""}
             {order.address_reference ? ` (${order.address_reference})` : ""}
           </p>
+        ) : tenant.address ? (
+          <a
+            href={mapsUrl(tenant.address)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-muted underline decoration-dotted underline-offset-4 transition hover:text-foreground"
+          >
+            {tenant.address} · como chegar
+          </a>
         ) : (
-          <p className="text-muted">{tenant.address ?? "Retirar no balcão"}</p>
+          <p className="text-muted">Retirar no balcão</p>
         )}
         <p className="mt-2 text-muted">
           {order.customer_name} · {order.customer_phone}

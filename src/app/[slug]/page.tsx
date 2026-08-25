@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
 import { Clock, MapPin, Bike, ShoppingBag } from "lucide-react";
 
+import { mapsUrl } from "@/lib/utils";
+
 import { money } from "@/lib/format";
 import { isOpenNow, nextOpening } from "@/lib/hours";
 import { getMenu } from "@/lib/menu";
@@ -46,10 +48,18 @@ export default async function StorePage({ params }: PageProps<"/[slug]">) {
         </div>
 
         {tenant.address && (
-          <p className="mt-3 flex items-start gap-1.5 text-sm text-muted">
+          <a
+            href={mapsUrl(tenant.address)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-3 flex items-start gap-1.5 text-sm text-muted underline decoration-dotted underline-offset-4 transition hover:text-foreground"
+          >
             <MapPin className="mt-0.5 size-3.5 shrink-0" />
-            {tenant.address}
-          </p>
+            <span>
+              {tenant.address}
+              <span className="ml-1 whitespace-nowrap font-medium">&middot; como chegar</span>
+            </span>
+          </a>
         )}
 
         {!open && (

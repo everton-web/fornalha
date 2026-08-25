@@ -2,7 +2,7 @@ import "server-only";
 
 import { cache } from "react";
 
-import { asJson, num, sql } from "@/lib/db";
+import { asJson, num, sql, TENANT_COLUMNS } from "@/lib/db";
 import type { Menu, Tenant } from "@/lib/types";
 
 function normalizeTenant(row: Record<string, unknown>): Tenant {
@@ -11,6 +11,7 @@ function normalizeTenant(row: Record<string, unknown>): Tenant {
     delivery_fee: num(row.delivery_fee),
     min_order_value: num(row.min_order_value),
     prep_time_min: Number(row.prep_time_min),
+    has_logo: Boolean(row.has_logo),
     opening_hours: asJson<Tenant["opening_hours"]>(row.opening_hours, []),
   };
 }
@@ -20,7 +21,9 @@ export const getTenantBySlug = cache(async function getTenantBySlug(
   slug: string,
 ): Promise<Tenant | null> {
   const rows = await sql`
-    select * from tenants where slug = ${slug} and is_active = true limit 1
+    select ${sql.unsafe(TENANT_COLUMNS)} from tenants
+    where slug = ${slug} and is_active = true
+    limit 1
   `;
   return rows[0] ? normalizeTenant(rows[0]) : null;
 });
@@ -28,7 +31,9 @@ export const getTenantBySlug = cache(async function getTenantBySlug(
 export const getTenantById = cache(async function getTenantById(
   id: string,
 ): Promise<Tenant | null> {
-  const rows = await sql`select * from tenants where id = ${id} limit 1`;
+  const rows = await sql`
+    select ${sql.unsafe(TENANT_COLUMNS)} from tenants where id = ${id} limit 1
+  `;
   return rows[0] ? normalizeTenant(rows[0]) : null;
 });
 

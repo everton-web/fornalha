@@ -30,6 +30,7 @@ function normalizeTenant(row: Record<string, unknown>): Tenant {
     delivery_fee: num(row.delivery_fee),
     min_order_value: num(row.min_order_value),
     prep_time_min: Number(row.prep_time_min),
+    has_logo: Boolean(row.has_logo),
     opening_hours: asJson<Tenant["opening_hours"]>(row.opening_hours, []),
   };
 }
@@ -44,12 +45,19 @@ export const getSession = cache(async function getSession(): Promise<Session | n
   const token = (await cookies()).get(COOKIE)?.value;
   if (!token) return null;
 
+  // Colunas listadas uma a uma: `t.*` traria logo_data, que é a imagem inteira.
   const rows = await sql`
     select
       u.id    as user_id,
       u.email as email,
       m.role  as role,
-      t.*
+      t.id, t.slug, t.name, t.tagline, t.logo_url, t.cover_url, t.primary_color,
+      t.phone, t.whatsapp, t.address, t.is_active, t.is_open_override,
+      t.opening_hours, t.timezone, t.prep_time_min, t.delivery_enabled,
+      t.pickup_enabled, t.delivery_fee, t.min_order_value, t.accepts_cash,
+      t.accepts_card_delivery, t.accepts_pix_manual, t.pix_key,
+      t.online_payment_enabled, t.payment_provider, t.half_pricing,
+      (t.logo_data is not null) as has_logo
     from sessions s
     join users u on u.id = s.user_id
     join tenant_members m on m.user_id = u.id

@@ -36,6 +36,8 @@ export type Tenant = {
   name: string;
   tagline: string | null;
   logo_url: string | null;
+  /** true quando existe imagem enviada pelo painel (servida por /api/logo/{slug}) */
+  has_logo: boolean;
   cover_url: string | null;
   primary_color: string;
   phone: string | null;

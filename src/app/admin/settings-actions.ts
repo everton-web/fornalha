@@ -100,3 +100,65 @@ export async function updateSettings(input: SettingsInput): Promise<ActionResult
   revalidatePath(`/${session.tenant.slug}`, "layout");
   return { ok: true };
 }
+
+/** Tipos que o navegador gera e a impressão/tela aguentam bem. */
+const TIPOS_ACEITOS = ["image/webp", "image/png", "image/jpeg"] as const;
+const LIMITE_BYTES = 400 * 1024;
+
+/**
+ * Guarda a logo enviada pelo painel.
+ *
+ * A imagem chega como data URI já redimensionada pelo navegador — validamos
+ * de novo aqui porque o cliente pode mentir sobre qualquer coisa.
+ */
+export async function uploadLogo(dataUri: string): Promise<ActionResult> {
+  const session = await requireSession();
+  if (session.role !== "owner") {
+    return { ok: false, error: "Só o dono pode trocar a logo." };
+  }
+
+  const match = /^data:(image\/[a-z+]+);base64,([A-Za-z0-9+/=]+)$/.exec(dataUri);
+  if (!match) return { ok: false, error: "Arquivo de imagem inválido." };
+
+  const [, tipo, base64] = match;
+  if (!TIPOS_ACEITOS.includes(tipo as (typeof TIPOS_ACEITOS)[number])) {
+    return { ok: false, error: "Use uma imagem PNG, JPG ou WebP." };
+  }
+
+  // base64 ocupa ~4/3 do binário: comparamos o tamanho real.
+  const bytes = Math.floor((base64.length * 3) / 4);
+  if (bytes > LIMITE_BYTES) {
+    return { ok: false, error: "A imagem ficou grande demais. Tente uma menor." };
+  }
+
+  try {
+    await sql`
+      update tenants
+      set logo_data = ${dataUri}, logo_type = ${tipo}, logo_url = null
+      where id = ${session.tenant.id}
+    `;
+  } catch (error) {
+    console.error("Falha ao salvar logo", error);
+    return { ok: false, error: "Não foi possível salvar a imagem." };
+  }
+
+  revalidatePath("/admin", "layout");
+  revalidatePath(`/${session.tenant.slug}`, "layout");
+  return { ok: true };
+}
+
+export async function removeLogo(): Promise<ActionResult> {
+  const session = await requireSession();
+  if (session.role !== "owner") {
+    return { ok: false, error: "Só o dono pode trocar a logo." };
+  }
+
+  await sql`
+    update tenants set logo_data = null, logo_type = null
+    where id = ${session.tenant.id}
+  `;
+
+  revalidatePath("/admin", "layout");
+  revalidatePath(`/${session.tenant.slug}`, "layout");
+  return { ok: true };
+}

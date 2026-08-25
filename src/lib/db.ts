@@ -65,3 +65,19 @@ export function asJson<T>(value: unknown, fallback: T): T {
   }
   return value as T;
 }
+
+/**
+ * Colunas do tenant para leitura comum.
+ *
+ * `logo_data` fica de fora de propósito: é a imagem inteira em base64, e o
+ * cardápio lê o tenant a cada visita. Quem precisa dos bytes é só a rota que
+ * serve a imagem.
+ */
+export const TENANT_COLUMNS = `
+  id, slug, name, tagline, logo_url, cover_url, primary_color, phone, whatsapp,
+  address, is_active, is_open_override, opening_hours, timezone, prep_time_min,
+  delivery_enabled, pickup_enabled, delivery_fee, min_order_value,
+  accepts_cash, accepts_card_delivery, accepts_pix_manual, pix_key,
+  online_payment_enabled, payment_provider, half_pricing, created_at, updated_at,
+  (logo_data is not null) as has_logo
+`;

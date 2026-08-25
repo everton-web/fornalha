@@ -2,12 +2,14 @@ import Link from "next/link";
 
 import { isOpenNow, nextOpening } from "@/lib/hours";
 import type { Tenant } from "@/lib/types";
+import { logoSrc } from "@/lib/utils";
 
 import { CartButton } from "./cart-button";
 
 export function StoreHeader({ tenant }: { tenant: Tenant }) {
   const open = isOpenNow(tenant);
   const next = open ? null : nextOpening(tenant);
+  const logo = logoSrc(tenant);
 
   return (
     <header className="sticky top-0 z-30 border-b border-line bg-surface/90 backdrop-blur">
@@ -17,10 +19,10 @@ export function StoreHeader({ tenant }: { tenant: Tenant }) {
             className="grid size-11 shrink-0 place-items-center overflow-hidden rounded-2xl text-lg font-bold"
             style={{ background: "var(--brand)", color: "var(--brand-ink)" }}
           >
-            {tenant.logo_url ? (
+            {logo ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
-                src={tenant.logo_url}
+                src={logo}
                 alt={tenant.name}
                 className="size-full object-cover"
               />
