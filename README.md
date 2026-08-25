@@ -8,7 +8,7 @@ cores, horários e pedidos próprios.
 - **Painel da pizzaria** — `/admin` — pedidos com aviso sonoro, edição do
   cardápio e configurações da loja.
 
-Next.js 16 · React 19 · Tailwind 4 · Postgres (Neon).
+Next.js 16 · React 19 · Tailwind 4 · Postgres (Supabase).
 
 ---
 
@@ -32,8 +32,10 @@ npm run vincular-dono -- --slug=bella-napoli --email=voce@exemplo.com --senha=um
 
 ### Banco
 
-Qualquer Postgres serve — Neon, Vercel Postgres, Supabase ou um local. Quando o
-provedor oferecer string "pooled" (com `-pooler`), use essa.
+Qualquer Postgres serve — Supabase, Neon, Vercel Postgres ou um local. Use
+sempre a string do **pooler** (a do Supabase tem `pooler` no host e porta 6543):
+a conexão direta esgota o limite de conexões em serverless e, no Supabase, só
+responde por IPv6.
 
 ```bash
 npm run db:migrate    # só as tabelas
