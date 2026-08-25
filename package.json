@@ -10,7 +10,10 @@
     "nova-pizzaria": "node scripts/nova-pizzaria.mjs",
     "vincular-dono": "node scripts/vincular-dono.mjs",
     "db:migrate": "node scripts/migrate.mjs",
-    "db:seed": "node scripts/migrate.mjs --seed"
+    "db:seed": "node scripts/migrate.mjs --seed",
+    "env:sync": "node scripts/sync-env.mjs",
+    "trocar-senha": "node scripts/trocar-senha.mjs",
+    "db:backup": "node scripts/backup.mjs"
   },
   "dependencies": {
     "clsx": "^2.1.1",

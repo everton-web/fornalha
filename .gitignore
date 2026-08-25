@@ -46,3 +46,7 @@ next-env.d.ts
 # env: ignora tudo, menos o modelo versionado
 .env*
 !.env.example
+
+# copias locais que nunca sobem
+backups/
+CREDENCIAIS.local.txt
