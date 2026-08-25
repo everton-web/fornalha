@@ -46,3 +46,22 @@ export function num(value: unknown): number {
 export function numOrNull(value: unknown): number | null {
   return value == null ? null : Number(value);
 }
+
+/**
+ * Lê uma coluna jsonb com tolerância a registro antigo.
+ *
+ * Até 25/08/2026 alguns valores foram gravados com JSON.stringify, o que os
+ * guardou como string escapada dentro do jsonb. A gravação já foi corrigida;
+ * isto mantém legível o que ficou para trás.
+ */
+export function asJson<T>(value: unknown, fallback: T): T {
+  if (value == null) return fallback;
+  if (typeof value === "string") {
+    try {
+      return JSON.parse(value) as T;
+    } catch {
+      return fallback;
+    }
+  }
+  return value as T;
+}

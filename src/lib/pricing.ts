@@ -1,6 +1,7 @@
 import type {
   CartItem,
   DeliveryType,
+  JsonObject,
   Menu,
   OrderSummary,
   PricedItem,
@@ -43,7 +44,7 @@ export function priceCart(menu: Menu, items: CartItem[]): PricedItem[] {
   const addonById = new Map(menu.addons.map((a) => [a.id, a]));
   const productById = new Map(menu.products.map((p) => [p.id, p]));
 
-  return items.map((item) => {
+  return items.map((item): PricedItem => {
     const quantity = Math.max(1, Math.trunc(item.quantity));
 
     if (item.kind === "simple") {
@@ -56,7 +57,7 @@ export function priceCart(menu: Menu, items: CartItem[]): PricedItem[] {
         kind: "simple",
         title: product.name,
         subtitle: product.description ?? "",
-        details: { product_id: product.id },
+        details: { product_id: product.id } satisfies JsonObject,
         quantity,
         unitPrice: product.price,
         totalPrice: round2(product.price * quantity),
@@ -125,7 +126,7 @@ export function priceCart(menu: Menu, items: CartItem[]): PricedItem[] {
         flavors: flavors.map((f) => ({ id: f.flavor.id, name: f.flavor.name })),
         crust: crust ? { id: crust.id, name: crust.name, price: crust.price } : null,
         addons: addons.map((a) => ({ id: a.id, name: a.name, price: a.price })),
-      },
+      } satisfies JsonObject,
       quantity,
       unitPrice,
       totalPrice: round2(unitPrice * quantity),

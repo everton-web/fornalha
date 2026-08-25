@@ -50,7 +50,7 @@ try {
       insert into tenants (slug, name, primary_color, whatsapp, opening_hours)
       values (
         ${slug}, ${nome}, ${cor || "#c81e1e"}, ${whats},
-        ${JSON.stringify(
+        ${tx.json(
           [2, 3, 4, 5, 6, 0].map((day) => ({ day, open: "18:00", close: "23:30" })),
         )}
       )

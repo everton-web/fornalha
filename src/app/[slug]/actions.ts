@@ -150,7 +150,9 @@ export async function createOrder(raw: CheckoutInput): Promise<CheckoutResult> {
               order_id: order.id as string,
               kind: item.kind,
               title: item.title,
-              details: JSON.stringify(item.details),
+              // sql.json marca o valor como JSON; JSON.stringify aqui gravaria
+              // uma string escapada dentro do jsonb, e o snapshot viraria texto morto.
+              details: tx.json(item.details),
               quantity: item.quantity,
               unit_price: item.unitPrice,
               total_price: item.totalPrice,

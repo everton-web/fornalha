@@ -20,6 +20,16 @@ export type ProductKind = "pizza" | "simple";
 
 export type OpeningHour = { day: number; open: string; close: string };
 
+/** Estrutura aceita numa coluna jsonb — evita cast na hora de gravar. */
+export type JsonValue =
+  | string
+  | number
+  | boolean
+  | null
+  | JsonValue[]
+  | { [key: string]: JsonValue };
+export type JsonObject = { [key: string]: JsonValue };
+
 export type Tenant = {
   id: string;
   slug: string;
@@ -129,7 +139,7 @@ export type PricedItem = {
   kind: ProductKind;
   title: string;
   subtitle: string;
-  details: Record<string, unknown>;
+  details: JsonObject;
   quantity: number;
   unitPrice: number;
   totalPrice: number;

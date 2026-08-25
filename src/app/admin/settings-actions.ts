@@ -88,7 +88,7 @@ export async function updateSettings(input: SettingsInput): Promise<ActionResult
         accepts_pix_manual = ${data.acceptsPixManual},
         pix_key = ${data.pixKey || null},
         half_pricing = ${data.halfPricing},
-        opening_hours = ${JSON.stringify(data.openingHours)}
+        opening_hours = ${sql.json(data.openingHours)}
       where id = ${session.tenant.id}
     `;
   } catch (error) {

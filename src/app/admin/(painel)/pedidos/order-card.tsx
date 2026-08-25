@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Bike, Clock, MapPin, Phone, ShoppingBag, X } from "lucide-react";
+import Link from "next/link";
+import { Bike, Clock, MapPin, Phone, Printer, ShoppingBag, X } from "lucide-react";
 
 import { formatTime, money } from "@/lib/format";
 import type { OrderRow } from "@/lib/orders";
@@ -68,8 +69,18 @@ export function OrderCard({
             {formatTime(order.created_at, timezone)}
           </p>
         </div>
+        <Link
+          href={`/admin/cupom/${order.id}?auto=1`}
+          target="_blank"
+          title="Imprimir cupom"
+          aria-label={`Imprimir cupom do pedido ${order.code}`}
+          className="ml-auto grid size-8 shrink-0 place-items-center rounded-full border border-line text-muted transition hover:border-stone-300 hover:text-foreground"
+        >
+          <Printer className="size-4" />
+        </Link>
+
         <span
-          className={`ml-auto rounded-full border px-2.5 py-1 text-[11px] font-semibold ${STATUS_STYLE[order.status]}`}
+          className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold ${STATUS_STYLE[order.status]}`}
         >
           {STATUS_LABEL[order.status]}
         </span>

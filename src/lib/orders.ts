@@ -1,6 +1,6 @@
 import "server-only";
 
-import { num, numOrNull, sql } from "@/lib/db";
+import { asJson, num, numOrNull, sql } from "@/lib/db";
 import type {
   DeliveryType,
   OrderStatus,
@@ -67,6 +67,7 @@ function normalizeOrder(row: Record<string, unknown>): Omit<OrderRow, "order_ite
 function normalizeItem(row: Record<string, unknown>): OrderItemRow {
   return {
     ...(row as unknown as OrderItemRow),
+    details: asJson<Record<string, unknown>>(row.details, {}),
     quantity: Number(row.quantity),
     unit_price: num(row.unit_price),
     total_price: num(row.total_price),
@@ -113,6 +114,22 @@ export async function getOrderByToken(
     select * from orders
     where tenant_id = ${tenantId} and public_token = ${token}
     limit 1
+  `;
+  if (!rows[0]) return null;
+
+  const [order] = await attachItems([normalizeOrder(rows[0])]);
+  return order ?? null;
+}
+
+/** Um pedido específico do tenant — usado pelo cupom, que já exige sessão. */
+export async function getOrderById(
+  tenantId: string,
+  id: string,
+): Promise<OrderRow | null> {
+  if (!/^[0-9a-f-]{36}$/i.test(id)) return null;
+
+  const rows = await sql`
+    select * from orders where tenant_id = ${tenantId} and id = ${id} limit 1
   `;
   if (!rows[0]) return null;
 

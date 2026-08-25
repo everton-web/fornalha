@@ -5,7 +5,7 @@ import { cache } from "react";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
-import { num, sql } from "@/lib/db";
+import { asJson, num, sql } from "@/lib/db";
 import { verifyPassword } from "@/lib/password";
 import type { Tenant } from "@/lib/types";
 
@@ -30,7 +30,7 @@ function normalizeTenant(row: Record<string, unknown>): Tenant {
     delivery_fee: num(row.delivery_fee),
     min_order_value: num(row.min_order_value),
     prep_time_min: Number(row.prep_time_min),
-    opening_hours: (row.opening_hours ?? []) as Tenant["opening_hours"],
+    opening_hours: asJson<Tenant["opening_hours"]>(row.opening_hours, []),
   };
 }
 
