@@ -2,8 +2,11 @@ import "server-only";
 
 import { cache } from "react";
 
-import { asJson, num, sql, TENANT_COLUMNS } from "@/lib/db";
+import { asJson, num, opcional, sql, TENANT_COLUMNS } from "@/lib/db";
 import type { Menu, Tenant } from "@/lib/types";
+
+/** Uma linha de price_group_prices, quando a tabela existe. */
+type PrecoDeFaixa = { group_id: string; size_id: string; price: string };
 
 function normalizeTenant(row: Record<string, unknown>): Tenant {
   return {
@@ -74,25 +77,44 @@ export const getMenu = cache(async function getMenu(
         where tenant_id = ${t} and is_active = true
         order by sort_order, name
       `,
-    sql`
+    // As colunas da 0009 podem não existir ainda; sem elas o cardápio segue,
+    // com preço próprio e sem foto, em vez de derrubar a página.
+    opcional(
+      () => sql`
         select id, category_id, price_group_id, name, description, image_url,
                is_sweet, sort_order, (image_data is not null) as has_image
         from flavors
         where tenant_id = ${t} and is_active = true
         order by sort_order, name
       `,
+      null,
+    ).then(
+      (linhas) =>
+        linhas ??
+        sql`
+        select id, category_id, null::uuid as price_group_id, name, description,
+               image_url, is_sweet, sort_order, false as has_image
+        from flavors
+        where tenant_id = ${t} and is_active = true
+        order by sort_order, name
+      `,
+    ),
     sql`
         select fp.flavor_id, fp.size_id, fp.price
         from flavor_prices fp
         join flavors f on f.id = fp.flavor_id
         where f.tenant_id = ${t}
       `,
-    sql`
+    opcional<PrecoDeFaixa[]>(
+      async () =>
+        (await sql`
         select gp.group_id, gp.size_id, gp.price
         from price_group_prices gp
         join price_groups g on g.id = gp.group_id
         where g.tenant_id = ${t} and g.is_active = true
-      `,
+      `) as unknown as PrecoDeFaixa[],
+      [],
+    ),
     sql`
         select id, name, price from crusts
         where tenant_id = ${t} and is_active = true
@@ -103,13 +125,26 @@ export const getMenu = cache(async function getMenu(
         where tenant_id = ${t} and is_active = true
         order by sort_order, name
       `,
-    sql`
+    opcional(
+      () => sql`
         select id, category_id, kind, name, description, image_url, price,
                sort_order, (image_data is not null) as has_image
         from products
         where tenant_id = ${t} and is_active = true and kind = 'simple'
         order by sort_order, name
       `,
+      null,
+    ).then(
+      (linhas) =>
+        linhas ??
+        sql`
+        select id, category_id, kind, name, description, image_url, price,
+               sort_order, false as has_image
+        from products
+        where tenant_id = ${t} and is_active = true and kind = 'simple'
+        order by sort_order, name
+      `,
+    ),
   ]);
 
   const priceMap = new Map<string, Record<string, number>>();

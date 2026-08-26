@@ -75,6 +75,15 @@ const nextConfig: NextConfig = {
   // Cabeçalho que entrega a versão do framework não ajuda ninguém além de
   // quem procura versão vulnerável.
   poweredByHeader: false,
+
+  // A tela de instalação lê os .sql em tempo de execução para preparar o
+  // banco. O rastreamento automático não os enxerga — eles nunca são
+  // importados, só lidos por caminho — e sem esta linha a instalação falha
+  // em produção com "arquivo não encontrado", funcionando só no computador
+  // de quem programou.
+  outputFileTracingIncludes: {
+    "/admin/instalar": ["db/migrations/**/*.sql", "db/seed.sql"],
+  },
 };
 
 export default nextConfig;

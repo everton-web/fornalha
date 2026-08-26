@@ -38,6 +38,37 @@ if (process.env.NODE_ENV !== "production") {
   globalForDb.__fornalhaDb = sql;
 }
 
+/**
+ * Consulta que tolera tabela ainda inexistente.
+ *
+ * O banco pode estar uma migration atrás do código — é exatamente o estado
+ * entre publicar uma versão nova e rodar a instalação. Sem isto, o cardápio
+ * inteiro cai com erro 500 nessa janela, e a página de instalação, que é a
+ * saída, ficaria inalcançável junto.
+ *
+ * São dois códigos, não um: 42P01 é tabela inexistente e 42703 é coluna
+ * inexistente. A migration 0009 acrescenta as duas coisas — tabelas novas
+ * (price_groups) e colunas em tabelas antigas (flavors.image_data) — e tratar
+ * só o primeiro deixaria metade dos casos derrubando a página.
+ *
+ * Qualquer outro erro sobe: o que falta por migration é previsível, o resto é
+ * problema de verdade e não pode ser engolido.
+ */
+const FALTA_NO_BANCO = new Set(["42P01", "42703"]);
+
+export async function opcional<T>(
+  consulta: () => Promise<T>,
+  fallback: T,
+): Promise<T> {
+  try {
+    return await consulta();
+  } catch (error) {
+    const code = (error as { code?: string }).code;
+    if (code && FALTA_NO_BANCO.has(code)) return fallback;
+    throw error;
+  }
+}
+
 /** numeric do Postgres chega como string — dinheiro sempre passa por aqui. */
 export function num(value: unknown): number {
   return value == null ? 0 : Number(value);

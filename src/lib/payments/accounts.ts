@@ -1,7 +1,7 @@
 import "server-only";
 
 import { decryptJson, encryptJson } from "@/lib/crypto";
-import { sql } from "@/lib/db";
+import { opcional, sql } from "@/lib/db";
 import { getProvider } from "@/lib/payments/registry";
 import type { Credentials, PaymentKind } from "@/lib/payments/types";
 
@@ -54,13 +54,19 @@ function toAccount(row: Row): PaymentAccount {
 }
 
 export async function listAccounts(tenantId: string): Promise<PaymentAccount[]> {
-  const rows = (await sql`
-    select provider, credentials, accepts_pix, accepts_card, is_active,
-           sort_order, hint, updated_at
-    from tenant_payment_accounts
-    where tenant_id = ${tenantId}
-    order by sort_order, provider
-  `) as unknown as Row[];
+  // opcional: num banco que ainda não recebeu a 0008 a tabela não existe, e
+  // "nenhum gateway ligado" é a resposta certa — não um erro no checkout.
+  const rows = await opcional(
+    async () =>
+      (await sql`
+        select provider, credentials, accepts_pix, accepts_card, is_active,
+               sort_order, hint, updated_at
+        from tenant_payment_accounts
+        where tenant_id = ${tenantId}
+        order by sort_order, provider
+      `) as unknown as Row[],
+    [] as Row[],
+  );
 
   return rows.map(toAccount);
 }
