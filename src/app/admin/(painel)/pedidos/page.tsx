@@ -28,13 +28,18 @@ export default async function PedidosPage({
     limit: showHistory ? 100 : 60,
   });
 
+  // Contagem de ativos para o indicador: no histórico, a lista traz tudo.
+  const ativos = orders.filter(
+    (o) => o.status !== "delivered" && o.status !== "cancelled",
+  ).length;
+
   const revenue = orders
     .filter((o) => o.status !== "cancelled")
     .reduce((acc, o) => acc + o.total, 0);
 
   return (
     <>
-      <OrdersLive newestOrderId={orders[0]?.id ?? null} />
+      <OrdersLive activeCount={showHistory ? ativos : orders.length} />
 
       <div className="mb-5 flex flex-wrap items-center gap-3">
         <h1 className="text-xl font-bold tracking-tight">
