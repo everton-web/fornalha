@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import Link from "next/link";
 import { AlertCircle } from "lucide-react";
 
 import { signIn } from "../actions";
@@ -22,7 +23,15 @@ export function LoginForm() {
       </label>
 
       <label className="block">
-        <span className="mb-1 block text-xs font-medium text-stone-500">Senha</span>
+        <span className="mb-1 flex items-baseline justify-between text-xs font-medium text-stone-500">
+          Senha
+          <Link
+            href="/admin/esqueci"
+            className="font-normal text-muted underline underline-offset-2 transition hover:text-foreground"
+          >
+            Esqueci minha senha
+          </Link>
+        </span>
         <input
           name="password"
           type="password"
