@@ -33,6 +33,20 @@ export function logoSrc(tenant: {
 }
 
 /**
+ * Endereço da foto de um sabor ou produto.
+ *
+ * A foto enviada pelo painel ganha da URL externa: quem subiu a imagem quis
+ * usar aquela, e ela continuaria escondida atrás de um endereço antigo.
+ */
+export function fotoSrc(
+  tipo: "sabor" | "produto",
+  item: { id: string; image_url?: string | null; has_image?: boolean },
+): string | null {
+  if (item.has_image) return `/api/foto/${tipo}/${item.id}`;
+  return item.image_url ?? null;
+}
+
+/**
  * Link que abre o endereço no aplicativo de mapas.
  *
  * Este formato do Google Maps é entendido pelo app nativo no Android e no

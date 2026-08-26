@@ -4,58 +4,14 @@ import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { ImageUp, Link2, Trash2 } from "lucide-react";
 
+import { prepararImagemQuadrada } from "@/lib/browser-image";
 import type { Tenant } from "@/lib/types";
 import { logoSrc } from "@/lib/utils";
 
 import { removeLogo, uploadLogo } from "../../settings-actions";
 
-/** Lado maior da imagem depois do corte — suficiente para tela e impressão. */
+/** Lado da imagem depois do corte — suficiente para tela e impressão. */
 const LADO = 512;
-
-/**
- * Reduz a imagem no próprio navegador antes de enviar.
- *
- * Foto de celular tem vários megabytes; a logo aparece num círculo de 44px.
- * Cortamos no quadrado central e mandamos WebP, que é uma fração do tamanho.
- */
-function prepararImagem(arquivo: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const leitor = new FileReader();
-    leitor.onerror = () => reject(new Error("Não consegui ler o arquivo."));
-    leitor.onload = () => {
-      const img = new Image();
-      img.onerror = () => reject(new Error("Esse arquivo não é uma imagem."));
-      img.onload = () => {
-        const lado = Math.min(img.width, img.height);
-        const canvas = document.createElement("canvas");
-        canvas.width = LADO;
-        canvas.height = LADO;
-
-        const ctx = canvas.getContext("2d");
-        if (!ctx) return reject(new Error("Não consegui processar a imagem."));
-
-        // Fundo branco: PNG com transparência vira preto em algumas impressoras.
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(0, 0, LADO, LADO);
-        ctx.drawImage(
-          img,
-          (img.width - lado) / 2,
-          (img.height - lado) / 2,
-          lado,
-          lado,
-          0,
-          0,
-          LADO,
-          LADO,
-        );
-
-        resolve(canvas.toDataURL("image/webp", 0.9));
-      };
-      img.src = leitor.result as string;
-    };
-    leitor.readAsDataURL(arquivo);
-  });
-}
 
 export function LogoField({
   tenant,
@@ -81,7 +37,7 @@ export function LogoField({
     setErro(null);
 
     try {
-      const dataUri = await prepararImagem(arquivo);
+      const dataUri = await prepararImagemQuadrada(arquivo, LADO, 0.9);
       setPreview(dataUri);
 
       startTransition(async () => {

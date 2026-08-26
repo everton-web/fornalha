@@ -9,7 +9,15 @@ import { sql } from "@/lib/db";
 export type ActionResult = { ok: true } | { ok: false; error: string };
 
 /** Tabelas que o painel pode editar — lista fechada, nunca vem do cliente livre. */
-const EDITABLE = ["categories", "sizes", "flavors", "crusts", "addons", "products"] as const;
+const EDITABLE = [
+  "categories",
+  "sizes",
+  "flavors",
+  "crusts",
+  "addons",
+  "products",
+  "price_groups",
+] as const;
 type Editable = (typeof EDITABLE)[number];
 
 function revalidateAll(slug: string) {
@@ -25,9 +33,17 @@ const flavorSchema = z.object({
   name: z.string().trim().min(2, "Informe o nome do sabor."),
   description: z.string().trim().max(300).optional().default(""),
   categoryId: uuid.nullable().optional(),
+  /** faixa de preço; null = o sabor tem preço próprio */
+  priceGroupId: uuid.nullable().optional(),
   isSweet: z.boolean().optional().default(false),
   isActive: z.boolean().optional().default(true),
-  /** { [size_id]: preço } — sem preço, o sabor não aparece naquele tamanho */
+  /**
+   * { [size_id]: preço } — exceções à faixa, não a tabela inteira.
+   *
+   * Com grupo, o que estiver aqui passa por cima do preço da faixa naquele
+   * tamanho; em branco, vale a faixa. Sem grupo, é o preço do sabor e ponto —
+   * sem preço, ele não aparece naquele tamanho.
+   */
   prices: z.record(uuid, priceSchema.nullable()),
 });
 
@@ -44,6 +60,17 @@ export async function saveFlavor(
 
   try {
     await sql.begin(async (tx) => {
+      // O id do grupo chega do navegador, e a chave estrangeira só garante que
+      // ele existe — não que é desta pizzaria. Sem esta conferência, um id de
+      // outra loja colaria o sabor na tabela de preços dela.
+      if (data.priceGroupId) {
+        const dono = await tx`
+          select 1 from price_groups
+          where id = ${data.priceGroupId} and tenant_id = ${tenantId}
+        `;
+        if (!dono[0]) throw new Error("grupo_invalido");
+      }
+
       let flavorId = data.id;
 
       if (flavorId) {
@@ -52,6 +79,7 @@ export async function saveFlavor(
             name = ${data.name},
             description = ${data.description || null},
             category_id = ${data.categoryId ?? null},
+            price_group_id = ${data.priceGroupId ?? null},
             is_sweet = ${data.isSweet},
             is_active = ${data.isActive}
           where id = ${flavorId} and tenant_id = ${tenantId}
@@ -60,10 +88,12 @@ export async function saveFlavor(
         if (!rows[0]) throw new Error("not_found");
       } else {
         const rows = await tx`
-          insert into flavors (tenant_id, name, description, category_id, is_sweet, is_active)
+          insert into flavors (tenant_id, name, description, category_id,
+                               price_group_id, is_sweet, is_active)
           values (
             ${tenantId}, ${data.name}, ${data.description || null},
-            ${data.categoryId ?? null}, ${data.isSweet}, ${data.isActive}
+            ${data.categoryId ?? null}, ${data.priceGroupId ?? null},
+            ${data.isSweet}, ${data.isActive}
           )
           returning id
         `;
@@ -89,6 +119,9 @@ export async function saveFlavor(
   } catch (error) {
     if ((error as Error).message === "not_found") {
       return { ok: false, error: "Sabor não encontrado." };
+    }
+    if ((error as Error).message === "grupo_invalido") {
+      return { ok: false, error: "A faixa de preço escolhida não existe." };
     }
     console.error("Falha ao salvar sabor", error);
     return { ok: false, error: "Não foi possível salvar o sabor." };
@@ -307,6 +340,152 @@ export async function deleteItem(table: Editable, id: string): Promise<ActionRes
     console.error("Falha ao excluir item", error);
     return { ok: false, error: "Não foi possível excluir." };
   }
+
+  revalidateAll(session.tenant.slug);
+  return { ok: true };
+}
+
+// ------------------------------------------------------- faixas de preço
+
+const groupSchema = z.object({
+  id: uuid.optional(),
+  name: z.string().trim().min(2, "Informe o nome da faixa."),
+  isActive: z.boolean().optional().default(true),
+  /** { [size_id]: preço } — sem preço, a faixa não cobre aquele tamanho */
+  prices: z.record(uuid, priceSchema.nullable()),
+});
+
+/**
+ * Cria ou atualiza uma faixa de preço.
+ *
+ * Mexer no preço daqui move todos os sabores da faixa de uma vez — que é o
+ * motivo de ela existir. Quem tem preço próprio no mesmo tamanho não se move:
+ * exceção continua exceção.
+ */
+export async function savePriceGroup(
+  input: z.input<typeof groupSchema>,
+): Promise<ActionResult> {
+  const session = await requireSession();
+  const parsed = groupSchema.safeParse(input);
+  if (!parsed.success) {
+    return { ok: false, error: parsed.error.issues[0]?.message ?? "Dados inválidos." };
+  }
+  const data = parsed.data;
+  const tenantId = session.tenant.id;
+
+  try {
+    await sql.begin(async (tx) => {
+      let groupId = data.id;
+
+      if (groupId) {
+        const rows = await tx`
+          update price_groups
+          set name = ${data.name}, is_active = ${data.isActive}
+          where id = ${groupId} and tenant_id = ${tenantId}
+          returning id
+        `;
+        if (!rows[0]) throw new Error("not_found");
+      } else {
+        const rows = await tx`
+          insert into price_groups (tenant_id, name, is_active)
+          values (${tenantId}, ${data.name}, ${data.isActive})
+          returning id
+        `;
+        groupId = rows[0].id as string;
+      }
+
+      for (const [sizeId, price] of Object.entries(data.prices)) {
+        if (price == null) {
+          await tx`
+            delete from price_group_prices
+            where group_id = ${groupId} and size_id = ${sizeId}
+          `;
+        } else {
+          await tx`
+            insert into price_group_prices (group_id, size_id, price)
+            values (${groupId}, ${sizeId}, ${price})
+            on conflict (group_id, size_id) do update set price = excluded.price
+          `;
+        }
+      }
+    });
+  } catch (error) {
+    if ((error as Error).message === "not_found") {
+      return { ok: false, error: "Faixa não encontrada." };
+    }
+    console.error("Falha ao salvar faixa de preço", error);
+    return { ok: false, error: "Não foi possível salvar a faixa." };
+  }
+
+  revalidateAll(session.tenant.slug);
+  return { ok: true };
+}
+
+// -------------------------------------------------------------- fotos
+
+/** Tipos que o navegador gera e a tela do cliente aguenta bem. */
+const TIPOS_FOTO = ["image/webp", "image/png", "image/jpeg"] as const;
+/** Depois do redimensionamento no navegador, 300 KB é folga larga. */
+const LIMITE_FOTO = 300 * 1024;
+
+const ALVOS = { sabor: "flavors", produto: "products" } as const;
+type AlvoFoto = keyof typeof ALVOS;
+
+/**
+ * Guarda a foto de um sabor ou produto.
+ *
+ * A imagem chega como data URI já reduzida pelo navegador. Validamos de novo
+ * aqui — tipo e tamanho — porque o navegador é do cliente e pode mentir sobre
+ * as duas coisas.
+ */
+export async function uploadFoto(
+  alvo: AlvoFoto,
+  id: string,
+  dataUri: string,
+): Promise<ActionResult> {
+  const session = await requireSession();
+  if (!(alvo in ALVOS)) return { ok: false, error: "Alvo inválido." };
+  if (!uuid.safeParse(id).success) return { ok: false, error: "Item inválido." };
+
+  const match = /^data:(image\/[a-z+]+);base64,([A-Za-z0-9+/=]+)$/.exec(dataUri);
+  if (!match) return { ok: false, error: "Arquivo de imagem inválido." };
+
+  const [, tipo, base64] = match;
+  if (!TIPOS_FOTO.includes(tipo as (typeof TIPOS_FOTO)[number])) {
+    return { ok: false, error: "Use uma imagem PNG, JPG ou WebP." };
+  }
+
+  // base64 ocupa ~4/3 do binário: comparamos o tamanho real.
+  const bytes = Math.floor((base64.length * 3) / 4);
+  if (bytes > LIMITE_FOTO) {
+    return { ok: false, error: "A imagem ficou grande demais. Tente uma menor." };
+  }
+
+  const rows = await sql`
+    update ${sql(ALVOS[alvo])}
+    set image_data = ${dataUri}, image_type = ${tipo}
+    where id = ${id} and tenant_id = ${session.tenant.id}
+    returning id
+  `;
+  if (!rows[0]) return { ok: false, error: "Item não encontrado." };
+
+  revalidateAll(session.tenant.slug);
+  return { ok: true };
+}
+
+export async function removeFoto(
+  alvo: AlvoFoto,
+  id: string,
+): Promise<ActionResult> {
+  const session = await requireSession();
+  if (!(alvo in ALVOS)) return { ok: false, error: "Alvo inválido." };
+  if (!uuid.safeParse(id).success) return { ok: false, error: "Item inválido." };
+
+  await sql`
+    update ${sql(ALVOS[alvo])}
+    set image_data = null, image_type = null
+    where id = ${id} and tenant_id = ${session.tenant.id}
+  `;
 
   revalidateAll(session.tenant.slug);
   return { ok: true };

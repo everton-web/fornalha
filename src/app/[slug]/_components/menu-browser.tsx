@@ -5,6 +5,7 @@ import { Plus } from "lucide-react";
 
 import { money } from "@/lib/format";
 import type { Flavor, Menu, Product } from "@/lib/types";
+import { fotoSrc } from "@/lib/utils";
 
 import { useCart } from "./cart-provider";
 import { PizzaBuilder } from "./pizza-builder";
@@ -141,11 +142,12 @@ function FlavorCard({
       onClick={onClick}
       className="flex w-full items-center gap-3 rounded-2xl border border-line bg-surface p-3 text-left transition hover:border-stone-300 active:scale-[0.995]"
     >
-      {flavor.image_url && (
+      {fotoSrc("sabor", flavor) && (
         // eslint-disable-next-line @next/next/no-img-element
         <img
-          src={flavor.image_url}
+          src={fotoSrc("sabor", flavor)!}
           alt={flavor.name}
+          loading="lazy"
           className="size-20 shrink-0 rounded-xl object-cover"
         />
       )}
@@ -182,11 +184,12 @@ function ProductCard({
 }) {
   return (
     <div className="flex items-center gap-3 rounded-2xl border border-line bg-surface p-3">
-      {product.image_url && (
+      {fotoSrc("produto", product) && (
         // eslint-disable-next-line @next/next/no-img-element
         <img
-          src={product.image_url}
+          src={fotoSrc("produto", product)!}
           alt={product.name}
+          loading="lazy"
           className="size-20 shrink-0 rounded-xl object-cover"
         />
       )}

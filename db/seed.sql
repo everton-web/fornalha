@@ -10,7 +10,9 @@ declare
   v_tenant uuid;
   v_p uuid; v_m uuid; v_g uuid;
   v_cat_salgada uuid; v_cat_doce uuid; v_cat_bebida uuid; v_cat_sobremesa uuid;
+  v_faixa_tradicional uuid; v_faixa_especial uuid; v_faixa_doce uuid;
   v_flavor uuid;
+  v_faixa uuid;
   r record;
 begin
   insert into tenants (
@@ -33,7 +35,10 @@ begin
       {"day":6,"open":"18:00","close":"00:30"}]'::jsonb,
     45, 8.00, 35.00,
     'contato@bellanapoli.com.br',
-    'max'
+    -- A demo usa a média para deixar visível o que acontece numa pizza de três
+    -- sabores. Cada pizzaria escolhe a sua em Configurações; 'max' (cobrar o
+    -- sabor mais caro) continua sendo o mais comum no Brasil.
+    'avg'
   ) returning id into v_tenant;
 
   -- categorias
@@ -54,41 +59,63 @@ begin
   insert into sizes (tenant_id, name, slices, max_flavors, sort_order) values
     (v_tenant, 'Grande', 8, 3, 3) returning id into v_g;
 
-  -- sabores salgados: nome, descrição, preço P/M/G
+  -- faixas de preço: é assim que uma pizzaria pensa o cardápio. O sabor entra
+  -- numa faixa e herda o preço dela; mexer aqui move todos de uma vez.
+  insert into price_groups (tenant_id, name, sort_order) values
+    (v_tenant, 'Tradicionais', 1) returning id into v_faixa_tradicional;
+  insert into price_groups (tenant_id, name, sort_order) values
+    (v_tenant, 'Especiais', 2) returning id into v_faixa_especial;
+  insert into price_groups (tenant_id, name, sort_order) values
+    (v_tenant, 'Doces', 3) returning id into v_faixa_doce;
+
+  insert into price_group_prices (group_id, size_id, price) values
+    (v_faixa_tradicional, v_p, 41.00), (v_faixa_tradicional, v_m, 55.00), (v_faixa_tradicional, v_g, 66.00),
+    (v_faixa_especial,    v_p, 46.00), (v_faixa_especial,    v_m, 61.00), (v_faixa_especial,    v_g, 74.00),
+    (v_faixa_doce,        v_p, 40.00), (v_faixa_doce,        v_m, 53.00), (v_faixa_doce,        v_g, 64.00);
+
+  -- sabores salgados. A última coluna é a exceção: quando tem preço próprio no
+  -- Grande, ele passa por cima da faixa — a trufada custa mais que as outras
+  -- especiais sem precisar de uma faixa só para ela.
   for r in
     select * from (values
-      ('Margherita',      'Molho de tomate italiano, muçarela de búfala, manjericão fresco', 39.0, 52.0, 64.0),
-      ('Calabresa',       'Calabresa artesanal fatiada, cebola roxa, azeitona preta',        41.0, 54.0, 66.0),
-      ('Portuguesa',      'Presunto, ovo, cebola, ervilha, azeitona e muçarela',             43.0, 57.0, 69.0),
-      ('Quatro Queijos',  'Muçarela, gorgonzola, parmesão e catupiry',                       46.0, 61.0, 74.0),
-      ('Frango c/ Catupiry','Frango desfiado temperado, catupiry original, milho',           44.0, 58.0, 71.0),
-      ('Pepperoni',       'Pepperoni importado, muçarela e orégano',                         47.0, 62.0, 76.0),
-      ('Bacon Supreme',   'Bacon crocante, cheddar, cebola caramelizada',                    46.0, 61.0, 74.0),
-      ('Vegetariana',     'Abobrinha, berinjela, pimentão, tomate seco e rúcula',            43.0, 57.0, 69.0),
-      ('Napolitana',      'Muçarela, tomate em rodelas, parmesão e alho crocante',           42.0, 55.0, 67.0),
-      ('Marguerita Trufada','Muçarela de búfala, tomate confit e azeite trufado',            54.0, 71.0, 86.0)
-    ) as x(nome, descricao, pp, pm, pg)
+      ('Margherita',        'Molho de tomate italiano, muçarela de búfala, manjericão fresco', 'tradicional', null::numeric),
+      ('Calabresa',         'Calabresa artesanal fatiada, cebola roxa, azeitona preta',        'tradicional', null),
+      ('Portuguesa',        'Presunto, ovo, cebola, ervilha, azeitona e muçarela',             'tradicional', null),
+      ('Napolitana',        'Muçarela, tomate em rodelas, parmesão e alho crocante',           'tradicional', null),
+      ('Vegetariana',       'Abobrinha, berinjela, pimentão, tomate seco e rúcula',            'tradicional', null),
+      ('Quatro Queijos',    'Muçarela, gorgonzola, parmesão e catupiry',                       'especial',    null),
+      ('Frango c/ Catupiry','Frango desfiado temperado, catupiry original, milho',             'especial',    null),
+      ('Pepperoni',         'Pepperoni importado, muçarela e orégano',                         'especial',    null),
+      ('Bacon Supreme',     'Bacon crocante, cheddar, cebola caramelizada',                    'especial',    null),
+      ('Marguerita Trufada','Muçarela de búfala, tomate confit e azeite trufado',              'especial',    86.00)
+    ) as x(nome, descricao, faixa, preco_g_proprio)
   loop
-    insert into flavors (tenant_id, category_id, name, description, sort_order)
-      values (v_tenant, v_cat_salgada, r.nome, r.descricao, 0)
+    v_faixa := case r.faixa
+                 when 'tradicional' then v_faixa_tradicional
+                 else v_faixa_especial
+               end;
+
+    insert into flavors (tenant_id, category_id, price_group_id, name, description, sort_order)
+      values (v_tenant, v_cat_salgada, v_faixa, r.nome, r.descricao, 0)
       returning id into v_flavor;
-    insert into flavor_prices (flavor_id, size_id, price) values
-      (v_flavor, v_p, r.pp), (v_flavor, v_m, r.pm), (v_flavor, v_g, r.pg);
+
+    if r.preco_g_proprio is not null then
+      insert into flavor_prices (flavor_id, size_id, price)
+        values (v_flavor, v_g, r.preco_g_proprio);
+    end if;
   end loop;
 
   -- sabores doces
   for r in
     select * from (values
-      ('Chocolate c/ Morango', 'Chocolate ao leite belga e morangos frescos', 42.0, 55.0, 67.0),
-      ('Banana c/ Canela',     'Banana caramelizada, canela e leite condensado', 38.0, 50.0, 61.0),
-      ('Prestígio',            'Chocolate meio amargo e coco fresco ralado',   40.0, 53.0, 64.0)
-    ) as x(nome, descricao, pp, pm, pg)
+      ('Chocolate c/ Morango', 'Chocolate ao leite belga e morangos frescos'),
+      ('Banana c/ Canela',     'Banana caramelizada, canela e leite condensado'),
+      ('Prestígio',            'Chocolate meio amargo e coco fresco ralado')
+    ) as x(nome, descricao)
   loop
-    insert into flavors (tenant_id, category_id, name, description, is_sweet, sort_order)
-      values (v_tenant, v_cat_doce, r.nome, r.descricao, true, 0)
+    insert into flavors (tenant_id, category_id, price_group_id, name, description, is_sweet, sort_order)
+      values (v_tenant, v_cat_doce, v_faixa_doce, r.nome, r.descricao, true, 0)
       returning id into v_flavor;
-    insert into flavor_prices (flavor_id, size_id, price) values
-      (v_flavor, v_p, r.pp), (v_flavor, v_m, r.pm), (v_flavor, v_g, r.pg);
   end loop;
 
   -- bordas

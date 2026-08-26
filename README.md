@@ -69,7 +69,32 @@ finalizar, o pedido falha em vez de gravar um valor inventado.
 
 Pizza de vários sabores segue a regra escolhida pela pizzaria em
 **Configurações → Preço da pizza com mais de um sabor**: cobrar o sabor mais
-caro (padrão no Brasil) ou a média.
+caro (padrão no Brasil) ou a média. Quantos sabores cabem é por tamanho, em
+**Cardápio → Tamanhos → até N sabores** — o teto do sistema é 4.
+
+### Faixas de preço
+
+Em vez de digitar o preço sabor por sabor, a pizzaria junta os sabores em
+faixas — Tradicionais, Especiais, Premium — e cada faixa guarda um preço por
+tamanho. Mexer na faixa move todos os sabores dela de uma vez.
+
+O preço próprio do sabor continua existindo e vale como **exceção**: onde ele
+existir, passa por cima da faixa naquele tamanho. É o que permite a camarão
+custar mais que as outras especiais sem virar uma faixa só para ela.
+
+A resolução acontece uma vez só, ao ler o cardápio
+([`menu.ts`](src/lib/menu.ts)) — `pricing.ts` continua lendo
+`flavor.prices[size]` sem saber que faixa existe. Cardápio antigo, sem faixa
+nenhuma, segue funcionando exatamente como antes.
+
+### Fotos
+
+Sabores e itens ganham foto em **Cardápio → o item → Foto**. O navegador corta
+no quadrado e reduz para 600px WebP antes de enviar (~50 KB cada), e a imagem
+fica no próprio banco — servida por `/api/foto/{sabor|produto}/{id}` com cache
+e ETag, nunca embutida no cardápio. Sessenta sabores ficam em torno de 3 MB, o
+que não justificou contratar um storage à parte; o custo é um backup mais
+pesado.
 
 ## Segurança
 
@@ -150,6 +175,14 @@ Verifica no banco as invariantes que quebram caladas: cobrança encontrada pela
 pizzaria certa, webhook repetido barrado, credencial que volta íntegra do
 `bytea`, pedido não pago fora da fila da cozinha. Roda tudo dentro de uma
 transação sempre desfeita — pode apontar para produção sem deixar rastro.
+
+```bash
+npm run testa-cardapio
+```
+
+O mesmo para a conta que o cliente paga: faixa herdada, exceção do sabor
+vencendo a faixa, média de três sabores, arredondamento a dois centavos e o
+sabor que sobrevive quando a faixa é apagada.
 
 ## Estrutura
 

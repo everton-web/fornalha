@@ -14,7 +14,8 @@
     "env:sync": "node scripts/sync-env.mjs",
     "trocar-senha": "node scripts/trocar-senha.mjs",
     "db:backup": "node scripts/backup.mjs",
-    "testa-pagamentos": "node scripts/testa-pagamentos.mjs"
+    "testa-pagamentos": "node scripts/testa-pagamentos.mjs",
+    "testa-cardapio": "node scripts/testa-cardapio.mjs"
   },
   "dependencies": {
     "clsx": "^2.1.1",

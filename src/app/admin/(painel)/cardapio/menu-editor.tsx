@@ -7,6 +7,7 @@ import { Check, Plus, Trash2 } from "lucide-react";
 import type {
   AdminFlavor,
   AdminMenu,
+  AdminPriceGroup,
   AdminProduct,
   AdminSimple,
   AdminSize,
@@ -16,16 +17,26 @@ import {
   deleteItem,
   saveCategory,
   saveFlavor,
+  savePriceGroup,
   saveProduct,
   saveSimpleItem,
   saveSize,
   setItemActive,
 } from "../../menu-actions";
+import { FotoField } from "./foto-field";
 
-type Tab = "sabores" | "tamanhos" | "bordas" | "adicionais" | "bebidas" | "categorias";
+type Tab =
+  | "sabores"
+  | "faixas"
+  | "tamanhos"
+  | "bordas"
+  | "adicionais"
+  | "bebidas"
+  | "categorias";
 
 const TABS: { id: Tab; label: string }[] = [
   { id: "sabores", label: "Sabores" },
+  { id: "faixas", label: "Faixas de preço" },
   { id: "tamanhos", label: "Tamanhos" },
   { id: "bordas", label: "Bordas" },
   { id: "adicionais", label: "Adicionais" },
@@ -56,6 +67,7 @@ export function MenuEditor({ menu }: { menu: AdminMenu }) {
       </div>
 
       {tab === "sabores" && <FlavorsSection menu={menu} />}
+      {tab === "faixas" && <PriceGroupsSection menu={menu} />}
       {tab === "tamanhos" && <SizesSection sizes={menu.sizes} />}
       {tab === "bordas" && <SimpleSection table="crusts" items={menu.crusts} label="borda" />}
       {tab === "adicionais" && (
@@ -95,8 +107,10 @@ function FlavorsSection({ menu }: { menu: AdminMenu }) {
             name: "",
             description: "",
             category_id: null,
+            price_group_id: menu.priceGroups[0]?.id ?? null,
             is_sweet: false,
             is_active: true,
+            has_image: false,
             prices: {},
           }}
           onDone={() => setCreating(false)}
@@ -122,6 +136,7 @@ function FlavorRow({
   const [name, setName] = useState(flavor.name);
   const [description, setDescription] = useState(flavor.description ?? "");
   const [categoryId, setCategoryId] = useState(flavor.category_id ?? "");
+  const [groupId, setGroupId] = useState(flavor.price_group_id ?? "");
   const [isSweet, setIsSweet] = useState(flavor.is_sweet);
   const [prices, setPrices] = useState<Record<string, string>>(() =>
     Object.fromEntries(
@@ -131,6 +146,8 @@ function FlavorRow({
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
+  const grupo = menu.priceGroups.find((g) => g.id === groupId) ?? null;
+
   function save() {
     setError(null);
     startTransition(async () => {
@@ -139,6 +156,7 @@ function FlavorRow({
         name,
         description,
         categoryId: categoryId || null,
+        priceGroupId: groupId || null,
         isSweet,
         isActive: flavor.is_active,
         prices: Object.fromEntries(
@@ -166,25 +184,27 @@ function FlavorRow({
         />
       </div>
 
-      <div className="mt-3 flex flex-wrap items-end gap-3">
-        {menu.sizes.map((size) => (
-          <label key={size.id} className="w-24">
-            <span className="mb-1 block text-xs font-medium text-stone-500">
-              {size.name}
-            </span>
-            <input
-              value={prices[size.id] ?? ""}
-              onChange={(e) =>
-                setPrices((prev) => ({ ...prev, [size.id]: e.target.value }))
-              }
-              inputMode="decimal"
-              placeholder="—"
-              className="w-full rounded-lg border border-line bg-background px-2.5 py-2 text-sm outline-none focus:border-stone-400"
-            />
-          </label>
-        ))}
+      <div className="mt-3 grid gap-3 sm:grid-cols-2">
+        <label>
+          <span className="mb-1 block text-xs font-medium text-stone-500">
+            Faixa de preço
+          </span>
+          <select
+            value={groupId}
+            onChange={(e) => setGroupId(e.target.value)}
+            className="w-full rounded-lg border border-line bg-background px-2.5 py-2 text-sm outline-none"
+          >
+            <option value="">Preço próprio (sem faixa)</option>
+            {menu.priceGroups.map((g) => (
+              <option key={g.id} value={g.id}>
+                {g.name}
+                {g.is_active ? "" : " (pausada)"}
+              </option>
+            ))}
+          </select>
+        </label>
 
-        <label className="min-w-40 flex-1">
+        <label>
           <span className="mb-1 block text-xs font-medium text-stone-500">
             Categoria
           </span>
@@ -201,6 +221,31 @@ function FlavorRow({
             ))}
           </select>
         </label>
+      </div>
+
+      <div className="mt-3 flex flex-wrap items-end gap-3">
+        {menu.sizes.map((size) => {
+          const daFaixa = grupo?.prices[size.id];
+          return (
+            <label key={size.id} className="w-24">
+              <span className="mb-1 block text-xs font-medium text-stone-500">
+                {size.name}
+              </span>
+              <input
+                value={prices[size.id] ?? ""}
+                onChange={(e) =>
+                  setPrices((prev) => ({ ...prev, [size.id]: e.target.value }))
+                }
+                inputMode="decimal"
+                // Com faixa, o campo em branco não é "sem preço": é o preço da
+                // faixa. Mostrá-lo como sugestão evita que alguém o redigite e
+                // crie sem querer uma exceção que nunca mais acompanha a tabela.
+                placeholder={daFaixa != null ? daFaixa.toFixed(2) : "—"}
+                className="w-full rounded-lg border border-line bg-background px-2.5 py-2 text-sm outline-none focus:border-stone-400"
+              />
+            </label>
+          );
+        })}
 
         <label className="flex items-center gap-2 pb-2 text-sm">
           <input
@@ -211,6 +256,25 @@ function FlavorRow({
           />
           Doce
         </label>
+      </div>
+
+      {grupo && (
+        <p className="mt-2 text-xs text-muted">
+          Em branco, vale o preço da faixa <strong>{grupo.name}</strong>.
+          Preencher um tamanho cria uma exceção só para este sabor.
+        </p>
+      )}
+
+      <div className="mt-3">
+        <span className="mb-1.5 block text-xs font-medium text-stone-500">
+          Foto
+        </span>
+        <FotoField
+          tipo="sabor"
+          id={flavor.id || null}
+          hasImage={flavor.has_image}
+          nome={name || "sabor"}
+        />
       </div>
 
       <RowFooter
@@ -228,6 +292,165 @@ function FlavorRow({
         onDelete={() =>
           startTransition(async () => {
             await deleteItem("flavors", flavor.id);
+            router.refresh();
+          })
+        }
+        onCancel={onDone}
+      />
+    </Row>
+  );
+}
+
+// ------------------------------------------------------------ faixas de preço
+
+function PriceGroupsSection({ menu }: { menu: AdminMenu }) {
+  const [creating, setCreating] = useState(false);
+
+  if (menu.sizes.length === 0) {
+    return (
+      <Empty>
+        Cadastre pelo menos um tamanho antes de criar faixas — a faixa guarda um
+        preço para cada tamanho.
+      </Empty>
+    );
+  }
+
+  const emUso = new Map<string, number>();
+  for (const f of menu.flavors) {
+    if (f.price_group_id) {
+      emUso.set(f.price_group_id, (emUso.get(f.price_group_id) ?? 0) + 1);
+    }
+  }
+
+  return (
+    <div className="space-y-3">
+      <p className="rounded-2xl border border-line bg-surface px-4 py-3 text-sm text-muted">
+        Em vez de digitar o preço sabor por sabor, junte os sabores em faixas —
+        Tradicionais, Especiais, Premium — e mexa no preço de todos de uma vez.
+        Um sabor sempre pode ter preço próprio como exceção.
+      </p>
+
+      {menu.priceGroups.map((grupo) => (
+        <PriceGroupRow
+          key={grupo.id}
+          grupo={grupo}
+          sizes={menu.sizes}
+          sabores={emUso.get(grupo.id) ?? 0}
+        />
+      ))}
+
+      {creating ? (
+        <PriceGroupRow
+          grupo={{ id: "", name: "", is_active: true, prices: {} }}
+          sizes={menu.sizes}
+          sabores={0}
+          onDone={() => setCreating(false)}
+        />
+      ) : (
+        <AddButton onClick={() => setCreating(true)}>Nova faixa</AddButton>
+      )}
+    </div>
+  );
+}
+
+function PriceGroupRow({
+  grupo,
+  sizes,
+  sabores,
+  onDone,
+}: {
+  grupo: AdminPriceGroup;
+  sizes: AdminSize[];
+  sabores: number;
+  onDone?: () => void;
+}) {
+  const router = useRouter();
+  const isNew = !grupo.id;
+  const [name, setName] = useState(grupo.name);
+  const [prices, setPrices] = useState<Record<string, string>>(() =>
+    Object.fromEntries(
+      sizes.map((s) => [s.id, grupo.prices[s.id]?.toString() ?? ""]),
+    ),
+  );
+  const [error, setError] = useState<string | null>(null);
+  const [pending, startTransition] = useTransition();
+
+  function save() {
+    setError(null);
+    startTransition(async () => {
+      const result = await savePriceGroup({
+        id: grupo.id || undefined,
+        name,
+        isActive: grupo.is_active,
+        prices: Object.fromEntries(
+          Object.entries(prices).map(([sizeId, value]) => [
+            sizeId,
+            value.trim() === "" ? null : Number(value.replace(",", ".")),
+          ]),
+        ),
+      });
+      if (!result.ok) return setError(result.error);
+      onDone?.();
+      router.refresh();
+    });
+  }
+
+  return (
+    <Row inactive={!grupo.is_active && !isNew}>
+      <div className="flex flex-wrap items-end gap-3">
+        <label className="min-w-40 flex-1">
+          <span className="mb-1 block text-xs font-medium text-stone-500">
+            Nome da faixa
+          </span>
+          <input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Especiais"
+            className="w-full rounded-lg border border-line bg-background px-2.5 py-2 text-sm outline-none focus:border-stone-400"
+          />
+        </label>
+
+        {sizes.map((size) => (
+          <label key={size.id} className="w-24">
+            <span className="mb-1 block text-xs font-medium text-stone-500">
+              {size.name}
+            </span>
+            <input
+              value={prices[size.id] ?? ""}
+              onChange={(e) =>
+                setPrices((prev) => ({ ...prev, [size.id]: e.target.value }))
+              }
+              inputMode="decimal"
+              placeholder="—"
+              className="w-full rounded-lg border border-line bg-background px-2.5 py-2 text-sm outline-none focus:border-stone-400"
+            />
+          </label>
+        ))}
+      </div>
+
+      {!isNew && (
+        <p className="mt-2 text-xs text-muted">
+          {sabores === 0
+            ? "Nenhum sabor nesta faixa ainda."
+            : `${sabores} sabor${sabores > 1 ? "es" : ""} nesta faixa — mudar o preço aqui muda o de todos.`}
+        </p>
+      )}
+
+      <RowFooter
+        error={error}
+        pending={pending}
+        onSave={save}
+        isNew={isNew}
+        isActive={grupo.is_active}
+        onToggleActive={() =>
+          startTransition(async () => {
+            await setItemActive("price_groups", grupo.id, !grupo.is_active);
+            router.refresh();
+          })
+        }
+        onDelete={() =>
+          startTransition(async () => {
+            await deleteItem("price_groups", grupo.id);
             router.refresh();
           })
         }
@@ -448,6 +671,7 @@ function ProductsSection({ menu }: { menu: AdminMenu }) {
             price: 0,
             category_id: null,
             is_active: true,
+            has_image: false,
           }}
           onDone={() => setCreating(false)}
         />
@@ -529,6 +753,18 @@ function ProductRow({
             ))}
           </select>
         </label>
+      </div>
+
+      <div className="mt-3">
+        <span className="mb-1.5 block text-xs font-medium text-stone-500">
+          Foto
+        </span>
+        <FotoField
+          tipo="produto"
+          id={product.id || null}
+          hasImage={product.has_image}
+          nome={name || "item"}
+        />
       </div>
 
       <RowFooter

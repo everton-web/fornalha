@@ -83,10 +83,19 @@ export type Flavor = {
   category_id: string | null;
   name: string;
   description: string | null;
+  /** imagem apontada para fora; a enviada pelo painel sai por /api/foto */
   image_url: string | null;
+  /** true quando existe foto enviada pelo painel */
+  has_image: boolean;
+  price_group_id: string | null;
   is_sweet: boolean;
   sort_order: number;
-  /** preço por tamanho: { [size_id]: price } */
+  /**
+   * Preço final por tamanho: { [size_id]: price }.
+   *
+   * Já resolvido em `menu.ts` — o grupo dá a base e o preço próprio do sabor
+   * passa por cima. Quem lê daqui não precisa saber que grupo existe.
+   */
   prices: Record<string, number>;
 };
 
@@ -100,8 +109,18 @@ export type Product = {
   name: string;
   description: string | null;
   image_url: string | null;
+  has_image: boolean;
   price: number;
   sort_order: number;
+};
+
+/** Faixa de preço a que um sabor pertence: "Tradicionais", "Especiais"… */
+export type PriceGroup = {
+  id: string;
+  name: string;
+  sort_order: number;
+  /** preço por tamanho: { [size_id]: price } */
+  prices: Record<string, number>;
 };
 
 /** Tudo que a vitrine da pizzaria precisa, em uma viagem só ao banco. */

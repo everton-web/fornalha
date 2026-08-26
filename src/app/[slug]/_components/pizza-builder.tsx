@@ -6,6 +6,7 @@ import { Check, Minus, Plus, X } from "lucide-react";
 import { money } from "@/lib/format";
 import { pizzaBasePrice } from "@/lib/pricing";
 import type { Flavor, Menu } from "@/lib/types";
+import { fotoSrc } from "@/lib/utils";
 
 import { useCart } from "./cart-provider";
 
@@ -201,6 +202,15 @@ export function PizzaBuilder({
                       >
                         {selected && <Check className="size-3.5" strokeWidth={3} />}
                       </span>
+                      {fotoSrc("sabor", f) && (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={fotoSrc("sabor", f)!}
+                          alt=""
+                          loading="lazy"
+                          className="size-12 shrink-0 rounded-lg object-cover"
+                        />
+                      )}
                       <span className="min-w-0 flex-1">
                         <span className="block text-sm font-medium">{f.name}</span>
                         {f.description && (
