@@ -11,6 +11,7 @@ import {
   verifyCredentials,
 } from "@/lib/auth";
 import { sql } from "@/lib/db";
+import { checkRate, clientIp, minutosEmTexto } from "@/lib/rate-limit";
 import { nextStatuses } from "@/lib/status";
 import type { OrderStatus } from "@/lib/types";
 
@@ -32,6 +33,20 @@ export async function signIn(
   });
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Dados inválidos." };
+  }
+
+  // Dois freios: por aparelho, contra quem varre senhas; por e-mail, contra
+  // quem ataca uma conta específica de vários lugares.
+  const ip = await clientIp();
+  const alvo = parsed.data.email.toLowerCase();
+
+  for (const chave of [`login:ip:${ip}`, `login:conta:${alvo}`]) {
+    const freio = await checkRate(chave, 10, 900);
+    if (!freio.ok) {
+      return {
+        error: `Muitas tentativas. Tente de novo em ${minutosEmTexto(freio.retryAfterSeconds)}.`,
+      };
+    }
   }
 
   const userId = await verifyCredentials(parsed.data.email, parsed.data.password);

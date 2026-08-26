@@ -14,6 +14,7 @@ import { sendEmail } from "@/lib/email/send";
 import { passwordChangedEmail, resetPasswordEmail } from "@/lib/email/messages";
 import { formatDateTime } from "@/lib/format";
 import { hashPassword } from "@/lib/password";
+import { checkRate, clientIp, minutosEmTexto } from "@/lib/rate-limit";
 
 export type FormState = { error?: string; sent?: boolean } | null;
 
@@ -33,6 +34,18 @@ export async function requestPasswordReset(
   if (!parsed.success) return { error: "Informe um e-mail válido." };
 
   const email = parsed.data.toLowerCase();
+
+  // Sem isto, o formulário vira uma máquina de encher a caixa de entrada
+  // de qualquer pessoa cadastrada.
+  for (const chave of [`reset:ip:${await clientIp()}`, `reset:conta:${email}`]) {
+    const freio = await checkRate(chave, 4, 3600);
+    if (!freio.ok) {
+      return {
+        error: `Muitos pedidos de link. Tente de novo em ${minutosEmTexto(freio.retryAfterSeconds)}.`,
+      };
+    }
+  }
+
   const rows = await sql`select id from users where email = ${email}`;
   const user = rows[0];
 

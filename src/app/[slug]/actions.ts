@@ -12,6 +12,7 @@ import { isOpenNow } from "@/lib/hours";
 import { getMenu } from "@/lib/menu";
 import { PricingError, summarize } from "@/lib/pricing";
 import { notifyTenant } from "@/lib/push";
+import { checkRate, clientIp, minutosEmTexto } from "@/lib/rate-limit";
 import type { PaymentMethod } from "@/lib/types";
 import { generateOrderCode } from "@/lib/utils";
 
@@ -60,6 +61,8 @@ const checkoutSchema = z.object({
   ]),
   changeFor: z.number().nonnegative().nullable().optional(),
   notes: z.string().trim().max(300).optional().default(""),
+  /** Campo invisível na tela: se veio preenchido, quem preencheu foi um robô. */
+  website: z.string().max(200).optional().default(""),
 });
 
 export type CheckoutInput = z.input<typeof checkoutSchema>;
@@ -87,6 +90,11 @@ export async function lookupAddress(
   slug: string,
   cep: string,
 ): Promise<AddressLookup> {
+  const freio = await checkRate(`cep:${await clientIp()}`, 40, 300);
+  if (!freio.ok) {
+    return { ok: false, error: "Muitas consultas seguidas. Aguarde um instante." };
+  }
+
   const menu = await getMenu(slug);
   if (!menu) return { ok: false, error: "Pizzaria indisponível." };
 
@@ -123,6 +131,22 @@ export async function createOrder(raw: CheckoutInput): Promise<CheckoutResult> {
     return { ok: false, error: parsed.error.issues[0]?.message ?? "Dados inválidos." };
   }
   const input = parsed.data;
+
+  // Armadilha para robô: humano nunca vê nem preenche este campo. Respondemos
+  // como se tivesse dado certo, para não ensinar o robô a contornar.
+  if (input.website.trim() !== "") {
+    console.warn("Pedido descartado pela armadilha de robô", await clientIp());
+    return { ok: true, code: "OK", token: "00000000-0000-0000-0000-000000000000" };
+  }
+
+  const ip = await clientIp();
+  const freio = await checkRate(`checkout:${ip}`, 8, 600);
+  if (!freio.ok) {
+    return {
+      ok: false,
+      error: `Muitos pedidos seguidos deste aparelho. Tente de novo em ${minutosEmTexto(freio.retryAfterSeconds)}.`,
+    };
+  }
 
   const menu = await getMenu(input.slug);
   if (!menu) return { ok: false, error: "Pizzaria indisponível." };

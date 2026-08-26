@@ -68,6 +68,7 @@ export function CheckoutForm({
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | null>(null);
   const [changeFor, setChangeFor] = useState("");
   const [notes, setNotes] = useState("");
+  const [armadilha, setArmadilha] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
@@ -192,6 +193,7 @@ export function CheckoutForm({
             ? Number(changeFor.replace(",", "."))
             : null,
         notes,
+        website: armadilha,
       });
 
       if (!result.ok) {
@@ -453,6 +455,28 @@ export function CheckoutForm({
           </p>
         )}
       </Card>
+
+      {/* Invisível e fora da ordem de tabulação: só robô preenche. */}
+      <input
+        type="text"
+        name="website"
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden="true"
+        value={armadilha}
+        onChange={(e) => setArmadilha(e.target.value)}
+        style={{
+          position: "absolute",
+          width: 1,
+          height: 1,
+          padding: 0,
+          margin: -1,
+          overflow: "hidden",
+          clip: "rect(0 0 0 0)",
+          whiteSpace: "nowrap",
+          border: 0,
+        }}
+      />
 
       <Card title="Observações do pedido">
         <textarea
