@@ -311,9 +311,11 @@ export default function Home() {
             do bairro dele. Longe não sai pelo preço de perto.
           </Texto>
           <div className="mt-auto space-y-1.5 pt-4 text-xs">
+            {/* Os mesmos bairros e taxas da pizzaria de demonstração: quem
+                clica em "Ver cardápio" logo depois encontra exatamente isto. */}
             {[
-              ["Vila Madalena", "R$ 6"],
-              ["Pinheiros", "R$ 9"],
+              ["Rio Vermelho", "R$ 6"],
+              ["Pituba", "R$ 12"],
             ].map(([bairro, taxa]) => (
               <div
                 key={bairro}

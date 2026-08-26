@@ -17,6 +17,7 @@ declare
 begin
   insert into tenants (
     slug, name, tagline, primary_color, phone, whatsapp, address,
+    zip, timezone,
     opening_hours, prep_time_min, delivery_fee, min_order_value,
     pix_key, half_pricing
   ) values (
@@ -24,9 +25,13 @@ begin
     'Bella Napoli',
     'Massa de fermentação natural, forno a lenha',
     '#c81e1e',
-    '(11) 3456-7890',
-    '5511987654321',
-    'Rua das Oliveiras, 128 — Vila Madalena, São Paulo/SP',
+    '(71) 3345-6789',
+    '5571987654321',
+    'Rua da Fonte do Boi, 42 — Rio Vermelho, Salvador/BA',
+    -- CEP de verdade do Rio Vermelho: a demo é apresentada em Salvador, e
+    -- endereço de outra cidade tira a régua de comparação de quem assiste.
+    '41940360',
+    'America/Bahia',
     '[{"day":0,"open":"18:00","close":"23:00"},
       {"day":2,"open":"18:00","close":"23:30"},
       {"day":3,"open":"18:00","close":"23:30"},
@@ -132,12 +137,18 @@ begin
     (v_tenant, 'Azeite trufado',   6.00, 3),
     (v_tenant, 'Parmesão ralado',  5.00, 4);
 
-  -- área de entrega por bairro (a taxa sobe conforme se afasta da loja)
+  -- Área de entrega por bairro, saindo do Rio Vermelho para fora: a taxa
+  -- sobe conforme se afasta da loja. Os nomes são exatamente os que a
+  -- BrasilAPI devolve para o CEP — o casamento é por `lower(district)`, e
+  -- "Federacao" sem cedilha não bateria com "Federação".
   insert into delivery_zones (tenant_id, district, city, fee) values
-    (v_tenant, 'Vila Madalena', 'São Paulo', 6.00),
-    (v_tenant, 'Pinheiros',     'São Paulo', 9.00),
-    (v_tenant, 'Sumarezinho',   'São Paulo', 12.00),
-    (v_tenant, 'Perdizes',      'São Paulo', 12.00);
+    (v_tenant, 'Rio Vermelho', 'Salvador',  6.00),
+    (v_tenant, 'Ondina',       'Salvador',  8.00),
+    (v_tenant, 'Federação',    'Salvador',  9.00),
+    (v_tenant, 'Amaralina',    'Salvador',  9.00),
+    (v_tenant, 'Graça',        'Salvador', 11.00),
+    (v_tenant, 'Pituba',       'Salvador', 12.00),
+    (v_tenant, 'Itaigara',     'Salvador', 14.00);
 
   -- bebidas e sobremesas
   insert into products (tenant_id, category_id, kind, name, description, price, sort_order) values
