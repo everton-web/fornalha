@@ -4,6 +4,7 @@ import { listOrders } from "@/lib/orders";
 import type { OrderStatus } from "@/lib/types";
 
 import { OrderCard } from "./order-card";
+import { PushToggle } from "../_components/push-toggle";
 import { OrdersLive } from "./orders-live";
 
 const ACTIVE: OrderStatus[] = [
@@ -40,6 +41,10 @@ export default async function PedidosPage({
   return (
     <>
       <OrdersLive activeCount={showHistory ? ativos : orders.length} />
+
+      <div className="mb-4">
+        <PushToggle vapidKey={process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? ""} />
+      </div>
 
       <div className="mb-5 flex flex-wrap items-center gap-3">
         <h1 className="text-xl font-bold tracking-tight">

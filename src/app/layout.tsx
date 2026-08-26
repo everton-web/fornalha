@@ -12,7 +12,11 @@ export const metadata: Metadata = {
   title: "Fornalha — sistema de pedidos para pizzarias",
   description:
     "Cardápio digital, pedidos online e painel de cozinha para pizzarias.",
+  manifest: "/manifest.json",
+  appleWebApp: { capable: true, title: "Fornalha", statusBarStyle: "default" },
 };
+
+export const viewport = { themeColor: "#c81e1e" };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (

@@ -55,13 +55,19 @@ for (const ambiente of AMBIENTES) {
     // não existia ainda — seguir em frente
   }
 
+  // A Vercel recusa marcar como secreta uma variável NEXT_PUBLIC_, e com razão:
+  // ela vai parar no navegador de qualquer forma.
+  const publica = chave.startsWith("NEXT_PUBLIC_");
+  const argumentos = ["env", "add", chave, ambiente];
+  if (publica) argumentos.push("--no-sensitive");
+
   try {
-    execFileSync("vercel", ["env", "add", chave, ambiente], {
+    execFileSync("vercel", argumentos, {
       input: valor,
       stdio: ["pipe", "ignore", "ignore"],
       shell: true,
     });
-    console.log(`  ✓ ${ambiente}`);
+    console.log(`  ✓ ${ambiente}${publica ? " (visível, como manda o prefixo)" : ""}`);
   } catch {
     die(`Falhou ao gravar em ${ambiente}. Rode 'vercel link' e tente de novo.`);
   }

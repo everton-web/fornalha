@@ -1,5 +1,7 @@
 "use server";
 
+import { after } from "next/server";
+
 import { z } from "zod";
 
 import { lookupCep } from "@/lib/cep";
@@ -9,6 +11,7 @@ import { formatPhone, onlyDigits } from "@/lib/format";
 import { isOpenNow } from "@/lib/hours";
 import { getMenu } from "@/lib/menu";
 import { PricingError, summarize } from "@/lib/pricing";
+import { notifyTenant } from "@/lib/push";
 import type { PaymentMethod } from "@/lib/types";
 import { generateOrderCode } from "@/lib/utils";
 
@@ -226,6 +229,16 @@ export async function createOrder(raw: CheckoutInput): Promise<CheckoutResult> {
         `;
 
         return order;
+      });
+
+      // after() roda depois da resposta: o cliente não espera o push sair.
+      after(async () => {
+        await notifyTenant(tenant.id, {
+          title: `Pedido novo #${result.code}`,
+          body: `${input.name} · ${summary.items.length} item(ns) · R$ ${summary.total.toFixed(2).replace(".", ",")}`,
+          url: "/admin/pedidos",
+          tag: `pedido-${result.code}`,
+        });
       });
 
       return {
