@@ -16,12 +16,20 @@ export async function GET() {
   const session = await getSession();
   if (!session) return new Response("Não autenticado", { status: 401 });
 
+  // Pedido online ainda não pago fica de fora da contagem: ele já existe no
+  // banco, mas não é trabalho para a cozinha. Contá-lo faria o alerta de
+  // "pedido novo" tocar no momento em que o cliente ainda está olhando o QR.
   const rows = await sql`
     select
       count(*)::int as ativos,
       max(created_at) as mais_recente
     from orders
-    where tenant_id = ${session.tenant.id} and status::text = any(${ATIVOS})
+    where tenant_id = ${session.tenant.id}
+      and status::text = any(${ATIVOS})
+      and not (
+        payment_method in ('pix_online', 'card_online')
+        and payment_status = 'pending'
+      )
   `;
 
   return Response.json(

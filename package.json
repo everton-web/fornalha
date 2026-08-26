@@ -13,7 +13,8 @@
     "db:seed": "node scripts/migrate.mjs --seed",
     "env:sync": "node scripts/sync-env.mjs",
     "trocar-senha": "node scripts/trocar-senha.mjs",
-    "db:backup": "node scripts/backup.mjs"
+    "db:backup": "node scripts/backup.mjs",
+    "testa-pagamentos": "node scripts/testa-pagamentos.mjs"
   },
   "dependencies": {
     "clsx": "^2.1.1",

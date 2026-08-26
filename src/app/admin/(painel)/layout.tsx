@@ -51,6 +51,7 @@ export default async function PainelLayout({ children }: LayoutProps<"/admin">) 
         <nav className="mx-auto flex max-w-6xl gap-1 px-2">
           <NavLink href="/admin/pedidos">Pedidos</NavLink>
           <NavLink href="/admin/cardapio">Cardápio</NavLink>
+          <NavLink href="/admin/pagamentos">Pagamentos</NavLink>
           <NavLink href="/admin/configuracoes">Configurações</NavLink>
         </nav>
       </header>

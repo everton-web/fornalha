@@ -143,6 +143,24 @@ export function OrderCard({
         <span className="font-bold">{money(order.total)}</span>
       </div>
 
+      {/*
+        Pagamento online tem um estado que os outros não têm: cobrado e ainda
+        não pago. Sem este aviso a cozinha assaria um pedido que ninguém pagou —
+        e no dinheiro e na maquininha isso não acontece, porque quem cobra é o
+        entregador.
+      */}
+      {(order.payment_method === "pix_online" ||
+        order.payment_method === "card_online") &&
+        (order.payment_status === "paid" ? (
+          <p className="mt-2 rounded-lg bg-emerald-50 px-2.5 py-1.5 text-xs font-semibold text-emerald-700">
+            Pago — pode preparar
+          </p>
+        ) : (
+          <p className="mt-2 rounded-lg bg-amber-100 px-2.5 py-1.5 text-xs font-bold text-amber-900">
+            Aguardando pagamento — não prepare ainda
+          </p>
+        ))}
+
       {error && <p className="mt-2 text-xs text-red-600">{error}</p>}
 
       {askCancel ? (

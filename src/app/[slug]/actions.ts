@@ -4,12 +4,16 @@ import { after } from "next/server";
 
 import { z } from "zod";
 
+import { baseUrl } from "@/lib/auth-tokens";
 import { lookupCep } from "@/lib/cep";
 import { sql } from "@/lib/db";
 import { feeForDistrict } from "@/lib/delivery";
 import { formatPhone, onlyDigits } from "@/lib/format";
 import { isOpenNow } from "@/lib/hours";
 import { getMenu } from "@/lib/menu";
+import { availableKinds } from "@/lib/payments/accounts";
+import { createChargeForOrder } from "@/lib/payments/charges";
+import { PaymentError } from "@/lib/payments/types";
 import { PricingError, summarize } from "@/lib/pricing";
 import { notifyTenant } from "@/lib/push";
 import { checkRate, clientIp, minutosEmTexto } from "@/lib/rate-limit";
@@ -164,7 +168,7 @@ export async function createOrder(raw: CheckoutInput): Promise<CheckoutResult> {
   if (input.deliveryType === "delivery" && (!input.street || !input.number)) {
     return { ok: false, error: "Informe o endereço de entrega." };
   }
-  if (!isPaymentAllowed(input.paymentMethod, tenant)) {
+  if (!(await isPaymentAllowed(input.paymentMethod, tenant))) {
     return { ok: false, error: "Forma de pagamento indisponível." };
   }
 
@@ -255,15 +259,66 @@ export async function createOrder(raw: CheckoutInput): Promise<CheckoutResult> {
         return order;
       });
 
-      // after() roda depois da resposta: o cliente não espera o push sair.
-      after(async () => {
-        await notifyTenant(tenant.id, {
-          title: `Pedido novo #${result.code}`,
-          body: `${input.name} · ${summary.items.length} item(ns) · R$ ${summary.total.toFixed(2).replace(".", ",")}`,
-          url: "/admin/pedidos",
-          tag: `pedido-${result.code}`,
+      const online =
+        input.paymentMethod === "pix_online" ||
+        input.paymentMethod === "card_online";
+
+      if (online) {
+        // A cobrança é criada agora, com o pedido já gravado: o Pix precisa
+        // apontar para um pedido que existe, e a tela de acompanhamento é
+        // quem mostra o código.
+        try {
+          await createChargeForOrder({
+            orderId: result.id as string,
+            tenantId: tenant.id,
+            orderCode: result.code as string,
+            amount: summary.total,
+            kind: input.paymentMethod === "pix_online" ? "pix" : "card",
+            customer: {
+              name: input.name,
+              phone: formatPhone(input.phone),
+              email: null,
+            },
+            baseUrl: await baseUrl(),
+            publicToken: result.public_token as string,
+            slug: input.slug,
+          });
+        } catch (error) {
+          // Sem cobrança não há pedido: deixá-lo de pé viraria um pedido que a
+          // cozinha vê e ninguém vai pagar. Cancelar aqui devolve o cliente ao
+          // checkout para escolher outra forma.
+          await sql`
+            update orders
+            set status = 'cancelled',
+                cancel_reason = 'Falha ao gerar a cobrança online',
+                updated_at = now()
+            where id = ${result.id}
+          `;
+          console.error("Falha ao gerar cobrança", error);
+
+          return {
+            ok: false,
+            error:
+              error instanceof PaymentError
+                ? error.message
+                : "Não foi possível gerar a cobrança. Escolha outra forma de pagamento.",
+          };
+        }
+
+        // Nenhum aviso à pizzaria por enquanto: quem chama a cozinha é o
+        // pagamento confirmado, não o pedido criado. O push sai de
+        // settleCharge, quando o dinheiro entra de verdade.
+      } else {
+        // after() roda depois da resposta: o cliente não espera o push sair.
+        after(async () => {
+          await notifyTenant(tenant.id, {
+            title: `Pedido novo #${result.code}`,
+            body: `${input.name} · ${summary.items.length} item(ns) · R$ ${summary.total.toFixed(2).replace(".", ",")}`,
+            url: "/admin/pedidos",
+            tag: `pedido-${result.code}`,
+          });
         });
-      });
+      }
 
       return {
         ok: true,
@@ -284,15 +339,24 @@ export async function createOrder(raw: CheckoutInput): Promise<CheckoutResult> {
   return { ok: false, error: "Não foi possível gerar o código do pedido." };
 }
 
-function isPaymentAllowed(
+/**
+ * A forma escolhida está mesmo disponível?
+ *
+ * Para as formas online não basta a chave geral estar ligada: precisa existir
+ * gateway conectado que aceite aquela forma. Sem esta conferência, o cliente
+ * escolheria Pix online numa pizzaria que desconectou o gateway e só
+ * descobriria o problema depois do pedido gravado.
+ */
+async function isPaymentAllowed(
   method: PaymentMethod,
   tenant: {
+    id: string;
     accepts_cash: boolean;
     accepts_card_delivery: boolean;
     accepts_pix_manual: boolean;
     online_payment_enabled: boolean;
   },
-): boolean {
+): Promise<boolean> {
   switch (method) {
     case "cash":
       return tenant.accepts_cash;
@@ -301,7 +365,10 @@ function isPaymentAllowed(
     case "pix_manual":
       return tenant.accepts_pix_manual;
     case "pix_online":
+      if (!tenant.online_payment_enabled) return false;
+      return (await availableKinds(tenant.id)).includes("pix");
     case "card_online":
-      return tenant.online_payment_enabled;
+      if (!tenant.online_payment_enabled) return false;
+      return (await availableKinds(tenant.id)).includes("card");
   }
 }

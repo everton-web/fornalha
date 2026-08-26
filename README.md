@@ -83,12 +83,73 @@ caro (padrão no Brasil) ou a média.
 
 ## Formas de pagamento
 
-Funcionando: dinheiro, cartão na entrega e Pix na chave (com comprovante pelo
+Na entrega: dinheiro, cartão na maquininha e Pix na chave (com comprovante pelo
 WhatsApp). O pedido cai no painel na hora.
 
-Pagamento online (Pix e cartão com confirmação automática) está modelado no
-banco — `online_payment_enabled`, `payment_provider`, `provider_payment_id` —
-e falta plugar o gateway (Mercado Pago é o caminho natural no Brasil).
+Online: Pix e cartão com confirmação automática, em **Painel → Pagamentos**.
+Cada pizzaria conecta o próprio gateway e o dinheiro cai direto na conta dela —
+nada passa pela agência.
+
+### Gateways
+
+Pronto: **Mercado Pago**. A camada aceita qualquer outro; o que falta em cada
+um é só o arquivo do adaptador.
+
+```
+src/lib/payments/
+  types.ts               o contrato que todo gateway implementa
+  registry.ts            quais estão ligados no sistema
+  accounts.ts            onde cada pizzaria recebe (credencial cifrada)
+  charges.ts             criar cobrança, confirmar, reconciliar
+  providers/
+    mercadopago.ts       ← um arquivo por gateway
+```
+
+Para acrescentar Asaas, Pagar.me (Stone), InfinitePay, PicPay ou Stripe: escreva
+`providers/<nome>.ts` implementando `PaymentProvider` e some uma linha em
+`registry.ts`. Checkout, painel, banco e tela de acompanhamento não mudam.
+
+**Nubank não entra nessa lista** e não precisa: o Nubank não vende API de
+checkout para lojista. "Pagar pelo Nubank" é pagar por Pix, e Pix é padrão do
+Banco Central — a cobrança Pix gerada em qualquer gateway daqui é paga de
+qualquer banco, sem integração nenhuma.
+
+### Duas regras que valem para todos
+
+1. **O webhook nunca decide nada.** Ele diz qual cobrança olhar; o desfecho sai
+   sempre de uma consulta ao gateway. Endereço de webhook vaza, e um POST
+   forjado não pode liberar pizza. O tipo `WebhookRead` nem tem campo de status,
+   para que nenhum adaptador consiga devolver um por engano.
+2. **O valor é conferido.** Um pedido de R$ 90 pago com R$ 0,01 não vira pago,
+   por mais que o gateway responda "approved".
+
+Webhook perdido não trava pedido: a própria tela do cliente, aberta no QR, puxa
+a reconciliação (`/api/pagamentos/conferir`), e `reconcilePending()` varre o que
+sobrou.
+
+### Chave de criptografia
+
+As credenciais dos gateways ficam cifradas (AES-256-GCM) na coluna
+`tenant_payment_accounts.credentials`. A chave mora no ambiente, nunca no banco:
+
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
+# → PAYMENTS_ENCRYPTION_KEY
+```
+
+Trocar a chave torna ilegível o que já foi salvo, e cada pizzaria precisaria
+reconectar seu gateway. Guarde-a junto com a `DATABASE_URL`.
+
+### Conferir as regras
+
+```bash
+npm run testa-pagamentos
+```
+
+Verifica no banco as invariantes que quebram caladas: cobrança encontrada pela
+pizzaria certa, webhook repetido barrado, credencial que volta íntegra do
+`bytea`, pedido não pago fora da fila da cozinha. Roda tudo dentro de uma
+transação sempre desfeita — pode apontar para produção sem deixar rastro.
 
 ## Estrutura
 
@@ -106,6 +167,8 @@ src/
     hours.ts           está aberto agora?
     auth.ts            sessão, login e tenant do usuário
     password.ts        hash de senha (scrypt)
+    crypto.ts          cifra das credenciais de gateway (AES-256-GCM)
+    payments/          pagamento online, um adaptador por gateway
 db/
   migrations/          schema
   seed.sql             pizzaria de demonstração

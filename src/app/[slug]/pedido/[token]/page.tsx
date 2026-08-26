@@ -5,10 +5,12 @@ import { Check, MessageCircle } from "lucide-react";
 import { formatTime, money } from "@/lib/format";
 import { getTenantBySlug } from "@/lib/menu";
 import { getOrderByToken } from "@/lib/orders";
+import { latestChargeForOrder } from "@/lib/payments/charges";
 import { PAYMENT_LABEL, STATUS_HINT, STATUS_LABEL, timelineFor } from "@/lib/status";
 import { mapsUrl } from "@/lib/utils";
 
 import { AutoRefresh } from "./auto-refresh";
+import { PagamentoPendente } from "./pagamento";
 
 export const metadata = { title: "Acompanhar pedido" };
 
@@ -26,6 +28,16 @@ export default async function OrderPage({
   const steps = timelineFor(order.delivery_type);
   const currentIndex = steps.indexOf(order.status);
   const cancelled = order.status === "cancelled";
+
+  // O painel de pagamento só existe enquanto há o que pagar: forma online,
+  // ainda pendente e pedido de pé.
+  const online =
+    order.payment_method === "pix_online" ||
+    order.payment_method === "card_online";
+  const cobranca =
+    online && order.payment_status === "pending" && !cancelled
+      ? await latestChargeForOrder(order.id)
+      : null;
 
   const whatsappUrl = tenant.whatsapp
     ? `https://wa.me/${tenant.whatsapp}?text=${encodeURIComponent(
@@ -45,9 +57,17 @@ export default async function OrderPage({
           <Check className="size-7" strokeWidth={3} />
         </span>
         <h1 className="mt-4 text-xl font-bold">
-          {cancelled ? "Pedido cancelado" : "Pedido recebido!"}
+          {cancelled
+            ? "Pedido cancelado"
+            : cobranca
+              ? "Falta pagar"
+              : "Pedido recebido!"}
         </h1>
-        <p className="mt-1 text-sm text-muted">{STATUS_HINT[order.status]}</p>
+        <p className="mt-1 text-sm text-muted">
+          {cobranca
+            ? "Seu pedido está guardado. Assim que o pagamento cair, a pizzaria começa."
+            : STATUS_HINT[order.status]}
+        </p>
         <p className="mt-4 inline-block rounded-full bg-background px-4 py-1.5 font-mono text-sm font-bold tracking-wider">
           #{order.code}
         </p>
@@ -56,6 +76,17 @@ export default async function OrderPage({
           {tenant.prep_time_min} min
         </p>
       </div>
+
+      {cobranca && (
+        <PagamentoPendente
+          token={token}
+          amount={cobranca.amount}
+          pixCode={cobranca.pixCode}
+          pixQrBase64={cobranca.pixQrBase64}
+          checkoutUrl={cobranca.checkoutUrl}
+          expiresAt={cobranca.expiresAt?.toISOString() ?? null}
+        />
+      )}
 
       {!cancelled && (
         <section className="mt-5 rounded-3xl border border-line bg-surface p-5">
