@@ -106,7 +106,7 @@ export function ComoComeca() {
       </h2>
 
       <div className="mt-4 gap-4 lg:grid lg:grid-cols-5">
-        <ol className="space-y-3 lg:col-span-3">
+        <ol className="space-y-3 lg:col-span-2">
           {PASSOS.map((passo, i) => {
             const emFoco = i === ativo;
             return (
@@ -152,8 +152,11 @@ export function ComoComeca() {
           funcionar onde não há mouse, e duplicá-lo no celular empurraria a
           página para baixo sem acrescentar nada.
         */}
-        <div className="hidden lg:col-span-2 lg:block">
-          <div className="sticky top-6 rounded-2xl border border-line bg-surface p-5">
+        {/* Centralizado, não grudado no topo: agora que esta é a coluna larga,
+            um painel curto encostado em cima deixava um vazio do tamanho da
+            própria seção embaixo dele. */}
+        <div className="hidden lg:col-span-3 lg:flex lg:items-center">
+          <div className="w-full rounded-2xl border border-line bg-surface p-6">
             <p className="text-sm font-semibold">{PASSOS[ativo].resumo}</p>
             {/* key: remonta a cada troca, e o `rise` do globals.css recomeça. */}
             <div key={ativo} className="mt-4 motion-safe:animate-rise">

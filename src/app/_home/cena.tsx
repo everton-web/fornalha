@@ -47,9 +47,21 @@ function useTampaQueLevanta() {
       const comeca = Math.max(0, topoNaPagina - window.innerHeight * 0.9);
       const duracao = Math.max(240, window.innerHeight * 0.55);
       const abertura = Math.min(1, Math.max(0, (y - comeca) / duracao));
-      // Nunca fecha de todo: a 90° a tela some, e um retângulo vazio no meio
-      // da página parece defeito de carregamento, não animação.
-      folha.style.transform = `rotateX(${(1 - abertura) * -72}deg)`;
+
+      /*
+       * Nunca fecha de todo: a 90° a tela some, e um retângulo vazio no meio
+       * da página parece defeito de carregamento, não animação.
+       *
+       * O `translateY` fecha o buraco que a rotação abre. Girando em torno da
+       * base, o topo da tampa desce — mas o espaço que ela ocupa no layout
+       * continua sendo o da tampa aberta, e sobra um vão no topo, bem embaixo
+       * dos botões. Subir a tampa por metade do que ela encolheu mantém a cena
+       * no lugar enquanto abre.
+       */
+      const angulo = (1 - abertura) * -60;
+      const encolheu = 1 - Math.cos((angulo * Math.PI) / 180);
+      folha.style.transform =
+        `translateY(-${(encolheu * 50).toFixed(2)}%) rotateX(${angulo}deg)`;
     };
 
     const aoRolar = () => {
@@ -109,59 +121,18 @@ function Notebook({
 }
 
 /**
- * Moldura de iPhone.
+ * O painel da pizzaria, na tela de quem vai usá-lo.
  *
- * A tela é full-bleed e a ilha dinâmica flutua sobre o conteúdo — que é como
- * o aparelho realmente é. A versão anterior punha a ilha dentro de uma barra
- * de status branca, com hora e bateria desenhadas; além de não parecer um
- * iPhone, era interface inventada num print que existe para provar o que o
- * sistema faz.
- *
- * A ilha cai justamente sobre o escurecido do modal do montador, então não
- * tapa nada que se queira ler. Se um dia o print mudar, é isso que precisa
- * ser reconferido.
- */
-function IPhone({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="relative">
-      {/* botões: ação e volume à esquerda, o de ligar à direita */}
-      <div className="absolute -left-[2px] top-[14%] h-[4%] w-[2px] rounded-l bg-stone-400" />
-      <div className="absolute -left-[2px] top-[22%] h-[7%] w-[2px] rounded-l bg-stone-400" />
-      <div className="absolute -left-[2px] top-[31%] h-[7%] w-[2px] rounded-l bg-stone-400" />
-      <div className="absolute -right-[2px] top-[25%] h-[10%] w-[2px] rounded-r bg-stone-400" />
-
-      {/* corpo em titânio natural, com a moldura preta fina por dentro */}
-      <div className="rounded-[2rem] bg-gradient-to-br from-stone-300 via-stone-400 to-stone-300 p-[1px] shadow-[0_24px_60px_-24px_rgba(28,25,23,0.6)] sm:rounded-[2.6rem] sm:p-[2px]">
-        {/* A moldura preta fica fina de propósito: num iPhone ela é uma linha,
-            e grossa demais o aparelho vira "celular genérico". */}
-        <div className="rounded-[1.95rem] bg-black p-[2px] sm:rounded-[2.55rem] sm:p-[3px]">
-          <div className="relative overflow-hidden rounded-[1.7rem] bg-black sm:rounded-[2.2rem]">
-            {children}
-
-            {/* ilha dinâmica, com a lente à direita como no aparelho */}
-            <span className="absolute left-1/2 top-[1.2%] flex h-[3.6%] w-[32%] -translate-x-1/2 items-center justify-end rounded-full bg-black pr-[7%]">
-              <span className="aspect-square h-[46%] rounded-full bg-stone-700" />
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/**
- * Os três lados de um pedido, numa cena só.
- *
- * Sobrepostos, e não lado a lado: três retângulos alinhados viram catálogo de
- * loja de app. Com a comanda torta à esquerda e o celular por cima do canto
- * do notebook, viram uma bancada.
+ * Só o notebook: a comanda e o celular saíram daqui e ganharam seção própria,
+ * onde cabem grandes o bastante para dar para ler. Amontoados no herói, os
+ * três disputavam o mesmo olhar e nenhum ganhava.
  */
 export function CenaDoProduto() {
   const { cena, tampa } = useTampaQueLevanta();
 
   return (
     <figure className="mt-14">
-      <div ref={cena} className="relative mx-auto max-w-3xl pb-16 sm:pb-20">
+      <div ref={cena} className="relative mx-auto max-w-3xl">
         <Notebook tampa={tampa}>
           <Image
             src="/print-painel.png"
@@ -173,35 +144,11 @@ export function CenaDoProduto() {
           />
         </Notebook>
 
-        {/* A comanda que sai na impressora da cozinha. Torta de propósito:
-            papel na bancada não fica alinhado, e o giro é o que separa uma
-            folha de verdade de mais um retângulo na tela. */}
-        <div className="absolute -left-3 bottom-0 w-32 -rotate-6 sm:-left-6 sm:w-44">
-          <Image
-            src="/print-comanda.png"
-            alt="Comanda impressa do pedido, com itens, endereço e total"
-            width={900}
-            height={1692}
-            className="block w-full rounded-[2px] shadow-[0_18px_40px_-16px_rgba(28,25,23,0.45)]"
-          />
-        </div>
-
-        <div className="absolute bottom-4 right-0 w-28 sm:bottom-6 sm:right-2 sm:w-40">
-          <IPhone>
-            <Image
-              src="/print-montador.png"
-              alt="Montador de pizza com tamanhos, sabores e preço pela média"
-              width={780}
-              height={1440}
-              className="block w-full"
-            />
-          </IPhone>
-        </div>
       </div>
 
       <figcaption className="mt-4 text-center text-sm text-muted">
-        Seu cliente monta a pizza no celular, o pedido cai no seu painel já
-        pago, e a comanda sai na impressora da cozinha.
+        O painel que você abre na cozinha: os pedidos do momento, o que cada um
+        pediu e em que pé está.
       </figcaption>
     </figure>
   );

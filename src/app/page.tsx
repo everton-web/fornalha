@@ -7,12 +7,12 @@ import {
   MapPin,
   Printer,
   QrCode,
-  Smartphone,
 } from "lucide-react";
 
 import { CenaDoProduto } from "./_home/cena";
 import { Comanda } from "./_home/comanda";
 import { Faq } from "./_home/faq";
+import { Montador } from "./_home/montador";
 import { ComoComeca } from "./_home/passos";
 import { Rodape } from "./_home/rodape";
 
@@ -139,51 +139,6 @@ export default function Home() {
           </div>
         </Quadro>
 
-        {/* Alto e estreito: a lista de sabores pede formato vertical. */}
-        <Quadro span="lg:col-span-2" icone={<Smartphone className="size-5" />}>
-          <Titulo>Montador de pizza</Titulo>
-          <Texto>
-            Seu cliente escolhe tamanho, até 4 sabores, borda e adicionais.
-            No celular dele, sem instalar nada.
-          </Texto>
-
-          <div className="mt-auto space-y-1.5 pt-4">
-            {[
-              ["Calabresa", true],
-              ["Quatro Queijos", true],
-              ["Margherita", false],
-            ].map(([nome, marcado]) => (
-              <div
-                key={nome as string}
-                className="flex items-center gap-2 rounded-lg border px-2.5 py-1.5 text-xs"
-                style={
-                  marcado
-                    ? {
-                        borderColor: "var(--brand)",
-                        background: "color-mix(in srgb, var(--brand) 6%, white)",
-                        fontWeight: 500,
-                      }
-                    : { borderColor: "var(--line)", color: "var(--muted)" }
-                }
-              >
-                <span
-                  className="size-3 rounded-sm border"
-                  style={
-                    marcado
-                      ? { borderColor: "var(--brand)", background: "var(--brand)" }
-                      : { borderColor: "var(--line)" }
-                  }
-                />
-                {nome as string}
-              </div>
-            ))}
-            <p className="pt-1 text-right text-xs text-muted">
-              média dos sabores ·{" "}
-              <strong className="text-foreground">R$ 70,00</strong>
-            </p>
-          </div>
-        </Quadro>
-
         {/* Trio de sustentação. */}
         <Quadro span="lg:col-span-2" icone={<Layers className="size-5" />}>
           <Titulo>Reajuste sem sofrimento</Titulo>
@@ -203,18 +158,21 @@ export default function Home() {
           </div>
         </Quadro>
 
-        <Quadro span="lg:col-span-2" icone={<QrCode className="size-5" />}>
+        <Quadro span="lg:col-span-3" icone={<QrCode className="size-5" />}>
           <Titulo>Pago antes de sair</Titulo>
           <Texto>
             O cliente paga por Pix e o dinheiro cai na sua conta, na hora. Você
             escolhe o gateway; a taxa é dele, não nossa.
           </Texto>
-          <p className="mt-auto rounded-lg px-2.5 py-2 text-xs font-medium" style={{ background: "rgb(16 60 34 / 0.55)", color: "#7fd6a0" }}>
+          {/* As mesmas cores do selo no painel de verdade. Antes era verde
+              claro sobre verde escuro — estilo de card escuro sobrando num
+              card claro, e o texto sumia. */}
+          <p className="mt-auto rounded-lg bg-emerald-50 px-2.5 py-2 text-xs font-medium text-emerald-700">
             Pago — pode preparar
           </p>
         </Quadro>
 
-        <Quadro span="lg:col-span-2" icone={<MapPin className="size-5" />}>
+        <Quadro span="lg:col-span-3" icone={<MapPin className="size-5" />}>
           <Titulo>Taxa por bairro</Titulo>
           <Texto>
             O cliente digita o CEP, o endereço se preenche sozinho e a taxa sai
@@ -257,6 +215,8 @@ export default function Home() {
           </Texto>
         </Quadro>
       </ul>
+
+      <Montador />
 
       <Comanda />
 
