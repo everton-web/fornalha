@@ -1,10 +1,26 @@
 #!/usr/bin/env node
 /**
- * Roda as migrations (db/migrations/*.sql) em ordem alfabética.
- * Com --seed, roda também db/seed.sql (pizzaria de demonstração).
+ * Roda as migrations (db/migrations/*.sql) em ordem alfabética, e por último
+ * db/demo.sql. Com --seed, roda também db/seed.sql (pizzaria de demonstração).
  *
  *   node scripts/migrate.mjs
  *   node scripts/migrate.mjs --seed
+ *
+ * Isto também é o `vercel-build` do package.json — a Vercel prefere esse
+ * script ao `build` quando ele existe, então todo deploy migra o banco antes
+ * de compilar. É o que impede o sintoma que motivou isso: código novo no ar e
+ * banco velho embaixo, com a tela mostrando dados de outra versão e nenhuma
+ * forma de corrigir sem SQL na mão.
+ *
+ * Antes de compilar, não depois, porque migration nossa é aditiva: a coluna
+ * precisa existir quando o código que a lê entra no ar, não o contrário.
+ *
+ * Falhar aqui derruba o deploy de propósito. Um deploy que sobe com o banco
+ * pela metade é pior que um que não sobe: o primeiro quebra na cara do
+ * cliente, o segundo aparece na tela da Vercel.
+ *
+ * `--seed` nunca entra no deploy: ele apaga e recria a pizzaria de
+ * demonstração, e apagar tenant em produção não é coisa de build.
  */
 
 import { readdirSync, readFileSync } from "node:fs";
