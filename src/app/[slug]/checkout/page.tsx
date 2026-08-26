@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 
+import { DEMO_CEP_CLIENTE, isDemo } from "@/lib/demo";
 import { isOpenNow } from "@/lib/hours";
 import { getMenu } from "@/lib/menu";
 
@@ -32,6 +33,7 @@ export default async function CheckoutPage({
         slug={slug}
         tenant={menu.tenant}
         isOpen={isOpenNow(menu.tenant)}
+        cepSugerido={isDemo(slug) ? DEMO_CEP_CLIENTE : null}
       />
     </main>
   );

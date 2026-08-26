@@ -52,10 +52,18 @@ export function CheckoutForm({
   slug,
   tenant,
   isOpen,
+  cepSugerido = null,
 }: {
   slug: string;
   tenant: Tenant;
   isOpen: boolean;
+  /**
+   * CEP para deixar pronto quando não há rascunho salvo. Só a pizzaria de
+   * demonstração manda um (ver `@/lib/demo`): no cardápio de um cliente de
+   * verdade o campo nasce vazio, porque adivinhar o endereço de quem chega
+   * é errar na frente dele.
+   */
+  cepSugerido?: string | null;
 }) {
   const router = useRouter();
   const { items, priced, subtotal, count, ready, setQuantity, remove, clear } =
@@ -82,15 +90,30 @@ export function CheckoutForm({
 
   // Quem já pediu uma vez não digita o endereço de novo.
   useEffect(() => {
+    let salvo: CustomerDraft | null = null;
     try {
       const raw = localStorage.getItem(CUSTOMER_KEY);
-      // Mesmo caso do carrinho: o rascunho salvo só pode ser lido no cliente.
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      if (raw) setCustomer({ ...EMPTY, ...(JSON.parse(raw) as CustomerDraft) });
+      if (raw) salvo = { ...EMPTY, ...(JSON.parse(raw) as CustomerDraft) };
     } catch {
       // sem dados salvos, segue com formulário vazio
     }
-  }, []);
+
+    if (salvo) {
+      // Mesmo caso do carrinho: o rascunho salvo só pode ser lido no cliente.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setCustomer(salvo);
+      // O rascunho guarda o CEP, não a taxa. Sem consultar de novo, a tela
+      // mostraria a taxa única da loja enquanto `createOrder` recalcula pelo
+      // bairro e cobra outra — o cliente veria um total e pagaria outro.
+      if (onlyDigits(salvo.zip).length === 8) aoDigitarCep(salvo.zip);
+    }
+    // O rascunho de quem já pediu vence a sugestão: o endereço dele é real,
+    // o sugerido é só um exemplo. Sem rascunho, a demo entra com o CEP
+    // pronto e a taxa aparece sem ninguém digitar.
+    else if (cepSugerido) aoDigitarCep(cepSugerido);
+    // aoDigitarCep só depende de `slug` e dos setters, todos estáveis.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cepSugerido]);
 
   const deliveryFee =
     deliveryType === "delivery" ? (cepState.fee ?? tenant.delivery_fee) : 0;
@@ -299,8 +322,21 @@ export function CheckoutForm({
               onClick={() => setDeliveryType("delivery")}
               icon={<Bike className="size-4" />}
               title="Entrega"
+              /*
+                Assim que o CEP resolve o bairro, este rótulo passa a mostrar
+                a taxa daquele bairro. Antes ele ficava preso na taxa única da
+                loja, e o cliente lia "R$ 8,00" aqui enquanto pagava a taxa do
+                bairro no total — dois números para a mesma coisa, na mesma
+                tela. Sem CEP ainda, a taxa única é o melhor palpite.
+              */
               subtitle={
-                tenant.delivery_fee > 0 ? money(tenant.delivery_fee) : "Grátis"
+                cepState.fee !== null
+                  ? cepState.fee > 0
+                    ? money(cepState.fee)
+                    : "Grátis"
+                  : tenant.delivery_fee > 0
+                    ? money(tenant.delivery_fee)
+                    : "Grátis"
               }
             />
           )}
