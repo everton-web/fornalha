@@ -30,6 +30,14 @@ Para acessar o painel da demo, crie um login:
 npm run vincular-dono -- --slug=bella-napoli --email=voce@exemplo.com --senha=umaSenhaForte
 ```
 
+Sem a `DATABASE_URL` configurada na máquina, `--sql` imprime o comando pronto
+para colar no SQL Editor do Supabase — não conecta em nada, e a senha vira hash
+antes de sair daqui:
+
+```bash
+npm run vincular-dono -- --sql --slug=bella-napoli --email=voce@exemplo.com --senha=umaSenhaForte
+```
+
 ### Banco
 
 Qualquer Postgres serve — Supabase, Neon, Vercel Postgres ou um local. Use
