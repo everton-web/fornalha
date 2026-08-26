@@ -1,4 +1,7 @@
 import Link from "next/link";
+import { Bodoni_Moda, Italianno } from "next/font/google";
+import "./lp.css";
+
 import {
   Bell,
   ChefHat,
@@ -9,6 +12,23 @@ import {
   QrCode,
   Smartphone,
 } from "lucide-react";
+
+/**
+ * Didone para os títulos e script para o logotipo — o par da referência.
+ * Carregados aqui, e não no layout raiz, porque só esta página os usa: o
+ * cardápio e o painel não devem pagar o download.
+ */
+const display = Bodoni_Moda({
+  variable: "--font-display",
+  subsets: ["latin"],
+  weight: ["400", "600", "700"],
+});
+
+const script = Italianno({
+  variable: "--font-script",
+  subsets: ["latin"],
+  weight: "400",
+});
 
 /**
  * Página de apresentação da Fornalha.
@@ -22,44 +42,65 @@ import {
  */
 export default function Home() {
   return (
-    <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-14 sm:py-20">
-      {/* ---------------------------------------------------------- topo */}
-      <span className="inline-flex w-fit items-center gap-2 rounded-full border border-line bg-surface px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wide text-stone-500">
-        <ChefHat className="size-3.5" />
-        Fornalha
+    <main
+      className={`lp ${display.variable} ${script.variable} flex-1`}
+    >
+      <div className="mx-auto w-full max-w-5xl px-6 py-14 text-center sm:py-20">
+      {/* --------------------------------------------------------- marca */}
+      <span
+        className="lp-selo mx-auto grid size-16 place-items-center rounded-full text-[2.6rem] leading-none"
+        style={{ fontFamily: "var(--font-script)" }}
+        aria-hidden
+      >
+        F
       </span>
+      <p
+        className="mt-3 text-xs font-semibold uppercase tracking-[0.32em]"
+        style={{ color: "var(--lt-green)" }}
+      >
+        <ChefHat className="mr-1.5 inline size-3.5" />
+        Fornalha
+      </p>
 
-      <h1 className="mt-5 max-w-3xl text-4xl font-bold leading-[1.05] tracking-tight sm:text-6xl">
+      <h1
+        className="mx-auto mt-6 max-w-3xl text-4xl leading-[1.1] sm:text-6xl"
+        style={{ fontFamily: "var(--font-display)", fontWeight: 600 }}
+      >
         Seu cardápio, no seu endereço.
         <br />
-        <span className="text-brand">Sem comissão por pedido.</span>
+        <em className="not-italic" style={{ color: "var(--lt-tomato)" }}>
+          Sem comissão por pedido.
+        </em>
       </h1>
 
-      <p className="mt-5 max-w-xl text-lg text-muted">
+      <p
+        className="mx-auto mt-5 max-w-xl text-lg"
+        style={{ color: "var(--lt-ink-soft)" }}
+      >
         Seu cliente pede no site da sua pizzaria, o pedido cai direto na
         cozinha e o dinheiro vai para a sua conta. Sem intermediário ficando
         com um pedaço de cada pizza.
       </p>
 
-      <div className="mt-8 flex flex-wrap gap-3">
+      <div className="mt-8 flex flex-wrap justify-center gap-3">
         <Link
           href="/bella-napoli"
-          className="rounded-full bg-brand px-6 py-3 text-sm font-semibold text-brand-ink transition hover:opacity-90"
+          className="lp-botao-tomate rounded-full px-6 py-3 text-sm font-semibold"
         >
           Ver cardápio de demonstração
         </Link>
         <Link
           href="/admin"
-          className="rounded-full border border-line bg-surface px-6 py-3 text-sm font-semibold transition hover:border-stone-300"
+          className="lp-botao-linha rounded-full px-6 py-3 text-sm font-semibold"
         >
           Entrar no painel
         </Link>
       </div>
 
       {/* --------------------------------------------------------- bento */}
-      <ul className="mt-16 grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
+      <ul className="mt-16 grid gap-4 text-left sm:grid-cols-2 lg:grid-cols-6">
         {/* Destaque: o que diferencia. Ganha o dobro e uma janela de navegador. */}
-        <Quadro span="lg:col-span-4" icone={<Globe className="size-5" />}>
+        <Quadro span="lg:col-span-4" verde icone={<Globe className="size-5" />}>
           <Titulo>Seu endereço na internet</Titulo>
           <Texto>
             Seu cliente digita o endereço da sua pizzaria e cai no seu
@@ -69,23 +110,26 @@ export default function Home() {
 
           {/* mt-auto: encosta no rodapé do quadro, para o bloco grande não
               ficar com um vão embaixo ao lado do vizinho mais alto. */}
-          <div className="mt-auto overflow-hidden rounded-xl border border-line bg-background pt-5">
-            <div className="mx-3 flex items-center gap-1.5 rounded-t-lg border border-b-0 border-line bg-surface px-3 py-2">
-              <span className="size-2 rounded-full bg-stone-300" />
-              <span className="size-2 rounded-full bg-stone-300" />
-              <span className="size-2 rounded-full bg-stone-300" />
-              <span className="ml-2 truncate rounded-md bg-background px-2.5 py-1 font-mono text-[11px] text-stone-600">
+          <div className="lp-fundo mt-auto overflow-hidden rounded-xl pt-5">
+            <div className="mx-3 flex items-center gap-1.5 rounded-t-lg px-3 py-2"
+              style={{ background: "var(--lt-cream-pure)" }}>
+              <span className="size-2 rounded-full" style={{ background: "var(--lt-ink-faint)" }} />
+              <span className="size-2 rounded-full" style={{ background: "var(--lt-ink-faint)" }} />
+              <span className="size-2 rounded-full" style={{ background: "var(--lt-ink-faint)" }} />
+              <span className="ml-2 truncate rounded px-2.5 py-1 font-mono text-[11px]" style={{ background: "var(--lt-cream-deep)", color: "var(--lt-ink-soft)" }}>
                 pizzariadobairro.com.br
               </span>
             </div>
 
-            <div className="mx-3 rounded-b-lg border border-line bg-surface">
-              <div className="flex items-center gap-2.5 border-b border-line px-3 py-2.5">
-                <span className="grid size-7 place-items-center rounded-lg bg-brand text-[11px] font-bold text-brand-ink">
+            <div className="mx-3 rounded-b-lg"
+              style={{ background: "var(--lt-cream-pure)", color: "var(--lt-ink)" }}>
+              <div className="flex items-center gap-2.5 border-b px-3 py-2.5"
+                style={{ borderColor: "var(--lt-cream-deep)" }}>
+                <span className="grid size-7 place-items-center rounded text-[11px] font-bold" style={{ background: "var(--lt-tomato)", color: "var(--lt-cream)" }}>
                   P
                 </span>
                 <span className="text-sm font-semibold">Pizzaria do Bairro</span>
-                <span className="ml-auto rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-emerald-700">
+                <span className="ml-auto rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide" style={{ background: "color-mix(in srgb, var(--lt-green) 14%, transparent)", color: "var(--lt-green)" }}>
                   Aberta
                 </span>
               </div>
@@ -96,14 +140,15 @@ export default function Home() {
               ].map(([nome, desc, preco]) => (
                 <div
                   key={nome}
-                  className="flex items-center gap-3 px-3 py-2.5 [&+&]:border-t [&+&]:border-line"
+                  className="flex items-center gap-3 px-3 py-2.5 [&+&]:border-t"
+                  style={{ borderTopColor: "var(--lt-cream-deep)" }}
                 >
-                  <span className="size-9 shrink-0 rounded-lg bg-stone-100" />
+                  <span className="size-9 shrink-0 rounded" style={{ background: "var(--lt-cream-deep)" }} />
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-xs font-medium">
                       {nome}
                     </span>
-                    <span className="block truncate text-[11px] text-muted">
+                    <span className="block truncate text-[11px]" style={{ color: "var(--lt-ink-soft)" }}>
                       {desc}
                     </span>
                   </span>
@@ -137,27 +182,30 @@ export default function Home() {
                 style={
                   marcado
                     ? {
-                        borderColor: "var(--brand)",
-                        background: "color-mix(in srgb, var(--brand) 6%, white)",
+                        borderColor: "var(--lt-tomato)",
+                        background: "color-mix(in srgb, var(--lt-tomato) 8%, transparent)",
                         fontWeight: 500,
                       }
-                    : { borderColor: "var(--line)", color: "var(--muted)" }
+                    : {
+                        borderColor: "color-mix(in srgb, var(--lt-green) 18%, transparent)",
+                        opacity: 0.6,
+                      }
                 }
               >
                 <span
                   className="size-3 rounded-sm border"
                   style={
                     marcado
-                      ? { borderColor: "var(--brand)", background: "var(--brand)" }
-                      : { borderColor: "var(--line)" }
+                      ? { borderColor: "var(--lt-tomato)", background: "var(--lt-tomato)" }
+                      : { borderColor: "color-mix(in srgb, var(--lt-green) 25%, transparent)" }
                   }
                 />
                 {nome as string}
               </div>
             ))}
-            <p className="pt-1 text-right text-xs text-muted">
+            <p className="pt-1 text-right text-xs opacity-70">
               média dos sabores ·{" "}
-              <strong className="text-foreground">R$ 70,00</strong>
+              <strong className="opacity-100">R$ 70,00</strong>
             </p>
           </div>
         </Quadro>
@@ -170,24 +218,24 @@ export default function Home() {
             dela sobem juntos. Não é sabor por sabor.
           </Texto>
           <div className="mt-auto space-y-1.5 pt-4 font-mono text-xs">
-            <div className="flex justify-between rounded-lg bg-background px-2.5 py-1.5">
-              <span className="text-muted">Tradicionais</span>
+            <div className="lp-fundo flex justify-between rounded px-2.5 py-1.5">
+              <span className="opacity-70">Tradicionais</span>
               <span className="font-semibold">R$ 66</span>
             </div>
-            <div className="flex justify-between rounded-lg bg-background px-2.5 py-1.5">
-              <span className="text-muted">Especiais</span>
+            <div className="lp-fundo flex justify-between rounded px-2.5 py-1.5">
+              <span className="opacity-70">Especiais</span>
               <span className="font-semibold">R$ 74</span>
             </div>
           </div>
         </Quadro>
 
-        <Quadro span="lg:col-span-2" icone={<QrCode className="size-5" />}>
+        <Quadro span="lg:col-span-2" verde icone={<QrCode className="size-5" />}>
           <Titulo>Pago antes de sair</Titulo>
           <Texto>
             O cliente paga por Pix e o dinheiro cai na sua conta, na hora. Você
             escolhe o gateway; a taxa é dele, não nossa.
           </Texto>
-          <p className="mt-auto rounded-lg px-2.5 py-2 text-xs font-medium" style={{ background: "rgb(16 60 34 / 0.55)", color: "#7fd6a0" }}>
+          <p className="lp-fundo mt-auto rounded px-2.5 py-2 text-xs font-medium">
             Pago — pode preparar
           </p>
         </Quadro>
@@ -205,9 +253,9 @@ export default function Home() {
             ].map(([bairro, taxa]) => (
               <div
                 key={bairro}
-                className="flex items-center gap-2 rounded-lg bg-background px-2.5 py-1.5"
+                className="lp-fundo flex items-center gap-2 rounded px-2.5 py-1.5"
               >
-                <span className="text-muted">{bairro}</span>
+                <span className="opacity-70">{bairro}</span>
                 <span className="ml-auto font-semibold">{taxa}</span>
               </div>
             ))}
@@ -236,46 +284,57 @@ export default function Home() {
 
       {/* --------------------------------------------------- como funciona */}
       <section className="mt-16">
-        <h2 className="text-sm font-bold uppercase tracking-wide text-stone-500">
+        <h2 className="lp-regua mx-auto max-w-md text-xs font-semibold uppercase tracking-[0.24em]" style={{ color: "var(--lt-green)" }}>
           Como sua pizzaria começa
         </h2>
-        <ol className="mt-4 grid gap-4 sm:grid-cols-3">
+        <ol className="mt-6 grid gap-4 text-left sm:grid-cols-3">
           {[
             ["A gente monta sua loja", "Criamos sua conta e o cardápio base — tamanhos, categorias, bordas e faixas de preço prontos."],
             ["Você põe os sabores", "Preços, fotos, horários e área de entrega, pelo painel. Sem depender de ninguém para mudar preço."],
             ["Seus clientes pedem", "Pelo seu link ou pelo seu domínio. O pedido cai na cozinha com aviso sonoro."],
           ].map(([titulo, texto], i) => (
-            <li key={titulo} className="rounded-2xl border border-line bg-surface p-5">
-              <span className="grid size-7 place-items-center rounded-full bg-foreground text-xs font-bold text-background">
+            <li key={titulo} className="lp-quadro rounded-2xl p-5">
+              <span className="lp-selo grid size-8 place-items-center rounded-full text-sm" style={{ fontFamily: "var(--font-display)", fontWeight: 700 }}>
                 {i + 1}
               </span>
-              <h3 className="mt-3 font-semibold">{titulo}</h3>
-              <p className="mt-1 text-sm text-muted">{texto}</p>
+              <h3 className="mt-3 text-base" style={{ fontFamily: "var(--font-display)", fontWeight: 600 }}>
+                {titulo}
+              </h3>
+              <p className="mt-1.5 text-sm" style={{ color: "var(--lt-ink-soft)" }}>
+                {texto}
+              </p>
             </li>
           ))}
         </ol>
       </section>
 
       {/* ----------------------------------------------------------- fecho */}
-      <section className="mt-14 rounded-3xl bg-foreground px-6 py-10 text-center sm:px-10">
-        <h2 className="text-2xl font-bold tracking-tight text-background sm:text-3xl">
+      <section
+        className="lp-serrilha mt-16 px-6 py-14 text-center sm:px-10"
+        style={{ background: "var(--lt-green)", color: "var(--lt-on-green)" }}
+      >
+        <h2 className="text-3xl sm:text-4xl" style={{ fontFamily: "var(--font-display)", fontWeight: 600 }}>
           Veja funcionando antes de decidir
         </h2>
-        <p className="mx-auto mt-2 max-w-md text-sm text-stone-400">
+        <p className="mx-auto mt-3 max-w-md text-sm" style={{ color: "var(--lt-on-green-soft)" }}>
           Uma pizzaria de exemplo está no ar com cardápio completo. Monte uma
           pizza, feche o pedido e veja como ele chega na cozinha.
         </p>
         <Link
           href="/bella-napoli"
-          className="mt-6 inline-block rounded-full bg-brand px-6 py-3 text-sm font-semibold text-brand-ink transition hover:opacity-90"
+          className="lp-botao-tomate mt-7 inline-block rounded-full px-6 py-3 text-sm font-semibold"
         >
           Abrir a demonstração
         </Link>
       </section>
 
-      <footer className="mt-10 text-center text-xs text-muted">
+      <footer
+        className="mt-12 text-xs uppercase tracking-[0.2em]"
+        style={{ color: "var(--lt-ink-faint)" }}
+      >
         Fornalha · sistema de pedidos para pizzarias
       </footer>
+      </div>
     </main>
   );
 }
@@ -284,17 +343,21 @@ export default function Home() {
 function Quadro({
   span,
   icone,
+  verde = false,
   children,
 }: {
   span: string;
   icone: React.ReactNode;
+  /** Quadro cheio de verde. Um ou dois por seção: mais que isso e o verde
+      deixa de ser pausa e vira o fundo. */
+  verde?: boolean;
   children: React.ReactNode;
 }) {
   return (
     <li
-      className={`${span} flex flex-col rounded-3xl border border-line bg-surface p-5 transition hover:border-stone-300`}
+      className={`${span} ${verde ? "lp-quadro--verde" : ""} lp-quadro flex flex-col rounded-2xl p-5`}
     >
-      <span className="grid size-10 shrink-0 place-items-center rounded-full bg-background">
+      <span className="lp-fundo grid size-10 shrink-0 place-items-center rounded-full">
         {icone}
       </span>
       {children}
@@ -303,7 +366,14 @@ function Quadro({
 }
 
 function Titulo({ children }: { children: React.ReactNode }) {
-  return <h2 className="mt-3 font-semibold">{children}</h2>;
+  return (
+    <h2
+      className="mt-3 text-lg"
+      style={{ fontFamily: "var(--font-display)", fontWeight: 600 }}
+    >
+      {children}
+    </h2>
+  );
 }
 
 function Texto({ children }: { children: React.ReactNode }) {
