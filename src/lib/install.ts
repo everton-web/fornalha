@@ -28,6 +28,18 @@ export type EstadoInstalacao = {
   pizzarias: number;
 };
 
+/**
+ * O que decide se a instalação ainda está aberta.
+ *
+ * A pergunta certa é "já existe uma conta de agência?", não "já existe algum
+ * usuário". Um sistema que rodou como pizzaria única tem donos cadastrados e
+ * nenhuma conta de plataforma — e barrar por "existe usuário" trancaria essa
+ * pessoa do lado de fora, sem nenhum caminho para dentro que não passasse por
+ * SQL na mão.
+ *
+ * A porta continua fechando sozinha, e para sempre: assim que a primeira conta
+ * de agência existir, ninguém mais entra por aqui.
+ */
 export async function lerEstado(): Promise<EstadoInstalacao> {
   const contas = await opcional(
     async () => {
@@ -42,6 +54,17 @@ export async function lerEstado(): Promise<EstadoInstalacao> {
     return { precisaInstalar: true, temTabelas: false, contas: 0, pizzarias: 0 };
   }
 
+  // Coluna ausente = banco anterior à 0010, então não há agência nenhuma.
+  const agencias = await opcional(
+    async () => {
+      const [r] = await sql`
+        select count(*)::int as n from users where is_platform_admin
+      `;
+      return r.n as number;
+    },
+    0,
+  );
+
   const pizzarias = await opcional(
     async () => {
       const [r] = await sql`select count(*)::int as n from tenants`;
@@ -50,7 +73,12 @@ export async function lerEstado(): Promise<EstadoInstalacao> {
     0,
   );
 
-  return { precisaInstalar: contas === 0, temTabelas: true, contas, pizzarias };
+  return {
+    precisaInstalar: agencias === 0,
+    temTabelas: true,
+    contas,
+    pizzarias,
+  };
 }
 
 export type ResultadoInstalacao = {
@@ -70,7 +98,7 @@ export async function instalar(input: {
   const estado = await lerEstado();
   if (!estado.precisaInstalar) {
     throw new Error(
-      "Este sistema já foi instalado. Use a tela de login, ou 'Esqueci minha senha'.",
+      "Este sistema já tem uma conta de agência. Use a tela de login, ou 'Esqueci minha senha'.",
     );
   }
 

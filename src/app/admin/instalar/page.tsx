@@ -29,8 +29,7 @@ export default async function InstalarPage() {
           <CheckCircle2 className="mx-auto size-10 text-emerald-600" />
           <h1 className="mt-3 text-lg font-bold">Sistema já instalado</h1>
           <p className="mt-1.5 text-sm text-muted">
-            Existe {estado.contas === 1 ? "uma conta" : `${estado.contas} contas`}{" "}
-            neste sistema, então esta página está desativada.
+            Já existe uma conta de agência, então esta página está desativada.
           </p>
           <Link
             href="/admin/login"
@@ -54,9 +53,11 @@ export default async function InstalarPage() {
     <main className="mx-auto flex min-h-full max-w-md flex-col justify-center px-4 py-12">
       <h1 className="text-xl font-bold tracking-tight">Instalar a Fornalha</h1>
       <p className="mt-1.5 text-sm text-muted">
-        {estado.temTabelas
-          ? "O banco existe mas ainda não tem nenhum acesso. Crie o seu."
-          : "Primeira vez: vamos preparar o banco e criar o seu acesso de dono."}
+        {!estado.temTabelas
+          ? "Primeira vez: vamos preparar o banco e criar o seu acesso de agência."
+          : estado.contas > 0
+            ? "O banco já roda, mas ainda não tem uma conta de agência. Crie a sua — se usar um e-mail que já existe, ele vira agência e a senha passa a ser esta."
+            : "O banco existe mas ainda não tem nenhum acesso. Crie o seu."}
       </p>
 
       <InstallForm temTabelas={estado.temTabelas} temPizzaria={estado.pizzarias > 0} />
