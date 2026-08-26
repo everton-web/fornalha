@@ -1,6 +1,4 @@
 import Link from "next/link";
-
-import "./lp.css";
 import {
   Bell,
   ChefHat,
@@ -24,19 +22,9 @@ import {
  */
 export default function Home() {
   return (
-    <main className="lp relative isolate flex-1 overflow-hidden">
-      {/* Campo de brasa: fica atrás de tudo, do topo até depois do herói.
-          O véu por cima garante que o título continue legível no ponto
-          incandescente. */}
-      <div aria-hidden className="pointer-events-none absolute inset-x-0 -top-40 h-[1000px]">
-        <div className="lp-ember-field lp-ember-field--vivo" />
-        <div className="lp-veu" />
-      </div>
-
-      <div className="relative mx-auto w-full max-w-5xl px-6 py-14 sm:py-20">
+    <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-14 sm:py-20">
       {/* ---------------------------------------------------------- topo */}
-      <span className="lp-fundo inline-flex w-fit items-center gap-2 rounded-full px-3.5 py-1.5 text-xs font-semibold uppercase tracking-[0.14em]"
-        style={{ color: "var(--lp-ink-dim)" }}>
+      <span className="inline-flex w-fit items-center gap-2 rounded-full border border-line bg-surface px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wide text-stone-500">
         <ChefHat className="size-3.5" />
         Fornalha
       </span>
@@ -44,10 +32,10 @@ export default function Home() {
       <h1 className="mt-5 max-w-3xl text-4xl font-bold leading-[1.05] tracking-tight sm:text-6xl">
         Seu cardápio, no seu endereço.
         <br />
-        <span className="lp-incandescente">Sem comissão por pedido.</span>
+        <span className="text-brand">Sem comissão por pedido.</span>
       </h1>
 
-      <p className="mt-5 max-w-xl text-lg" style={{ color: "var(--lp-ink-dim)" }}>
+      <p className="mt-5 max-w-xl text-lg text-muted">
         Seu cliente pede no site da sua pizzaria, o pedido cai direto na
         cozinha e o dinheiro vai para a sua conta. Sem intermediário ficando
         com um pedaço de cada pizza.
@@ -56,13 +44,13 @@ export default function Home() {
       <div className="mt-8 flex flex-wrap gap-3">
         <Link
           href="/bella-napoli"
-          className="lp-botao-brasa rounded-full px-6 py-3 text-sm font-semibold"
+          className="rounded-full bg-brand px-6 py-3 text-sm font-semibold text-brand-ink transition hover:opacity-90"
         >
           Ver cardápio de demonstração
         </Link>
         <Link
           href="/admin"
-          className="lp-botao-fantasma rounded-full px-6 py-3 text-sm font-semibold"
+          className="rounded-full border border-line bg-surface px-6 py-3 text-sm font-semibold transition hover:border-stone-300"
         >
           Entrar no painel
         </Link>
@@ -81,26 +69,23 @@ export default function Home() {
 
           {/* mt-auto: encosta no rodapé do quadro, para o bloco grande não
               ficar com um vão embaixo ao lado do vizinho mais alto. */}
-          <div className="lp-fundo mt-auto overflow-hidden rounded-xl pt-5">
-            <div className="mx-3 flex items-center gap-1.5 rounded-t-lg border border-b-0 px-3 py-2"
-              style={{ borderColor: "var(--lp-ash)", background: "var(--lp-coal)" }}>
-              <span className="size-2 rounded-full" style={{ background: "var(--lp-ash)" }} />
-              <span className="size-2 rounded-full" style={{ background: "var(--lp-ash)" }} />
-              <span className="size-2 rounded-full" style={{ background: "var(--lp-ash)" }} />
-              <span className="ml-2 truncate rounded-md px-2.5 py-1 font-mono text-[11px]" style={{ background: "var(--lp-ash-soft)", color: "var(--lp-ink-dim)" }}>
+          <div className="mt-auto overflow-hidden rounded-xl border border-line bg-background pt-5">
+            <div className="mx-3 flex items-center gap-1.5 rounded-t-lg border border-b-0 border-line bg-surface px-3 py-2">
+              <span className="size-2 rounded-full bg-stone-300" />
+              <span className="size-2 rounded-full bg-stone-300" />
+              <span className="size-2 rounded-full bg-stone-300" />
+              <span className="ml-2 truncate rounded-md bg-background px-2.5 py-1 font-mono text-[11px] text-stone-600">
                 pizzariadobairro.com.br
               </span>
             </div>
 
-            <div className="mx-3 rounded-b-lg border"
-              style={{ borderColor: "var(--lp-ash)", background: "var(--lp-coal)" }}>
-              <div className="flex items-center gap-2.5 border-b px-3 py-2.5"
-                style={{ borderColor: "var(--lp-ash)" }}>
-                <span className="grid size-7 place-items-center rounded-lg text-[11px] font-bold" style={{ background: "var(--lp-ember)", color: "#2a1002" }}>
+            <div className="mx-3 rounded-b-lg border border-line bg-surface">
+              <div className="flex items-center gap-2.5 border-b border-line px-3 py-2.5">
+                <span className="grid size-7 place-items-center rounded-lg bg-brand text-[11px] font-bold text-brand-ink">
                   P
                 </span>
                 <span className="text-sm font-semibold">Pizzaria do Bairro</span>
-                <span className="ml-auto rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide" style={{ background: "rgb(16 60 34 / 0.6)", color: "#7fd6a0" }}>
+                <span className="ml-auto rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-emerald-700">
                   Aberta
                 </span>
               </div>
@@ -111,15 +96,14 @@ export default function Home() {
               ].map(([nome, desc, preco]) => (
                 <div
                   key={nome}
-                  className="flex items-center gap-3 px-3 py-2.5 [&+&]:border-t"
-                  style={{ borderTopColor: "var(--lp-ash)" }}
+                  className="flex items-center gap-3 px-3 py-2.5 [&+&]:border-t [&+&]:border-line"
                 >
-                  <span className="size-9 shrink-0 rounded-lg" style={{ background: "var(--lp-ash)" }} />
+                  <span className="size-9 shrink-0 rounded-lg bg-stone-100" />
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-xs font-medium">
                       {nome}
                     </span>
-                    <span className="block truncate text-[11px]" style={{ color: "var(--lp-ink-faint)" }}>
+                    <span className="block truncate text-[11px] text-muted">
                       {desc}
                     </span>
                   </span>
@@ -153,27 +137,27 @@ export default function Home() {
                 style={
                   marcado
                     ? {
-                        borderColor: "color-mix(in srgb, var(--lp-ember) 55%, transparent)",
-                        background: "color-mix(in srgb, var(--lp-ember) 10%, transparent)",
+                        borderColor: "var(--brand)",
+                        background: "color-mix(in srgb, var(--brand) 6%, white)",
                         fontWeight: 500,
                       }
-                    : { borderColor: "var(--lp-ash)", color: "var(--lp-ink-faint)" }
+                    : { borderColor: "var(--line)", color: "var(--muted)" }
                 }
               >
                 <span
                   className="size-3 rounded-sm border"
                   style={
                     marcado
-                      ? { borderColor: "var(--lp-flame)", background: "var(--lp-flame)" }
-                      : { borderColor: "var(--lp-ash)" }
+                      ? { borderColor: "var(--brand)", background: "var(--brand)" }
+                      : { borderColor: "var(--line)" }
                   }
                 />
                 {nome as string}
               </div>
             ))}
-            <p className="pt-1 text-right text-xs" style={{ color: "var(--lp-ink-faint)" }}>
+            <p className="pt-1 text-right text-xs text-muted">
               média dos sabores ·{" "}
-              <strong style={{ color: "var(--lp-ink)" }}>R$ 70,00</strong>
+              <strong className="text-foreground">R$ 70,00</strong>
             </p>
           </div>
         </Quadro>
@@ -186,12 +170,12 @@ export default function Home() {
             dela sobem juntos. Não é sabor por sabor.
           </Texto>
           <div className="mt-auto space-y-1.5 pt-4 font-mono text-xs">
-            <div className="lp-fundo flex justify-between rounded-lg px-2.5 py-1.5">
-              <span style={{ color: "var(--lp-ink-faint)" }}>Tradicionais</span>
+            <div className="flex justify-between rounded-lg bg-background px-2.5 py-1.5">
+              <span className="text-muted">Tradicionais</span>
               <span className="font-semibold">R$ 66</span>
             </div>
-            <div className="lp-fundo flex justify-between rounded-lg px-2.5 py-1.5">
-              <span style={{ color: "var(--lp-ink-faint)" }}>Especiais</span>
+            <div className="flex justify-between rounded-lg bg-background px-2.5 py-1.5">
+              <span className="text-muted">Especiais</span>
               <span className="font-semibold">R$ 74</span>
             </div>
           </div>
@@ -221,9 +205,9 @@ export default function Home() {
             ].map(([bairro, taxa]) => (
               <div
                 key={bairro}
-                className="lp-fundo flex items-center gap-2 rounded-lg px-2.5 py-1.5"
+                className="flex items-center gap-2 rounded-lg bg-background px-2.5 py-1.5"
               >
-                <span style={{ color: "var(--lp-ink-dim)" }}>{bairro}</span>
+                <span className="text-muted">{bairro}</span>
                 <span className="ml-auto font-semibold">{taxa}</span>
               </div>
             ))}
@@ -252,7 +236,7 @@ export default function Home() {
 
       {/* --------------------------------------------------- como funciona */}
       <section className="mt-16">
-        <h2 className="text-sm font-bold uppercase tracking-[0.14em]" style={{ color: "var(--lp-ink-faint)" }}>
+        <h2 className="text-sm font-bold uppercase tracking-wide text-stone-500">
           Como sua pizzaria começa
         </h2>
         <ol className="mt-4 grid gap-4 sm:grid-cols-3">
@@ -261,44 +245,37 @@ export default function Home() {
             ["Você põe os sabores", "Preços, fotos, horários e área de entrega, pelo painel. Sem depender de ninguém para mudar preço."],
             ["Seus clientes pedem", "Pelo seu link ou pelo seu domínio. O pedido cai na cozinha com aviso sonoro."],
           ].map(([titulo, texto], i) => (
-            <li key={titulo} className="lp-quadro rounded-2xl p-5">
-              <span className="grid size-7 place-items-center rounded-full text-xs font-bold" style={{ background: "var(--lp-ember)", color: "#2a1002" }}>
+            <li key={titulo} className="rounded-2xl border border-line bg-surface p-5">
+              <span className="grid size-7 place-items-center rounded-full bg-foreground text-xs font-bold text-background">
                 {i + 1}
               </span>
               <h3 className="mt-3 font-semibold">{titulo}</h3>
-              <p className="mt-1 text-sm" style={{ color: "var(--lp-ink-dim)" }}>
-                {texto}
-              </p>
+              <p className="mt-1 text-sm text-muted">{texto}</p>
             </li>
           ))}
         </ol>
       </section>
 
       {/* ----------------------------------------------------------- fecho */}
-      <section className="relative isolate mt-14 overflow-hidden rounded-3xl px-6 py-12 text-center sm:px-10" style={{ background: "var(--lp-coal)", border: "1px solid var(--lp-ash)" }}>
-        <div aria-hidden className="lp-ember-field" style={{ opacity: 0.5 }} />
-        <div aria-hidden className="lp-veu" style={{ opacity: 0.75 }} />
-        <div className="relative">
-        <h2 className="text-2xl font-bold tracking-tight sm:text-3xl" style={{ color: "var(--lp-ink)" }}>
+      <section className="mt-14 rounded-3xl bg-foreground px-6 py-10 text-center sm:px-10">
+        <h2 className="text-2xl font-bold tracking-tight text-background sm:text-3xl">
           Veja funcionando antes de decidir
         </h2>
-        <p className="mx-auto mt-2 max-w-md text-sm" style={{ color: "var(--lp-ink-dim)" }}>
+        <p className="mx-auto mt-2 max-w-md text-sm text-stone-400">
           Uma pizzaria de exemplo está no ar com cardápio completo. Monte uma
           pizza, feche o pedido e veja como ele chega na cozinha.
         </p>
         <Link
           href="/bella-napoli"
-          className="lp-botao-brasa mt-6 inline-block rounded-full px-6 py-3 text-sm font-semibold"
+          className="mt-6 inline-block rounded-full bg-brand px-6 py-3 text-sm font-semibold text-brand-ink transition hover:opacity-90"
         >
           Abrir a demonstração
         </Link>
-        </div>
       </section>
 
-      <footer className="mt-10 text-center text-xs" style={{ color: "var(--lp-ink-faint)" }}>
+      <footer className="mt-10 text-center text-xs text-muted">
         Fornalha · sistema de pedidos para pizzarias
       </footer>
-      </div>
     </main>
   );
 }
@@ -315,9 +292,9 @@ function Quadro({
 }) {
   return (
     <li
-      className={`${span} lp-quadro flex flex-col rounded-3xl p-5`}
+      className={`${span} flex flex-col rounded-3xl border border-line bg-surface p-5 transition hover:border-stone-300`}
     >
-      <span className="lp-fundo grid size-10 shrink-0 place-items-center rounded-full" style={{ color: "var(--lp-flame)" }}>
+      <span className="grid size-10 shrink-0 place-items-center rounded-full bg-background">
         {icone}
       </span>
       {children}
@@ -331,8 +308,6 @@ function Titulo({ children }: { children: React.ReactNode }) {
 
 function Texto({ children }: { children: React.ReactNode }) {
   return (
-    <p className="mt-1 text-sm leading-relaxed" style={{ color: "var(--lp-ink-dim)" }}>
-      {children}
-    </p>
+    <p className="mt-1 text-sm leading-relaxed text-muted">{children}</p>
   );
 }
