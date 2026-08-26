@@ -109,41 +109,39 @@ function Notebook({
 }
 
 /**
- * Moldura de iPhone 17.
+ * Moldura de iPhone.
  *
- * O que faz um aparelho ser reconhecido não é o desenho do corpo, é a ilha
- * dinâmica e a borda fina e igual nos quatro lados. Por isso a barra de status
- * entra na moldura em vez de o print ser recortado com ela: assim o cabeçalho
- * da pizzaria não fica escondido atrás da ilha.
+ * A tela é full-bleed e a ilha dinâmica flutua sobre o conteúdo — que é como
+ * o aparelho realmente é. A versão anterior punha a ilha dentro de uma barra
+ * de status branca, com hora e bateria desenhadas; além de não parecer um
+ * iPhone, era interface inventada num print que existe para provar o que o
+ * sistema faz.
+ *
+ * A ilha cai justamente sobre o escurecido do modal do montador, então não
+ * tapa nada que se queira ler. Se um dia o print mudar, é isso que precisa
+ * ser reconferido.
  */
 function IPhone({ children }: { children: React.ReactNode }) {
   return (
     <div className="relative">
       {/* botões: ação e volume à esquerda, o de ligar à direita */}
-      <div className="absolute -left-[2px] top-[14%] h-[4%] w-[2px] rounded-l bg-stone-500" />
-      <div className="absolute -left-[2px] top-[22%] h-[7%] w-[2px] rounded-l bg-stone-500" />
-      <div className="absolute -left-[2px] top-[31%] h-[7%] w-[2px] rounded-l bg-stone-500" />
-      <div className="absolute -right-[2px] top-[25%] h-[10%] w-[2px] rounded-r bg-stone-500" />
+      <div className="absolute -left-[2px] top-[14%] h-[4%] w-[2px] rounded-l bg-stone-400" />
+      <div className="absolute -left-[2px] top-[22%] h-[7%] w-[2px] rounded-l bg-stone-400" />
+      <div className="absolute -left-[2px] top-[31%] h-[7%] w-[2px] rounded-l bg-stone-400" />
+      <div className="absolute -right-[2px] top-[25%] h-[10%] w-[2px] rounded-r bg-stone-400" />
 
-      {/* corpo: alumínio claro, borda fina e uniforme */}
-      <div className="rounded-[2rem] bg-gradient-to-b from-stone-400 via-stone-600 to-stone-500 p-[2px] shadow-[0_24px_60px_-24px_rgba(28,25,23,0.6)] sm:rounded-[2.6rem] sm:p-[3px]">
-        <div className="rounded-[1.9rem] bg-black p-[3px] sm:rounded-[2.5rem] sm:p-1">
-          <div className="relative overflow-hidden rounded-[1.7rem] bg-white sm:rounded-[2.2rem]">
-            {/* barra de status + ilha dinâmica */}
-            <div className="relative flex items-center justify-between bg-white px-3 pb-0.5 pt-1 sm:px-4 sm:pt-1.5">
-              <span className="text-[6px] font-semibold text-stone-900 sm:text-[9px]">
-                20:14
-              </span>
-              <span className="absolute left-1/2 top-1 h-[9px] w-[30%] -translate-x-1/2 rounded-full bg-black sm:top-1.5 sm:h-[14px]" />
-              <span className="flex items-center gap-[2px]">
-                <span className="h-[4px] w-[3px] rounded-[1px] bg-stone-900 sm:h-[6px] sm:w-[4px]" />
-                <span className="h-[5px] w-[3px] rounded-[1px] bg-stone-900 sm:h-[8px] sm:w-[4px]" />
-                <span className="ml-[2px] h-[4px] w-[8px] rounded-[2px] border border-stone-900 sm:h-[6px] sm:w-[12px]">
-                  <span className="block h-full w-2/3 rounded-[1px] bg-stone-900" />
-                </span>
-              </span>
-            </div>
+      {/* corpo em titânio natural, com a moldura preta fina por dentro */}
+      <div className="rounded-[2rem] bg-gradient-to-br from-stone-300 via-stone-400 to-stone-300 p-[1px] shadow-[0_24px_60px_-24px_rgba(28,25,23,0.6)] sm:rounded-[2.6rem] sm:p-[2px]">
+        {/* A moldura preta fica fina de propósito: num iPhone ela é uma linha,
+            e grossa demais o aparelho vira "celular genérico". */}
+        <div className="rounded-[1.95rem] bg-black p-[2px] sm:rounded-[2.55rem] sm:p-[3px]">
+          <div className="relative overflow-hidden rounded-[1.7rem] bg-black sm:rounded-[2.2rem]">
             {children}
+
+            {/* ilha dinâmica, com a lente à direita como no aparelho */}
+            <span className="absolute left-1/2 top-[1.2%] flex h-[3.6%] w-[32%] -translate-x-1/2 items-center justify-end rounded-full bg-black pr-[7%]">
+              <span className="aspect-square h-[46%] rounded-full bg-stone-700" />
+            </span>
           </div>
         </div>
       </div>
