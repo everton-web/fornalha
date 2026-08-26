@@ -7,7 +7,7 @@ import { z } from "zod";
 import {
   createSession,
   destroySession,
-  requireSession,
+  requireEscrita,
   verifyCredentials,
 } from "@/lib/auth";
 import { sql } from "@/lib/db";
@@ -86,7 +86,7 @@ export async function setOrderStatus(input: {
   status: OrderStatus;
   reason?: string;
 }): Promise<ActionResult> {
-  const session = await requireSession();
+  const session = await requireEscrita();
   const parsed = statusSchema.safeParse(input);
   if (!parsed.success) return { ok: false, error: "Dados inválidos." };
 
@@ -130,7 +130,7 @@ export async function setOrderStatus(input: {
 
 /** Abre ou fecha a loja manualmente; null devolve o controle ao horário. */
 export async function setOpenOverride(value: boolean | null): Promise<ActionResult> {
-  const session = await requireSession();
+  const session = await requireEscrita();
 
   await sql`
     update tenants set is_open_override = ${value} where id = ${session.tenant.id}

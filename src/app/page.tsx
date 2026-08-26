@@ -98,18 +98,25 @@ export default function Home() {
         </p>
       </div>
 
+      {/*
+        Duas demonstrações, porque são dois lados: o que seu cliente vê e o que
+        você vê. Mostrar só o cardápio deixava a pergunta que decide a venda —
+        "e como eu recebo o pedido?" — sem resposta que pudesse ser clicada.
+        "Entrar no painel" saiu daqui: quem já é cliente entra por /admin, e
+        este espaço vale mais mostrando o produto a quem ainda não é.
+      */}
       <div className="mt-8 flex flex-wrap justify-center gap-3">
         <Link
           href="/bella-napoli"
           className="rounded-full bg-brand px-6 py-3 text-sm font-semibold text-brand-ink transition hover:opacity-90"
         >
-          Ver cardápio de demonstração
+          Ver o cardápio do cliente
         </Link>
         <Link
-          href="/admin"
+          href="/admin/demo"
           className="rounded-full border border-line bg-surface px-6 py-3 text-sm font-semibold transition hover:border-stone-300"
         >
-          Entrar no painel
+          Ver o painel por dentro
         </Link>
       </div>
 
@@ -376,19 +383,35 @@ export default function Home() {
           Veja funcionando antes de decidir
         </h2>
         <p className="mx-auto mt-2 max-w-md text-sm text-stone-400">
-          Uma pizzaria de exemplo está no ar com cardápio completo. Monte uma
-          pizza, feche o pedido e veja como ele chega na cozinha.
+          Uma pizzaria de exemplo está no ar. Monte uma pizza no cardápio, e
+          veja no painel como o pedido chega na cozinha.
         </p>
-        <Link
-          href="/bella-napoli"
-          className="mt-6 inline-block rounded-full bg-brand px-6 py-3 text-sm font-semibold text-brand-ink transition hover:opacity-90"
-        >
-          Abrir a demonstração
-        </Link>
+        <div className="mt-6 flex flex-wrap justify-center gap-3">
+          <Link
+            href="/bella-napoli"
+            className="rounded-full bg-brand px-6 py-3 text-sm font-semibold text-brand-ink transition hover:opacity-90"
+          >
+            Abrir o cardápio
+          </Link>
+          <Link
+            href="/admin/demo"
+            className="rounded-full border border-stone-600 px-6 py-3 text-sm font-semibold text-stone-100 transition hover:border-stone-400"
+          >
+            Abrir o painel
+          </Link>
+        </div>
       </section>
 
+      {/* O login sai do herói e vem para cá: o topo é de quem ainda não é
+          cliente, e quem já é sabe procurar o rodapé — ou já tem o link. */}
       <footer className="mt-10 text-center text-xs text-muted">
-        Fornalha · sistema de pedidos para pizzarias
+        <Link
+          href="/admin"
+          className="font-medium underline decoration-dotted underline-offset-4 transition hover:text-foreground"
+        >
+          Entrar na minha conta
+        </Link>
+        <p className="mt-2">Fornalha · sistema de pedidos para pizzarias</p>
       </footer>
     </main>
   );

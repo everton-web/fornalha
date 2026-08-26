@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
-import { requireSession } from "@/lib/auth";
+import { requireEscrita } from "@/lib/auth";
 import { sql } from "@/lib/db";
 import { onlyDigits } from "@/lib/format";
 
@@ -41,7 +41,7 @@ const settingsSchema = z.object({
 export type SettingsInput = z.input<typeof settingsSchema>;
 
 export async function updateSettings(input: SettingsInput): Promise<ActionResult> {
-  const session = await requireSession();
+  const session = await requireEscrita();
 
   if (session.role !== "owner") {
     return { ok: false, error: "Só o dono pode mudar as configurações." };
@@ -112,7 +112,7 @@ const LIMITE_BYTES = 400 * 1024;
  * de novo aqui porque o cliente pode mentir sobre qualquer coisa.
  */
 export async function uploadLogo(dataUri: string): Promise<ActionResult> {
-  const session = await requireSession();
+  const session = await requireEscrita();
   if (session.role !== "owner") {
     return { ok: false, error: "Só o dono pode trocar a logo." };
   }
@@ -148,7 +148,7 @@ export async function uploadLogo(dataUri: string): Promise<ActionResult> {
 }
 
 export async function removeLogo(): Promise<ActionResult> {
-  const session = await requireSession();
+  const session = await requireEscrita();
   if (session.role !== "owner") {
     return { ok: false, error: "Só o dono pode trocar a logo." };
   }

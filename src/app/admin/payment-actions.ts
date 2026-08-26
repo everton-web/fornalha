@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
-import { requireSession } from "@/lib/auth";
+import { requireEscrita } from "@/lib/auth";
 import { sql } from "@/lib/db";
 import {
   removeAccount,
@@ -33,7 +33,7 @@ export type ConectarInput = z.input<typeof conectarSchema>;
 export async function conectarGateway(
   input: ConectarInput,
 ): Promise<ActionResult> {
-  const session = await requireSession();
+  const session = await requireEscrita();
   if (session.role !== "owner") {
     return { ok: false, error: "Só o dono pode ligar um gateway." };
   }
@@ -108,7 +108,7 @@ export async function alternarGateway(
   provider: string,
   ativo: boolean,
 ): Promise<ActionResult> {
-  const session = await requireSession();
+  const session = await requireEscrita();
   if (session.role !== "owner") {
     return { ok: false, error: "Só o dono pode mudar isto." };
   }
@@ -121,7 +121,7 @@ export async function alternarGateway(
 export async function desconectarGateway(
   provider: string,
 ): Promise<ActionResult> {
-  const session = await requireSession();
+  const session = await requireEscrita();
   if (session.role !== "owner") {
     return { ok: false, error: "Só o dono pode desconectar um gateway." };
   }

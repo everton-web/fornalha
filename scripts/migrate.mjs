@@ -57,6 +57,12 @@ try {
     console.log("ok");
   }
 
+  // Sempre por último: depende da pizzaria de demonstração existir, e o seed
+  // apaga e recria esse tenant. Ver o cabeçalho de db/demo.sql.
+  process.stdout.write("• demo.sql … ");
+  await sql.unsafe(readFileSync("db/demo.sql", "utf8")).simple();
+  console.log("ok");
+
   console.log("\n✓ Banco pronto.\n");
 } catch (error) {
   console.error(`\n✖ ${error.message}\n`);

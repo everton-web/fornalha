@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
-import { requireSession } from "@/lib/auth";
+import { requireEscrita } from "@/lib/auth";
 import { sql } from "@/lib/db";
 
 export type ActionResult = { ok: true } | { ok: false; error: string };
@@ -18,7 +18,7 @@ const areaSchema = z.object({
 export async function saveArea(
   input: z.input<typeof areaSchema>,
 ): Promise<ActionResult> {
-  const session = await requireSession();
+  const session = await requireEscrita();
   if (session.role !== "owner") {
     return { ok: false, error: "Só o dono pode mudar a área de entrega." };
   }
@@ -53,7 +53,7 @@ export async function saveArea(
 }
 
 export async function deleteArea(id: string): Promise<ActionResult> {
-  const session = await requireSession();
+  const session = await requireEscrita();
   if (session.role !== "owner") {
     return { ok: false, error: "Só o dono pode mudar a área de entrega." };
   }
@@ -72,7 +72,7 @@ export async function deleteArea(id: string): Promise<ActionResult> {
 
 /** Recusar endereço fora dos bairros cadastrados, ou cobrar a taxa padrão. */
 export async function setRefuseOutside(value: boolean): Promise<ActionResult> {
-  const session = await requireSession();
+  const session = await requireEscrita();
   if (session.role !== "owner") {
     return { ok: false, error: "Só o dono pode mudar a área de entrega." };
   }

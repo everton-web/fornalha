@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 
-import { requireSession } from "@/lib/auth";
+import { requireEscrita } from "@/lib/auth";
 import { sql } from "@/lib/db";
 import { notifyTenant } from "@/lib/push";
 
@@ -19,7 +19,7 @@ const subscriptionSchema = z.object({
 export async function subscribeToPush(
   input: z.input<typeof subscriptionSchema>,
 ): Promise<ActionResult> {
-  const session = await requireSession();
+  const session = await requireEscrita();
   const parsed = subscriptionSchema.safeParse(input);
   if (!parsed.success) return { ok: false, error: "Assinatura inválida." };
 
@@ -46,14 +46,14 @@ export async function subscribeToPush(
 }
 
 export async function unsubscribeFromPush(endpoint: string): Promise<ActionResult> {
-  await requireSession();
+  await requireEscrita();
   await sql`delete from push_subscriptions where endpoint = ${endpoint}`;
   return { ok: true };
 }
 
 /** Manda um aviso de teste para os aparelhos desta pizzaria. */
 export async function sendTestPush(): Promise<ActionResult> {
-  const session = await requireSession();
+  const session = await requireEscrita();
 
   const { enviados } = await notifyTenant(session.tenant.id, {
     title: "Aviso de teste",

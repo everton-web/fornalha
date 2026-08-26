@@ -110,6 +110,18 @@ export async function rodarMigrations(): Promise<string[]> {
   return arquivos;
 }
 
+/**
+ * Cria a conta de demonstração e os pedidos que ela mostra.
+ *
+ * Roda sempre depois das migrations e depois do seed: depende da pizzaria de
+ * demonstração existir, e o seed apaga e recria esse tenant. Ver o cabeçalho
+ * de db/demo.sql.
+ */
+export async function prepararDemo(): Promise<void> {
+  const caminho = join(process.cwd(), "db", "demo.sql");
+  await sql.unsafe(readFileSync(caminho, "utf8")).simple();
+}
+
 export type ResultadoInstalacao = {
   migrationsRodadas: string[];
   criouDemo: boolean;
@@ -142,6 +154,9 @@ export async function instalar(input: {
       .simple();
     criouDemo = true;
   }
+
+  // Depois do seed, porque ele recria o tenant da demonstração.
+  await prepararDemo();
 
   const [tenant] = await sql`
     select id, name from tenants order by created_at limit 1

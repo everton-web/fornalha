@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
-import { requireSession } from "@/lib/auth";
+import { requireEscrita } from "@/lib/auth";
 import { sql } from "@/lib/db";
 
 export type ActionResult = { ok: true } | { ok: false; error: string };
@@ -50,7 +50,7 @@ const flavorSchema = z.object({
 export async function saveFlavor(
   input: z.input<typeof flavorSchema>,
 ): Promise<ActionResult> {
-  const session = await requireSession();
+  const session = await requireEscrita();
   const parsed = flavorSchema.safeParse(input);
   if (!parsed.success) {
     return { ok: false, error: parsed.error.issues[0]?.message ?? "Dados inválidos." };
@@ -143,7 +143,7 @@ const simpleSchema = z.object({
 export async function saveSimpleItem(
   input: z.input<typeof simpleSchema>,
 ): Promise<ActionResult> {
-  const session = await requireSession();
+  const session = await requireEscrita();
   const parsed = simpleSchema.safeParse(input);
   if (!parsed.success) {
     return { ok: false, error: parsed.error.issues[0]?.message ?? "Dados inválidos." };
@@ -183,7 +183,7 @@ const productSchema = z.object({
 export async function saveProduct(
   input: z.input<typeof productSchema>,
 ): Promise<ActionResult> {
-  const session = await requireSession();
+  const session = await requireEscrita();
   const parsed = productSchema.safeParse(input);
   if (!parsed.success) {
     return { ok: false, error: parsed.error.issues[0]?.message ?? "Dados inválidos." };
@@ -231,7 +231,7 @@ const sizeSchema = z.object({
 export async function saveSize(
   input: z.input<typeof sizeSchema>,
 ): Promise<ActionResult> {
-  const session = await requireSession();
+  const session = await requireEscrita();
   const parsed = sizeSchema.safeParse(input);
   if (!parsed.success) {
     return { ok: false, error: parsed.error.issues[0]?.message ?? "Dados inválidos." };
@@ -275,7 +275,7 @@ const categorySchema = z.object({
 export async function saveCategory(
   input: z.input<typeof categorySchema>,
 ): Promise<ActionResult> {
-  const session = await requireSession();
+  const session = await requireEscrita();
   const parsed = categorySchema.safeParse(input);
   if (!parsed.success) {
     return { ok: false, error: parsed.error.issues[0]?.message ?? "Dados inválidos." };
@@ -308,7 +308,7 @@ export async function setItemActive(
   id: string,
   isActive: boolean,
 ): Promise<ActionResult> {
-  const session = await requireSession();
+  const session = await requireEscrita();
   if (!EDITABLE.includes(table)) return { ok: false, error: "Tabela inválida." };
   if (!uuid.safeParse(id).success) return { ok: false, error: "Item inválido." };
 
@@ -328,7 +328,7 @@ export async function setItemActive(
  * mas apagar um sabor leva junto os preços dele.
  */
 export async function deleteItem(table: Editable, id: string): Promise<ActionResult> {
-  const session = await requireSession();
+  const session = await requireEscrita();
   if (!EDITABLE.includes(table)) return { ok: false, error: "Tabela inválida." };
   if (!uuid.safeParse(id).success) return { ok: false, error: "Item inválido." };
 
@@ -365,7 +365,7 @@ const groupSchema = z.object({
 export async function savePriceGroup(
   input: z.input<typeof groupSchema>,
 ): Promise<ActionResult> {
-  const session = await requireSession();
+  const session = await requireEscrita();
   const parsed = groupSchema.safeParse(input);
   if (!parsed.success) {
     return { ok: false, error: parsed.error.issues[0]?.message ?? "Dados inválidos." };
@@ -443,7 +443,7 @@ export async function uploadFoto(
   id: string,
   dataUri: string,
 ): Promise<ActionResult> {
-  const session = await requireSession();
+  const session = await requireEscrita();
   if (!(alvo in ALVOS)) return { ok: false, error: "Alvo inválido." };
   if (!uuid.safeParse(id).success) return { ok: false, error: "Item inválido." };
 
@@ -477,7 +477,7 @@ export async function removeFoto(
   alvo: AlvoFoto,
   id: string,
 ): Promise<ActionResult> {
-  const session = await requireSession();
+  const session = await requireEscrita();
   if (!(alvo in ALVOS)) return { ok: false, error: "Alvo inválido." };
   if (!uuid.safeParse(id).success) return { ok: false, error: "Item inválido." };
 

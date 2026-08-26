@@ -5,7 +5,7 @@ import { z } from "zod";
 
 import { requirePlatformAdmin } from "@/lib/auth";
 import { sql } from "@/lib/db";
-import { rodarMigrations } from "@/lib/install";
+import { prepararDemo, rodarMigrations } from "@/lib/install";
 import {
   criarPizzaria,
   ProvisioningError,
@@ -168,6 +168,8 @@ export async function atualizarBanco(): Promise<
 
   try {
     const arquivos = await rodarMigrations();
+    // Por último, sempre: depende da pizzaria de demonstração existir.
+    await prepararDemo();
     // O cardápio da demo é público e cacheado; sem isto a mudança existiria
     // no banco e continuaria invisível na tela.
     revalidatePath("/", "layout");

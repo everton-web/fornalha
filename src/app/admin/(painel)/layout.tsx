@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ExternalLink, LogOut } from "lucide-react";
+import { ExternalLink, Eye, LogOut } from "lucide-react";
 
 import { requireSession } from "@/lib/auth";
 import { isOpenNow } from "@/lib/hours";
@@ -55,6 +55,23 @@ export default async function PainelLayout({ children }: LayoutProps<"/admin">) 
           <NavLink href="/admin/configuracoes">Configurações</NavLink>
         </nav>
       </header>
+
+      {/*
+        Fica no topo de toda tela do painel, não só na primeira: quem entra
+        pela demonstração navega, se distrai, e daqui a três cliques precisa
+        continuar sabendo que está numa vitrine e não na própria loja.
+      */}
+      {session.isDemo && (
+        <div className="border-b border-amber-200 bg-amber-50">
+          <p className="mx-auto flex max-w-6xl items-start gap-2 px-4 py-2.5 text-sm text-amber-900">
+            <Eye className="mt-0.5 size-4 shrink-0" />
+            <span>
+              <strong className="font-semibold">Modo demonstração.</strong>{" "}
+              Abra tudo à vontade — nada aqui é salvo.
+            </span>
+          </p>
+        </div>
+      )}
 
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6">{children}</main>
     </div>

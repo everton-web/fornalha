@@ -17,6 +17,12 @@ export type Session = {
   email: string;
   tenant: Tenant;
   role: "owner" | "staff";
+  /**
+   * Conta de demonstração: vê tudo, não muda nada. Quem lê isto para decidir
+   * o que mostrar na tela está fazendo cortesia; quem impede a escrita é o
+   * `requireEscrita()`, no servidor.
+   */
+  isDemo: boolean;
 };
 
 /** O banco guarda só o hash do token — o valor original vive no cookie. */
@@ -71,10 +77,23 @@ export const getSession = cache(async function getSession(): Promise<Session | n
   const row = rows[0];
   if (!row) return null;
 
+  /*
+   * Consulta à parte, e tolerante: um deploy leva o código antes de alguém
+   * apertar "Atualizar o banco", e nesse intervalo a coluna ainda não existe.
+   * Lida junto na consulta acima, a ausência dela derrubaria o painel inteiro
+   * — justamente para o dono que precisa entrar e apertar o botão. Sem a
+   * coluna, ninguém é demo, que é a resposta certa: a conta nem existe ainda.
+   */
+  const isDemo = await opcional(async () => {
+    const [r] = await sql`select is_demo from users where id = ${row.user_id}`;
+    return Boolean(r?.is_demo);
+  }, false);
+
   return {
     userId: row.user_id as string,
     email: row.email as string,
     role: row.role as "owner" | "staff",
+    isDemo,
     tenant: normalizeTenant(row),
   };
 });
@@ -82,6 +101,30 @@ export const getSession = cache(async function getSession(): Promise<Session | n
 export async function requireSession(): Promise<Session> {
   const session = await getSession();
   if (!session) redirect("/admin/login");
+  return session;
+}
+
+/** Lançado quando a conta de demonstração tenta escrever. */
+export class DemoSomenteLeitura extends Error {
+  constructor() {
+    super("Modo demonstração: nada aqui é salvo de verdade.");
+    this.name = "DemoSomenteLeitura";
+  }
+}
+
+/**
+ * A sessão de quem pode mudar as coisas.
+ *
+ * Toda Server Action que escreve chama isto no lugar de `requireSession()` —
+ * e `scripts/testa-demo.mjs` confere que nenhuma escapou, porque esquecer uma
+ * só é o bastante para um visitante apagar o cardápio da demonstração.
+ *
+ * A trava mora aqui, no servidor, e não em botão desabilitado na tela: Server
+ * Action é endpoint POST aberto, e esconder o botão não fecha a porta.
+ */
+export async function requireEscrita(): Promise<Session> {
+  const session = await requireSession();
+  if (session.isDemo) throw new DemoSomenteLeitura();
   return session;
 }
 

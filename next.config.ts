@@ -82,8 +82,8 @@ const nextConfig: NextConfig = {
   // falham em produção com "arquivo não encontrado", funcionando só no
   // computador de quem programou.
   outputFileTracingIncludes: {
-    "/admin/instalar": ["db/migrations/**/*.sql", "db/seed.sql"],
-    "/agencia": ["db/migrations/**/*.sql"],
+    "/admin/instalar": ["db/migrations/**/*.sql", "db/seed.sql", "db/demo.sql"],
+    "/agencia": ["db/migrations/**/*.sql", "db/demo.sql"],
   },
 };
 

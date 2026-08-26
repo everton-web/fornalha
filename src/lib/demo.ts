@@ -21,3 +21,12 @@ export const DEMO_CEP_CLIENTE = "41830000";
 export function isDemo(slug: string): boolean {
   return slug === DEMO_SLUG;
 }
+
+/**
+ * Conta que entra no painel da demonstração.
+ *
+ * A senha dela é impossível de propósito (ver a migration 0013): a única
+ * porta é /admin/demo, que não pede nenhuma. Assim ninguém entra por engano
+ * pela tela de login, e não há segredo publicado para alguém reaproveitar.
+ */
+export const DEMO_EMAIL = "demo@fornalha.com.br";
