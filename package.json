@@ -9,6 +9,7 @@
     "lint": "eslint",
     "nova-pizzaria": "node scripts/nova-pizzaria.mjs",
     "vincular-dono": "node scripts/vincular-dono.mjs",
+    "instalar": "node scripts/instalar.mjs",
     "db:migrate": "node scripts/migrate.mjs",
     "db:seed": "node scripts/migrate.mjs --seed",
     "env:sync": "node scripts/sync-env.mjs",

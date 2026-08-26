@@ -17,9 +17,14 @@ Next.js 16 · React 19 · Tailwind 4 · Postgres (Supabase).
 ```bash
 npm install
 cp .env.example .env.local     # preencha DATABASE_URL
-npm run db:seed                # cria as tabelas + pizzaria de demonstração
+npm run instalar -- --email=voce@exemplo.com --senha=umaSenhaForte --demo
 npm run dev
 ```
+
+`instalar` faz tudo numa passada: roda as migrations que faltarem, cria a
+pizzaria de demonstração (com `--demo`), libera seu login no painel e mostra o
+inventário do banco para conferir. Serve tanto para começar do zero quanto para
+pôr em dia um banco que já roda — sem `--demo`, ele não toca no cardápio.
 
 - Cardápio da demo: http://localhost:3000/bella-napoli
 - Painel: http://localhost:3000/admin
