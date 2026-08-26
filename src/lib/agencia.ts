@@ -6,6 +6,7 @@ import { num, sql } from "@/lib/db";
 export type PizzariaNaAgencia = {
   id: string;
   slug: string;
+  dominio: string | null;
   nome: string;
   cor: string;
   ativa: boolean;
@@ -28,7 +29,7 @@ export type PizzariaNaAgencia = {
 export async function listarPizzarias(): Promise<PizzariaNaAgencia[]> {
   const rows = await sql`
     select
-      t.id, t.slug, t.name, t.primary_color, t.is_active, t.created_at,
+      t.id, t.slug, t.custom_domain, t.name, t.primary_color, t.is_active, t.created_at,
       (
         select u.email from tenant_members m
         join users u on u.id = m.user_id
@@ -53,6 +54,7 @@ export async function listarPizzarias(): Promise<PizzariaNaAgencia[]> {
   return rows.map((r) => ({
     id: r.id as string,
     slug: r.slug as string,
+    dominio: (r.custom_domain as string | null) ?? null,
     nome: r.name as string,
     cor: r.primary_color as string,
     ativa: Boolean(r.is_active),

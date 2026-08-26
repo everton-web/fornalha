@@ -1,5 +1,12 @@
 import Link from "next/link";
-import { ChefHat, LayoutDashboard, Smartphone, Store } from "lucide-react";
+import {
+  ChefHat,
+  Globe,
+  LayoutDashboard,
+  Palette,
+  Smartphone,
+  Store,
+} from "lucide-react";
 
 export default function Home() {
   return (
@@ -34,7 +41,7 @@ export default function Home() {
         </Link>
       </div>
 
-      <ul className="mt-14 grid gap-4 sm:grid-cols-3">
+      <ul className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Feature
           icon={<Smartphone className="size-5" />}
           title="App do cliente"
@@ -46,9 +53,19 @@ export default function Home() {
           text="Pedidos em tempo real, mudança de status e histórico do dia."
         />
         <Feature
+          icon={<Globe className="size-5" />}
+          title="Domínio próprio"
+          text="Cada pizzaria atende no endereço dela, com a marca dela. O sistema fica invisível."
+        />
+        <Feature
           icon={<Store className="size-5" />}
-          title="Várias pizzarias"
-          text="Um sistema, um link por cliente. Cardápio e identidade separados."
+          title="Conta separada"
+          text="Cada dono entra no painel dele e vê só a loja dele. Cardápio, preços e pedidos isolados."
+        />
+        <Feature
+          icon={<Palette className="size-5" />}
+          title="Do jeito da casa"
+          text="Cor, logo, tamanhos, faixas de preço, bordas, horários, área de entrega e formas de pagamento."
         />
       </ul>
     </main>

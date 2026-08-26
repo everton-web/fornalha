@@ -248,3 +248,26 @@ vercel deploy --prod
 ```
 
 Cada pizzaria pode ganhar um domínio próprio apontando para `/{slug}`.
+
+## Domínio próprio da pizzaria
+
+Cada pizzaria pode atender no endereço dela — `pizzariadobairro.com.br` em vez
+de `/pizzaria-do-bairro`. São duas etapas:
+
+1. **No painel da agência**, em `/agencia` → a pizzaria → **Domínio próprio**,
+   informe o domínio. Fica guardado normalizado (minúsculas, sem `www`), que é
+   como o host chega na requisição.
+2. **Na Vercel**, Settings → Domains, cadastre o mesmo domínio no projeto, e
+   aponte o DNS do cliente conforme a Vercel indicar.
+
+O roteamento é feito por [`src/proxy.ts`](src/proxy.ts) — no Next 16 este
+arquivo se chama `proxy` (era `middleware`) e roda em Node.js, o que permite
+consultar o banco. Ele descobre de quem é o host e reescreve `/` para
+`/{slug}`, mantendo intactos `/admin`, `/agencia` e `/api`, que são da
+plataforma e atendem em qualquer domínio.
+
+O mapa host → pizzaria fica um minuto em memória: domínio muda quando a agência
+cadastra um, não a cada pedido.
+
+Pizzaria desligada não atende pelo domínio dela — a mesma chave que corta o
+`/slug` corta o domínio próprio.

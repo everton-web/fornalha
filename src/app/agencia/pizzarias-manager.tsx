@@ -2,11 +2,21 @@
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
-import { Check, Copy, ExternalLink, KeyRound, Plus, Store, X } from "lucide-react";
+import {
+  Check,
+  Copy,
+  ExternalLink,
+  Globe,
+  KeyRound,
+  Plus,
+  Store,
+  X,
+} from "lucide-react";
 
 import {
   alternarPizzaria,
   cadastrarPizzaria,
+  definirDominio,
   trocarSenhaDoDono,
 } from "@/app/agencia/actions";
 import type { PizzariaNaAgencia } from "@/lib/agencia";
@@ -324,6 +334,8 @@ Troque a senha assim que entrar.`;
 
 function LinhaPizzaria({ pizzaria: p }: { pizzaria: PizzariaNaAgencia }) {
   const [trocando, setTrocando] = useState(false);
+  const [editandoDominio, setEditandoDominio] = useState(false);
+  const [dominio, setDominio] = useState(p.dominio ?? "");
   const [novaSenha, setNovaSenha] = useState("");
   const [aviso, setAviso] = useState<string | null>(null);
   const [pendente, iniciar] = useTransition();
@@ -350,14 +362,27 @@ function LinhaPizzaria({ pizzaria: p }: { pizzaria: PizzariaNaAgencia }) {
               </span>
             )}
           </div>
-          <Link
-            href={`/${p.slug}`}
-            target="_blank"
-            className="inline-flex items-center gap-1 font-mono text-xs text-muted hover:text-foreground"
-          >
-            /{p.slug}
-            <ExternalLink className="size-3" />
-          </Link>
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+            <Link
+              href={`/${p.slug}`}
+              target="_blank"
+              className="inline-flex items-center gap-1 font-mono text-xs text-muted hover:text-foreground"
+            >
+              /{p.slug}
+              <ExternalLink className="size-3" />
+            </Link>
+            {p.dominio && (
+              <a
+                href={`https://${p.dominio}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 rounded-full bg-stone-100 px-2 py-0.5 font-mono text-xs font-medium text-stone-700"
+              >
+                <Globe className="size-3" />
+                {p.dominio}
+              </a>
+            )}
+          </div>
           <p className="mt-1 truncate text-xs text-muted">
             {p.donoEmail ?? "sem dono cadastrado"}
           </p>
@@ -391,7 +416,52 @@ function LinhaPizzaria({ pizzaria: p }: { pizzaria: PizzariaNaAgencia }) {
         </p>
       )}
 
-      {trocando ? (
+      {editandoDominio ? (
+        <div className="mt-4 border-t border-line pt-4">
+          <p className="mb-2 text-xs text-muted">
+            Depois de salvar aqui, cadastre o mesmo domínio na Vercel
+            (Settings → Domains) e aponte o DNS para lá. Deixe em branco para
+            voltar a usar só <code>/{p.slug}</code>.
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <input
+              value={dominio}
+              onChange={(e) => setDominio(e.target.value)}
+              placeholder="pizzariadobairro.com.br"
+              className="min-w-56 flex-1 rounded-xl border border-line bg-background px-3 py-2 font-mono text-sm outline-none focus:border-stone-400"
+            />
+            <button
+              type="button"
+              disabled={pendente}
+              onClick={() =>
+                iniciar(async () => {
+                  const r = await definirDominio(p.id, dominio);
+                  if (!r.ok) return setAviso(r.error);
+                  setAviso(
+                    r.dados.dominio
+                      ? `Domínio salvo. Falta cadastrá-lo na Vercel e apontar o DNS.`
+                      : "Domínio removido. A pizzaria volta a atender só pelo /slug.",
+                  );
+                  setEditandoDominio(false);
+                })
+              }
+              className="rounded-full bg-foreground px-4 py-2 text-sm font-semibold text-white disabled:opacity-40"
+            >
+              Salvar
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setDominio(p.dominio ?? "");
+                setEditandoDominio(false);
+              }}
+              className="rounded-full border border-line px-4 py-2 text-sm"
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      ) : trocando ? (
         <div className="mt-4 flex flex-wrap gap-2 border-t border-line pt-4">
           <input
             value={novaSenha}
@@ -427,6 +497,19 @@ function LinhaPizzaria({ pizzaria: p }: { pizzaria: PizzariaNaAgencia }) {
         </div>
       ) : (
         <div className="mt-4 flex flex-wrap gap-2 border-t border-line pt-4">
+          <button
+            type="button"
+            disabled={pendente}
+            onClick={() => {
+              setAviso(null);
+              setEditandoDominio(true);
+            }}
+            className="flex items-center gap-1.5 rounded-full border border-line px-4 py-2 text-sm font-medium transition hover:border-stone-300 disabled:opacity-40"
+          >
+            <Globe className="size-3.5" />
+            {p.dominio ? "Trocar domínio" : "Domínio próprio"}
+          </button>
+
           <button
             type="button"
             disabled={pendente}

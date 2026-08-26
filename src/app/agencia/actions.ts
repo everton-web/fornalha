@@ -77,6 +77,55 @@ export async function alternarPizzaria(
   return { ok: true };
 }
 
+/**
+ * Aponta um domínio próprio para a pizzaria.
+ *
+ * Guarda normalizado — minúsculas, sem "www", sem protocolo, sem barra — que
+ * é a forma como o host chega na requisição. Aceitar "https://www.X.com.br/"
+ * e comparar cru faria o domínio nunca bater, e o erro apareceria só quando o
+ * cliente abrisse o site.
+ */
+export async function definirDominio(
+  tenantId: string,
+  dominio: string,
+): Promise<ActionResult<{ dominio: string | null }>> {
+  await requirePlatformAdmin();
+  if (!z.string().uuid().safeParse(tenantId).success) {
+    return { ok: false, error: "Pizzaria inválida." };
+  }
+
+  const limpo = dominio
+    .trim()
+    .toLowerCase()
+    .replace(/^https?:\/\//, "")
+    .replace(/^www\./, "")
+    .replace(/\/.*$/, "");
+
+  if (limpo && !/^[a-z0-9.-]+\.[a-z]{2,}$/.test(limpo)) {
+    return {
+      ok: false,
+      error: "Domínio inválido. Exemplo: pizzariadobairro.com.br",
+    };
+  }
+
+  try {
+    await sql`
+      update tenants
+      set custom_domain = ${limpo || null}, updated_at = now()
+      where id = ${tenantId}
+    `;
+  } catch (error) {
+    // 23505 = unique_violation: outra pizzaria já usa este domínio.
+    if ((error as { code?: string }).code === "23505") {
+      return { ok: false, error: "Esse domínio já está em outra pizzaria." };
+    }
+    throw error;
+  }
+
+  revalidatePath("/agencia");
+  return { ok: true, dados: { dominio: limpo || null } };
+}
+
 export async function trocarSenhaDoDono(
   tenantId: string,
   novaSenha: string,
