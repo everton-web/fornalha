@@ -6,10 +6,10 @@ import {
   ChefHat,
   Globe,
   Layers,
+  MapPin,
   Printer,
   QrCode,
   Smartphone,
-  Store,
 } from "lucide-react";
 
 /**
@@ -42,16 +42,15 @@ export default function Home() {
       </span>
 
       <h1 className="mt-5 max-w-3xl text-4xl font-bold leading-[1.05] tracking-tight sm:text-6xl">
-        A pizzaria vende no{" "}
-        <span className="lp-incandescente">endereço dela</span>.
+        Seu cardápio, no seu endereço.
         <br />
-        Você cuida do sistema.
+        <span className="lp-incandescente">Sem comissão por pedido.</span>
       </h1>
 
       <p className="mt-5 max-w-xl text-lg" style={{ color: "var(--lp-ink-dim)" }}>
-        Cardápio digital, pedidos online e painel de cozinha. Uma instalação
-        atende quantas pizzarias você quiser — cada uma com domínio, marca e
-        conta próprios.
+        Seu cliente pede no site da sua pizzaria, o pedido cai direto na
+        cozinha e o dinheiro vai para a sua conta. Sem intermediário ficando
+        com um pedaço de cada pizza.
       </p>
 
       <div className="mt-8 flex flex-wrap gap-3">
@@ -73,11 +72,11 @@ export default function Home() {
       <ul className="mt-16 grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
         {/* Destaque: o que diferencia. Ganha o dobro e uma janela de navegador. */}
         <Quadro span="lg:col-span-4" icone={<Globe className="size-5" />}>
-          <Titulo>Domínio próprio</Titulo>
+          <Titulo>Seu endereço na internet</Titulo>
           <Texto>
-            O cliente abre o endereço da pizzaria e cai direto no cardápio.
-            Sem <code className="font-mono text-[0.85em]">/nome-da-loja</code>{" "}
-            no fim, sem a sua marca aparecer. O sistema fica invisível.
+            Seu cliente digita o endereço da sua pizzaria e cai no seu
+            cardápio. Sem link de terceiro, sem nome de outra empresa no meio
+            — a marca que aparece é a sua.
           </Texto>
 
           {/* mt-auto: encosta no rodapé do quadro, para o bloco grande não
@@ -138,8 +137,8 @@ export default function Home() {
         <Quadro span="lg:col-span-2" icone={<Smartphone className="size-5" />}>
           <Titulo>Montador de pizza</Titulo>
           <Texto>
-            Tamanho, até 4 sabores, borda e adicionais. No celular, sem
-            instalar nada.
+            Seu cliente escolhe tamanho, até 4 sabores, borda e adicionais.
+            No celular dele, sem instalar nada.
           </Texto>
 
           <div className="mt-auto space-y-1.5 pt-4">
@@ -181,9 +180,10 @@ export default function Home() {
 
         {/* Trio de sustentação. */}
         <Quadro span="lg:col-span-2" icone={<Layers className="size-5" />}>
-          <Titulo>Faixas de preço</Titulo>
+          <Titulo>Reajuste sem sofrimento</Titulo>
           <Texto>
-            Junta os sabores em faixas e mexe no preço de todos de uma vez.
+            Subiu o queijo? Você mexe no preço da faixa e todos os sabores
+            dela sobem juntos. Não é sabor por sabor.
           </Texto>
           <div className="mt-auto space-y-1.5 pt-4 font-mono text-xs">
             <div className="lp-fundo flex justify-between rounded-lg px-2.5 py-1.5">
@@ -198,39 +198,33 @@ export default function Home() {
         </Quadro>
 
         <Quadro span="lg:col-span-2" icone={<QrCode className="size-5" />}>
-          <Titulo>Pix na hora</Titulo>
+          <Titulo>Pago antes de sair</Titulo>
           <Texto>
-            O cliente paga antes de a moto sair, e o dinheiro cai na conta da
-            pizzaria — não passa por você.
+            O cliente paga por Pix e o dinheiro cai na sua conta, na hora. Você
+            escolhe o gateway; a taxa é dele, não nossa.
           </Texto>
           <p className="mt-auto rounded-lg px-2.5 py-2 text-xs font-medium" style={{ background: "rgb(16 60 34 / 0.55)", color: "#7fd6a0" }}>
             Pago — pode preparar
           </p>
         </Quadro>
 
-        <Quadro span="lg:col-span-2" icone={<Store className="size-5" />}>
-          <Titulo>Conta separada</Titulo>
+        <Quadro span="lg:col-span-2" icone={<MapPin className="size-5" />}>
+          <Titulo>Taxa por bairro</Titulo>
           <Texto>
-            Cada dono entra no painel dele e enxerga só a loja dele. Cardápio,
-            preços e pedidos isolados.
+            O cliente digita o CEP, o endereço se preenche sozinho e a taxa sai
+            do bairro dele. Longe não sai pelo preço de perto.
           </Texto>
-          <div className="mt-auto space-y-1.5 pt-4">
+          <div className="mt-auto space-y-1.5 pt-4 text-xs">
             {[
-              ["Dom Luigi", "#1e5c2f"],
-              ["Bella Napoli", "#c81e1e"],
-            ].map(([nome, cor]) => (
+              ["Vila Madalena", "R$ 6"],
+              ["Pinheiros", "R$ 9"],
+            ].map(([bairro, taxa]) => (
               <div
-                key={nome}
+                key={bairro}
                 className="lp-fundo flex items-center gap-2 rounded-lg px-2.5 py-1.5"
               >
-                <span
-                  className="size-4 shrink-0 rounded"
-                  style={{ background: cor }}
-                />
-                <span className="truncate text-xs font-medium">{nome}</span>
-                <span className="ml-auto shrink-0 text-[11px]" style={{ color: "var(--lp-ink-faint)" }}>
-                  painel próprio
-                </span>
+                <span style={{ color: "var(--lp-ink-dim)" }}>{bairro}</span>
+                <span className="ml-auto font-semibold">{taxa}</span>
               </div>
             ))}
           </div>
@@ -259,13 +253,13 @@ export default function Home() {
       {/* --------------------------------------------------- como funciona */}
       <section className="mt-16">
         <h2 className="text-sm font-bold uppercase tracking-[0.14em]" style={{ color: "var(--lp-ink-faint)" }}>
-          Como uma pizzaria entra
+          Como sua pizzaria começa
         </h2>
         <ol className="mt-4 grid gap-4 sm:grid-cols-3">
           {[
-            ["Você cadastra a loja", "Nome, endereço e login do dono. Ela nasce com tamanhos, categorias, bordas e faixas de preço."],
-            ["O dono monta o cardápio", "Sabores, preços, fotos, horários e área de entrega — tudo pelo painel, sem depender de você."],
-            ["O cliente pede", "Pelo link ou pelo domínio da pizzaria. O pedido cai na cozinha com aviso sonoro."],
+            ["A gente monta sua loja", "Criamos sua conta e o cardápio base — tamanhos, categorias, bordas e faixas de preço prontos."],
+            ["Você põe os sabores", "Preços, fotos, horários e área de entrega, pelo painel. Sem depender de ninguém para mudar preço."],
+            ["Seus clientes pedem", "Pelo seu link ou pelo seu domínio. O pedido cai na cozinha com aviso sonoro."],
           ].map(([titulo, texto], i) => (
             <li key={titulo} className="lp-quadro rounded-2xl p-5">
               <span className="grid size-7 place-items-center rounded-full text-xs font-bold" style={{ background: "var(--lp-ember)", color: "#2a1002" }}>
@@ -289,8 +283,8 @@ export default function Home() {
           Veja funcionando antes de decidir
         </h2>
         <p className="mx-auto mt-2 max-w-md text-sm" style={{ color: "var(--lp-ink-dim)" }}>
-          A pizzaria de demonstração está no ar com cardápio completo. Monte uma
-          pizza, feche o pedido e veja onde ele cai.
+          Uma pizzaria de exemplo está no ar com cardápio completo. Monte uma
+          pizza, feche o pedido e veja como ele chega na cozinha.
         </p>
         <Link
           href="/bella-napoli"
