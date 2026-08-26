@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import {
   Bell,
@@ -11,54 +10,11 @@ import {
   Smartphone,
 } from "lucide-react";
 
-/**
- * Moldura de notebook.
- *
- * Desenhada em CSS, não recortada de um mockup pronto: a foto de mockup vem
- * em perspectiva, o que obrigaria a deformar o print e perder a nitidez do
- * texto — e um print de sistema só convence se der para ler. Em CSS a tela
- * fica reta, nítida em qualquer densidade de pixel, e pesa nada.
- */
-function Notebook({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="w-full">
-      {/* tampa — a moldura escura em volta da tela */}
-      <div className="rounded-t-xl bg-gradient-to-b from-stone-700 to-stone-800 p-1.5 pt-2 sm:rounded-t-2xl sm:p-2 sm:pt-3">
-        <div className="mx-auto mb-1 size-1 rounded-full bg-stone-500/70 sm:mb-1.5" />
-        <div className="overflow-hidden rounded-sm bg-black sm:rounded">
-          {children}
-        </div>
-      </div>
-      {/* base — mais larga que a tampa, como no aparelho de verdade */}
-      <div className="relative -mx-[5%] h-2 rounded-b-md bg-gradient-to-b from-stone-300 to-stone-400 sm:h-3 sm:rounded-b-lg">
-        <div className="absolute left-1/2 top-0 h-1 w-[14%] -translate-x-1/2 rounded-b-full bg-stone-400" />
-      </div>
-    </div>
-  );
-}
-
-/**
- * Moldura de celular.
- *
- * Sem "ilha dinâmica": ela cairia por cima do cabeçalho da pizzaria, tapando
- * justamente o nome da loja. Os botões laterais já entregam que é um celular
- * sem cobrir nada da tela.
- */
-function Celular({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="relative">
-      {/* botões — volume à esquerda, o de ligar à direita */}
-      <div className="absolute -left-[2px] top-[18%] h-[6%] w-[2px] rounded-l bg-stone-600" />
-      <div className="absolute -left-[2px] top-[27%] h-[6%] w-[2px] rounded-l bg-stone-600" />
-      <div className="absolute -right-[2px] top-[22%] h-[9%] w-[2px] rounded-r bg-stone-600" />
-      <div className="rounded-[1.4rem] bg-gradient-to-b from-stone-700 to-stone-800 p-[3px] shadow-[0_24px_60px_-24px_rgba(28,25,23,0.6)] sm:rounded-[2rem] sm:p-1">
-        <div className="overflow-hidden rounded-[1.25rem] bg-black sm:rounded-[1.75rem]">
-          {children}
-        </div>
-      </div>
-    </div>
-  );
-}
+import { CenaDoProduto } from "./_home/cena";
+import { Comanda } from "./_home/comanda";
+import { Faq } from "./_home/faq";
+import { ComoComeca } from "./_home/passos";
+import { Rodape } from "./_home/rodape";
 
 /**
  * Página de apresentação da Fornalha.
@@ -120,60 +76,7 @@ export default function Home() {
         </Link>
       </div>
 
-      {/* ---------------------------------------------------- o produto
-          Print de verdade das telas, não desenho: quem decide contratar
-          quer ver o que vai receber. Os dois lados do mesmo pedido — o
-          cliente montando no celular, e ele caindo no painel da pizzaria. */}
-      <figure className="mt-14">
-        {/* Sobrepostos, não lado a lado: dois aparelhos alinhados viram
-            catálogo de loja de app. Com o celular por cima do canto do
-            notebook, viram uma cena só — os dois lados de um pedido. */}
-        <div className="relative mx-auto max-w-3xl pb-12 sm:pb-16">
-          <Notebook>
-            <Image
-              src="/print-painel.png"
-              alt="Painel da pizzaria com os pedidos ativos e o status de cada um"
-              width={2880}
-              height={1800}
-              priority
-              className="block w-full"
-            />
-          </Notebook>
-
-          {/* A comanda que sai na impressora da cozinha. Torta de propósito:
-              papel na bancada não fica alinhado, e o leve giro é o que
-              separa uma folha de verdade de mais um retângulo na tela. */}
-          <div className="absolute -left-2 bottom-4 w-24 -rotate-6 sm:bottom-6 sm:left-2 sm:w-32">
-            <Image
-              src="/print-comanda.png"
-              alt="Comanda impressa do pedido, com itens, endereço e total"
-              width={900}
-              height={1692}
-              className="block w-full rounded-[2px] shadow-[0_18px_40px_-16px_rgba(28,25,23,0.45)]"
-            />
-          </div>
-
-          {/* O celular passa um pouco além da base do notebook — é o que dá
-              profundidade à cena. `bottom` fica menor que o `pb` do pai
-              justamente por isso; o resto do `pb` é o respiro até a legenda. */}
-          <div className="absolute bottom-8 right-0 w-28 sm:bottom-10 sm:right-4 sm:w-40">
-            <Celular>
-              <Image
-                src="/print-montador.png"
-                alt="Montador de pizza com tamanhos, sabores e preço pela média"
-                width={780}
-                height={1440}
-                className="block w-full"
-              />
-            </Celular>
-          </div>
-        </div>
-
-        <figcaption className="mt-4 text-center text-sm text-muted">
-          Seu cliente monta a pizza no celular, o pedido cai no seu painel já
-          pago, e a comanda sai na impressora da cozinha.
-        </figcaption>
-      </figure>
+      <CenaDoProduto />
 
       {/* --------------------------------------------------------- bento */}
       <ul className="mt-16 grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
@@ -355,34 +258,18 @@ export default function Home() {
         </Quadro>
       </ul>
 
-      {/* --------------------------------------------------- como funciona */}
-      <section className="mt-16">
-        <h2 className="text-sm font-bold uppercase tracking-wide text-stone-500">
-          Como sua pizzaria começa
-        </h2>
-        <ol className="mt-4 grid gap-4 sm:grid-cols-3">
-          {[
-            ["A gente monta sua loja", "Criamos sua conta e o cardápio base — tamanhos, categorias, bordas e faixas de preço prontos."],
-            ["Você põe os sabores", "Preços, fotos, horários e área de entrega, pelo painel. Sem depender de ninguém para mudar preço."],
-            ["Seus clientes pedem", "Pelo seu link ou pelo seu domínio. O pedido cai na cozinha com aviso sonoro."],
-          ].map(([titulo, texto], i) => (
-            <li key={titulo} className="rounded-2xl border border-line bg-surface p-5">
-              <span className="grid size-7 place-items-center rounded-full bg-foreground text-xs font-bold text-background">
-                {i + 1}
-              </span>
-              <h3 className="mt-3 font-semibold">{titulo}</h3>
-              <p className="mt-1 text-sm text-muted">{texto}</p>
-            </li>
-          ))}
-        </ol>
-      </section>
+      <Comanda />
+
+      <ComoComeca />
+
+      <Faq />
 
       {/* ----------------------------------------------------------- fecho */}
       <section className="mt-14 rounded-3xl bg-foreground px-6 py-10 text-center sm:px-10">
         <h2 className="text-2xl font-bold tracking-tight text-background sm:text-3xl">
           Veja funcionando antes de decidir
         </h2>
-        <p className="mx-auto mt-2 max-w-md text-sm text-stone-400">
+        <p className="mx-auto mt-3 max-w-md text-stone-300">
           Uma pizzaria de exemplo está no ar. Monte uma pizza no cardápio, e
           veja no painel como o pedido chega na cozinha.
         </p>
@@ -393,26 +280,21 @@ export default function Home() {
           >
             Abrir o cardápio
           </Link>
+          {/*
+            Secundário no escuro precisa de fundo, não só de borda: contorno
+            cinza sobre preto some na tela do celular no sol, e o botão
+            "Abrir o painel" era metade da oferta desta seção.
+          */}
           <Link
             href="/admin/demo"
-            className="rounded-full border border-stone-600 px-6 py-3 text-sm font-semibold text-stone-100 transition hover:border-stone-400"
+            className="rounded-full bg-white/10 px-6 py-3 text-sm font-semibold text-white ring-1 ring-inset ring-white/30 transition hover:bg-white/20"
           >
             Abrir o painel
           </Link>
         </div>
       </section>
 
-      {/* O login sai do herói e vem para cá: o topo é de quem ainda não é
-          cliente, e quem já é sabe procurar o rodapé — ou já tem o link. */}
-      <footer className="mt-10 text-center text-xs text-muted">
-        <Link
-          href="/admin"
-          className="font-medium underline decoration-dotted underline-offset-4 transition hover:text-foreground"
-        >
-          Entrar na minha conta
-        </Link>
-        <p className="mt-2">Fornalha · sistema de pedidos para pizzarias</p>
-      </footer>
+      <Rodape />
     </main>
   );
 }
