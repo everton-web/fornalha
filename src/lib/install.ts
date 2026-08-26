@@ -81,6 +81,35 @@ export async function lerEstado(): Promise<EstadoInstalacao> {
   };
 }
 
+/**
+ * Aplica todas as migrations, na ordem, e devolve quais rodaram.
+ *
+ * Existe separada da instalação porque o banco precisa ser atualizado mais de
+ * uma vez na vida: a instalação acontece uma vez só, mas toda versão nova que
+ * mexe no schema precisa chegar num banco que já roda. Sem isto, um deploy
+ * sobe o código novo e deixa o banco para trás — e quem hospeda na nuvem não
+ * tem como rodar `npm run db:migrate`, porque não tem o projeto na máquina
+ * nem a credencial do banco.
+ *
+ * As migrations são idempotentes por contrato (`if not exists`, `on conflict`,
+ * update no lugar de insert), então rodar todas de novo é seguro e é o que
+ * dispensa guardar um registro de quais já passaram.
+ */
+export async function rodarMigrations(): Promise<string[]> {
+  const dir = join(process.cwd(), "db", "migrations");
+  const arquivos = readdirSync(dir)
+    .filter((f) => f.endsWith(".sql"))
+    .sort();
+
+  for (const arquivo of arquivos) {
+    // .simple(): cada migration é um script com vários comandos, e o protocolo
+    // simples é o que aceita isso numa tacada.
+    await sql.unsafe(readFileSync(join(dir, arquivo), "utf8")).simple();
+  }
+
+  return arquivos;
+}
+
 export type ResultadoInstalacao = {
   migrationsRodadas: string[];
   criouDemo: boolean;
@@ -102,16 +131,7 @@ export async function instalar(input: {
     );
   }
 
-  const dir = join(process.cwd(), "db", "migrations");
-  const arquivos = readdirSync(dir)
-    .filter((f) => f.endsWith(".sql"))
-    .sort();
-
-  for (const arquivo of arquivos) {
-    // .simple(): cada migration é um script com vários comandos, e o protocolo
-    // simples é o que aceita isso numa tacada.
-    await sql.unsafe(readFileSync(join(dir, arquivo), "utf8")).simple();
-  }
+  const arquivos = await rodarMigrations();
 
   let criouDemo = false;
   const [{ n: pizzarias }] = await sql`select count(*)::int as n from tenants`;

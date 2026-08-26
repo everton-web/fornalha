@@ -5,6 +5,7 @@ import { z } from "zod";
 
 import { requirePlatformAdmin } from "@/lib/auth";
 import { sql } from "@/lib/db";
+import { rodarMigrations } from "@/lib/install";
 import {
   criarPizzaria,
   ProvisioningError,
@@ -145,5 +146,40 @@ export async function trocarSenhaDoDono(
     }
     console.error("Falha ao trocar senha do dono", error);
     return { ok: false, error: "Não foi possível trocar a senha." };
+  }
+}
+
+/**
+ * Põe o banco em dia com o código que está no ar.
+ *
+ * Um deploy sobe o código, não o schema. Quem hospeda na nuvem não tem o
+ * projeto na máquina nem a credencial do banco, então `npm run db:migrate`
+ * não é uma opção — sem este botão, toda mudança de banco viraria SQL colado
+ * na mão no painel do provedor, e o sistema ficaria com o código de uma
+ * versão e o banco de outra.
+ *
+ * Fica atrás da conta de agência: quem administra a plataforma já pode criar
+ * e desligar pizzarias, então atualizar o banco não amplia nada.
+ */
+export async function atualizarBanco(): Promise<
+  ActionResult<{ migrations: number }>
+> {
+  await requirePlatformAdmin();
+
+  try {
+    const arquivos = await rodarMigrations();
+    // O cardápio da demo é público e cacheado; sem isto a mudança existiria
+    // no banco e continuaria invisível na tela.
+    revalidatePath("/", "layout");
+    return { ok: true, dados: { migrations: arquivos.length } };
+  } catch (error) {
+    console.error("Falha ao atualizar o banco", error);
+    return {
+      ok: false,
+      error:
+        error instanceof Error
+          ? `Não foi possível atualizar o banco: ${error.message}`
+          : "Não foi possível atualizar o banco.",
+    };
   }
 }

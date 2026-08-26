@@ -76,13 +76,14 @@ const nextConfig: NextConfig = {
   // quem procura versão vulnerável.
   poweredByHeader: false,
 
-  // A tela de instalação lê os .sql em tempo de execução para preparar o
-  // banco. O rastreamento automático não os enxerga — eles nunca são
-  // importados, só lidos por caminho — e sem esta linha a instalação falha
-  // em produção com "arquivo não encontrado", funcionando só no computador
-  // de quem programou.
+  // A tela de instalação e o "atualizar banco" da agência leem os .sql em
+  // tempo de execução. O rastreamento automático não os enxerga — eles nunca
+  // são importados, só lidos por caminho — e sem estas linhas as duas coisas
+  // falham em produção com "arquivo não encontrado", funcionando só no
+  // computador de quem programou.
   outputFileTracingIncludes: {
     "/admin/instalar": ["db/migrations/**/*.sql", "db/seed.sql"],
+    "/agencia": ["db/migrations/**/*.sql"],
   },
 };
 

@@ -5,6 +5,7 @@ import Link from "next/link";
 import {
   Check,
   Copy,
+  DatabaseZap,
   ExternalLink,
   Globe,
   KeyRound,
@@ -15,6 +16,7 @@ import {
 
 import {
   alternarPizzaria,
+  atualizarBanco,
   cadastrarPizzaria,
   definirDominio,
   trocarSenhaDoDono,
@@ -85,6 +87,63 @@ export function PizzariasManager({
       {pizzarias.map((p) => (
         <LinhaPizzaria key={p.id} pizzaria={p} />
       ))}
+
+      <AtualizarBanco />
+    </div>
+  );
+}
+
+/**
+ * Põe o banco em dia com o código que está no ar.
+ *
+ * Fica no rodapé da tela, discreto: não é coisa do dia a dia da agência, é
+ * o que se aperta depois de uma versão nova que mexeu no banco.
+ */
+function AtualizarBanco() {
+  const [estado, setEstado] = useState<
+    { tipo: "pronto"; migrations: number } | { tipo: "erro"; msg: string } | null
+  >(null);
+  const [pendente, iniciar] = useTransition();
+
+  return (
+    <div className="mt-6 rounded-2xl border border-line px-4 py-3">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="min-w-48 flex-1">
+          <p className="text-sm font-semibold">Atualizar o banco</p>
+          <p className="mt-0.5 text-xs text-muted">
+            Um deploy sobe o código, não o banco. Depois de uma versão que mexeu
+            no schema, aperte aqui uma vez. Rodar de novo não estraga nada.
+          </p>
+        </div>
+        <button
+          type="button"
+          disabled={pendente}
+          onClick={() =>
+            iniciar(async () => {
+              setEstado(null);
+              const r = await atualizarBanco();
+              setEstado(
+                r.ok
+                  ? { tipo: "pronto", migrations: r.dados.migrations }
+                  : { tipo: "erro", msg: r.error },
+              );
+            })
+          }
+          className="flex items-center gap-1.5 rounded-full border border-line px-4 py-2 text-sm font-semibold transition hover:border-stone-400 disabled:opacity-40"
+        >
+          <DatabaseZap className="size-4" />
+          {pendente ? "Atualizando…" : "Atualizar"}
+        </button>
+      </div>
+
+      {estado?.tipo === "pronto" && (
+        <p className="mt-2 text-xs font-medium text-green-700">
+          Banco em dia — {estado.migrations} migrations aplicadas.
+        </p>
+      )}
+      {estado?.tipo === "erro" && (
+        <p className="mt-2 text-xs font-medium text-red-600">{estado.msg}</p>
+      )}
     </div>
   );
 }
