@@ -35,7 +35,10 @@ if (!url) {
   process.exit(1);
 }
 
-const sql = postgres(url, { ssl: "require", prepare: false, max: 1 });
+// Mesma regra do src/lib/db.ts: Postgres local não fala TLS, e exigir SSL aqui
+// quebraria o `npm run db:migrate` contra um banco na própria máquina.
+const local = url.includes("localhost") || url.includes("127.0.0.1");
+const sql = postgres(url, { ssl: local ? false : "require", prepare: false, max: 1 });
 
 const files = readdirSync("db/migrations")
   .filter((f) => f.endsWith(".sql"))

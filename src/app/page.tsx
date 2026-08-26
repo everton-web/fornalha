@@ -12,6 +12,55 @@ import {
 } from "lucide-react";
 
 /**
+ * Moldura de notebook.
+ *
+ * Desenhada em CSS, não recortada de um mockup pronto: a foto de mockup vem
+ * em perspectiva, o que obrigaria a deformar o print e perder a nitidez do
+ * texto — e um print de sistema só convence se der para ler. Em CSS a tela
+ * fica reta, nítida em qualquer densidade de pixel, e pesa nada.
+ */
+function Notebook({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="w-full">
+      {/* tampa — a moldura escura em volta da tela */}
+      <div className="rounded-t-xl bg-gradient-to-b from-stone-700 to-stone-800 p-1.5 pt-2 sm:rounded-t-2xl sm:p-2 sm:pt-3">
+        <div className="mx-auto mb-1 size-1 rounded-full bg-stone-500/70 sm:mb-1.5" />
+        <div className="overflow-hidden rounded-sm bg-black sm:rounded">
+          {children}
+        </div>
+      </div>
+      {/* base — mais larga que a tampa, como no aparelho de verdade */}
+      <div className="relative -mx-[5%] h-2 rounded-b-md bg-gradient-to-b from-stone-300 to-stone-400 sm:h-3 sm:rounded-b-lg">
+        <div className="absolute left-1/2 top-0 h-1 w-[14%] -translate-x-1/2 rounded-b-full bg-stone-400" />
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Moldura de celular.
+ *
+ * Sem "ilha dinâmica": ela cairia por cima do cabeçalho da pizzaria, tapando
+ * justamente o nome da loja. Os botões laterais já entregam que é um celular
+ * sem cobrir nada da tela.
+ */
+function Celular({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="relative">
+      {/* botões — volume à esquerda, o de ligar à direita */}
+      <div className="absolute -left-[2px] top-[18%] h-[6%] w-[2px] rounded-l bg-stone-600" />
+      <div className="absolute -left-[2px] top-[27%] h-[6%] w-[2px] rounded-l bg-stone-600" />
+      <div className="absolute -right-[2px] top-[22%] h-[9%] w-[2px] rounded-r bg-stone-600" />
+      <div className="rounded-[1.4rem] bg-gradient-to-b from-stone-700 to-stone-800 p-[3px] shadow-[0_24px_60px_-24px_rgba(28,25,23,0.6)] sm:rounded-[2rem] sm:p-1">
+        <div className="overflow-hidden rounded-[1.25rem] bg-black sm:rounded-[1.75rem]">
+          {children}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/**
  * Página de apresentação da Fornalha.
  *
  * Bento: os quadros têm tamanhos diferentes porque o peso do que contam é
@@ -66,32 +115,43 @@ export default function Home() {
 
       {/* ---------------------------------------------------- o produto
           Print de verdade das telas, não desenho: quem decide contratar
-          quer ver o que vai receber. Os dois momentos que importam — o
-          cardápio que o cliente abre e o montador em que ele escolhe. */}
+          quer ver o que vai receber. Os dois lados do mesmo pedido — o
+          cliente montando no celular, e ele caindo no painel da pizzaria. */}
       <figure className="mt-14">
-        {/* Sobrepostas, não lado a lado: duas telas alinhadas viram catálogo
-            de app store. Com a segunda por cima e descida, elas se tornam
-            uma cena — o cardápio, e o montador aberto sobre ele. */}
-        <div className="flex items-end justify-center">
-          <Image
-            src="/print-cardapio.png"
-            alt="Cardápio da pizzaria aberto no celular do cliente"
-            width={780}
-            height={1440}
-            priority
-            className="w-40 rounded-2xl border border-line shadow-[0_24px_60px_-28px_rgba(28,25,23,0.5)] sm:w-56"
-          />
-          <Image
-            src="/print-montador.png"
-            alt="Montador de pizza com tamanhos, sabores e preço pela média"
-            width={780}
-            height={1440}
-            className="-ml-8 w-44 translate-y-6 rounded-2xl border border-line shadow-[0_24px_60px_-28px_rgba(28,25,23,0.55)] sm:-ml-14 sm:w-64"
-          />
+        {/* Sobrepostos, não lado a lado: dois aparelhos alinhados viram
+            catálogo de loja de app. Com o celular por cima do canto do
+            notebook, viram uma cena só — os dois lados de um pedido. */}
+        <div className="relative mx-auto max-w-3xl pb-12 sm:pb-16">
+          <Notebook>
+            <Image
+              src="/print-painel.png"
+              alt="Painel da pizzaria com os pedidos ativos e o status de cada um"
+              width={2880}
+              height={1800}
+              priority
+              className="block w-full"
+            />
+          </Notebook>
+
+          {/* O celular passa um pouco além da base do notebook — é o que dá
+              profundidade à cena. `bottom` fica menor que o `pb` do pai
+              justamente por isso; o resto do `pb` é o respiro até a legenda. */}
+          <div className="absolute bottom-8 right-0 w-28 sm:bottom-10 sm:right-4 sm:w-40">
+            <Celular>
+              <Image
+                src="/print-montador.png"
+                alt="Montador de pizza com tamanhos, sabores e preço pela média"
+                width={780}
+                height={1440}
+                className="block w-full"
+              />
+            </Celular>
+          </div>
         </div>
-        <figcaption className="mt-10 text-center text-sm text-muted">
-          O cardápio que seu cliente abre, e o montador onde ele escolhe os
-          sabores.
+
+        <figcaption className="mt-4 text-center text-sm text-muted">
+          Seu cliente monta a pizza no celular. O pedido cai no seu painel na
+          mesma hora, já com o pagamento confirmado.
         </figcaption>
       </figure>
 

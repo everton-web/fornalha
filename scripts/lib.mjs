@@ -39,7 +39,10 @@ export function connect() {
   loadEnv();
   const url = process.env.DATABASE_URL;
   if (!url) die("DATABASE_URL não definida. Preencha o .env.local.");
-  return postgres(url, { ssl: "require", prepare: false, max: 1 });
+  // Mesma regra do src/lib/db.ts: Postgres local não fala TLS, e exigir SSL
+  // aqui quebraria os scripts contra um banco na própria máquina.
+  const local = url.includes("localhost") || url.includes("127.0.0.1");
+  return postgres(url, { ssl: local ? false : "require", prepare: false, max: 1 });
 }
 
 /** Mesmo formato de src/lib/password.ts: "salt_hex:hash_hex". */
