@@ -4,17 +4,21 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { AlertCircle, Check, Plus, Trash2 } from "lucide-react";
 
+import type { DeliveryArea } from "@/lib/delivery";
 import { dayName } from "@/lib/hours";
 import type { OpeningHour, Tenant } from "@/lib/types";
 
 import { updateSettings } from "../../settings-actions";
+import { AreasField } from "./areas-field";
 import { LogoField } from "./logo-field";
 
 export function SettingsForm({
   tenant,
+  areas,
   canEdit,
 }: {
   tenant: Tenant;
+  areas: DeliveryArea[];
   canEdit: boolean;
 }) {
   const router = useRouter();
@@ -178,6 +182,15 @@ export function SettingsForm({
             <option value="avg">Cobrar a média dos sabores</option>
           </select>
         </label>
+      </Card>
+
+      <Card title="Área de entrega">
+        <AreasField
+          areas={areas}
+          taxaPadrao={tenant.delivery_fee}
+          refuseOutside={tenant.refuse_outside_zones}
+          canEdit={canEdit}
+        />
       </Card>
 
       <Card title="Pagamento">

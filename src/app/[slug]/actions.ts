@@ -2,7 +2,9 @@
 
 import { z } from "zod";
 
+import { lookupCep } from "@/lib/cep";
 import { sql } from "@/lib/db";
+import { feeForDistrict } from "@/lib/delivery";
 import { formatPhone, onlyDigits } from "@/lib/format";
 import { isOpenNow } from "@/lib/hours";
 import { getMenu } from "@/lib/menu";
@@ -59,6 +61,49 @@ const checkoutSchema = z.object({
 
 export type CheckoutInput = z.input<typeof checkoutSchema>;
 
+export type AddressLookup =
+  | {
+      ok: true;
+      street: string;
+      district: string;
+      city: string;
+      /** null quando a pizzaria não entrega nesse bairro */
+      fee: number | null;
+      /** nome do bairro como a pizzaria cadastrou, quando bate com uma área */
+      matchedArea: string | null;
+    }
+  | { ok: false; error: string };
+
+/**
+ * Busca o endereço do CEP e já devolve quanto custa entregar ali.
+ *
+ * A taxa sai daqui e não do navegador — o mesmo cálculo roda de novo ao
+ * fechar o pedido, então mexer nisto pelo console não muda o que se paga.
+ */
+export async function lookupAddress(
+  slug: string,
+  cep: string,
+): Promise<AddressLookup> {
+  const menu = await getMenu(slug);
+  if (!menu) return { ok: false, error: "Pizzaria indisponível." };
+
+  const endereco = await lookupCep(cep);
+  if (!endereco) {
+    return { ok: false, error: "CEP não encontrado. Preencha o endereço na mão." };
+  }
+
+  const taxa = await feeForDistrict(menu.tenant, endereco.district);
+
+  return {
+    ok: true,
+    street: endereco.street,
+    district: endereco.district,
+    city: endereco.city,
+    fee: taxa.status === "outside" ? null : taxa.fee,
+    matchedArea: taxa.status === "ok" ? taxa.district : null,
+  };
+}
+
 export type CheckoutResult =
   | { ok: true; code: string; token: string }
   | { ok: false; error: string };
@@ -96,9 +141,28 @@ export async function createOrder(raw: CheckoutInput): Promise<CheckoutResult> {
     return { ok: false, error: "Forma de pagamento indisponível." };
   }
 
+  // A taxa é recalculada aqui, a partir do bairro informado: o que veio da
+  // tela serve para mostrar, nunca para cobrar.
+  let deliveryFee = tenant.delivery_fee;
+  if (input.deliveryType === "delivery") {
+    // O CEP manda, não o campo de bairro: o cliente pode digitar o bairro que
+    // quiser, mas o CEP é conferível na base dos Correios.
+    const porCep = await lookupCep(input.zip);
+    const bairro = porCep?.district || input.district || "";
+    const taxa = await feeForDistrict(tenant, bairro);
+
+    if (taxa.status === "outside") {
+      return {
+        ok: false,
+        error: "Esse endereço está fora da nossa área de entrega.",
+      };
+    }
+    deliveryFee = taxa.fee;
+  }
+
   let summary;
   try {
-    summary = summarize(menu, input.items, input.deliveryType);
+    summary = summarize(menu, input.items, input.deliveryType, deliveryFee);
   } catch (error) {
     if (error instanceof PricingError) return { ok: false, error: error.message };
     throw error;

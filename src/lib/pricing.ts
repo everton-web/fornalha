@@ -135,15 +135,24 @@ export function priceCart(menu: Menu, items: CartItem[]): PricedItem[] {
   });
 }
 
+/**
+ * Fecha a conta.
+ *
+ * `feeOverride` entra quando a taxa depende do endereço — o servidor resolve
+ * o bairro antes de chamar aqui. Sem ele, vale a taxa única da pizzaria.
+ */
 export function summarize(
   menu: Menu,
   items: CartItem[],
   deliveryType: DeliveryType,
+  feeOverride?: number,
 ): OrderSummary {
   const priced = priceCart(menu, items);
   const subtotal = round2(priced.reduce((acc, i) => acc + i.totalPrice, 0));
   const deliveryFee =
-    deliveryType === "delivery" ? Number(menu.tenant.delivery_fee) : 0;
+    deliveryType === "delivery"
+      ? Number(feeOverride ?? menu.tenant.delivery_fee)
+      : 0;
 
   return {
     items: priced,

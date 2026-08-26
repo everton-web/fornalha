@@ -8,6 +8,7 @@ import {
   Banknote,
   Bike,
   CreditCard,
+  MapPin,
   Minus,
   Plus,
   QrCode,
@@ -19,7 +20,7 @@ import { formatPhone, isValidPhone, money, onlyDigits } from "@/lib/format";
 import type { DeliveryType, PaymentMethod, Tenant } from "@/lib/types";
 
 import { useCart } from "../_components/cart-provider";
-import { createOrder } from "../actions";
+import { createOrder, lookupAddress } from "../actions";
 
 const CUSTOMER_KEY = "fornalha:customer";
 
@@ -70,6 +71,14 @@ export function CheckoutForm({
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
+  // Resultado da consulta de CEP: a taxa vem de lá quando o bairro é conhecido.
+  const [cepState, setCepState] = useState<{
+    status: "idle" | "buscando" | "ok" | "fora" | "erro";
+    fee: number | null;
+    area: string | null;
+    message: string | null;
+  }>({ status: "idle", fee: null, area: null, message: null });
+
   // Quem já pediu uma vez não digita o endereço de novo.
   useEffect(() => {
     try {
@@ -82,7 +91,9 @@ export function CheckoutForm({
     }
   }, []);
 
-  const deliveryFee = deliveryType === "delivery" ? tenant.delivery_fee : 0;
+  const deliveryFee =
+    deliveryType === "delivery" ? (cepState.fee ?? tenant.delivery_fee) : 0;
+  const foraDaArea = deliveryType === "delivery" && cepState.status === "fora";
   const total = subtotal + deliveryFee;
   const belowMinimum = subtotal < tenant.min_order_value;
 
@@ -90,6 +101,54 @@ export function CheckoutForm({
 
   function set<K extends keyof CustomerDraft>(key: K, value: string) {
     setCustomer((prev) => ({ ...prev, [key]: value }));
+  }
+
+  /** Dispara sozinho quando o CEP fica completo — ninguém gosta de clicar em "buscar". */
+  function aoDigitarCep(valor: string) {
+    const digitos = onlyDigits(valor).slice(0, 8);
+    set("zip", digitos.length > 5 ? `${digitos.slice(0, 5)}-${digitos.slice(5)}` : digitos);
+
+    if (digitos.length !== 8) {
+      setCepState({ status: "idle", fee: null, area: null, message: null });
+      return;
+    }
+
+    setCepState({ status: "buscando", fee: null, area: null, message: null });
+
+    startTransition(async () => {
+      const r = await lookupAddress(slug, digitos);
+
+      if (!r.ok) {
+        setCepState({ status: "erro", fee: null, area: null, message: r.error });
+        return;
+      }
+
+      setCustomer((prev) => ({
+        ...prev,
+        street: r.street || prev.street,
+        district: r.district || prev.district,
+        city: r.city || prev.city,
+      }));
+
+      if (r.fee === null) {
+        setCepState({
+          status: "fora",
+          fee: null,
+          area: null,
+          message: `Ainda não entregamos em ${r.district || "esse endereço"}.`,
+        });
+        return;
+      }
+
+      setCepState({
+        status: "ok",
+        fee: r.fee,
+        area: r.matchedArea,
+        message: r.matchedArea
+          ? `Entrega em ${r.matchedArea}`
+          : "Endereço encontrado",
+      });
+    });
   }
 
   function submit() {
@@ -101,6 +160,8 @@ export function CheckoutForm({
     if (!isValidPhone(customer.phone)) return setError("Informe um telefone válido com DDD.");
     if (deliveryType === "delivery" && (!customer.street.trim() || !customer.number.trim()))
       return setError("Informe rua e número para a entrega.");
+    if (foraDaArea)
+      return setError("Esse endereço está fora da área de entrega da pizzaria.");
     if (!paymentMethod) return setError("Escolha a forma de pagamento.");
     if (belowMinimum)
       return setError(`O pedido mínimo é de ${money(tenant.min_order_value)}.`);
@@ -260,6 +321,39 @@ export function CheckoutForm({
 
         {deliveryType === "delivery" && (
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <label className="block sm:col-span-2">
+              <span className="mb-1 block text-xs font-medium text-stone-500">CEP</span>
+              <input
+                value={customer.zip}
+                onChange={(e) => aoDigitarCep(e.target.value)}
+                placeholder="00000-000"
+                inputMode="numeric"
+                className="w-full rounded-xl border border-line bg-background px-3 py-2.5 text-sm outline-none focus:border-stone-400"
+              />
+              {cepState.status === "buscando" && (
+                <span className="mt-1 block text-xs text-muted">Buscando endereço…</span>
+              )}
+              {cepState.status === "ok" && (
+                <span className="mt-1 flex items-center gap-1 text-xs font-medium text-emerald-700">
+                  <MapPin className="size-3" />
+                  {cepState.message}
+                  {cepState.fee !== null && (
+                    <> · taxa {cepState.fee > 0 ? money(cepState.fee) : "grátis"}</>
+                  )}
+                </span>
+              )}
+              {cepState.status === "fora" && (
+                <span className="mt-1 block text-xs font-medium text-red-600">
+                  {cepState.message}
+                </span>
+              )}
+              {cepState.status === "erro" && (
+                <span className="mt-1 block text-xs text-amber-700">
+                  {cepState.message}
+                </span>
+              )}
+            </label>
+
             <Field
               className="sm:col-span-2"
               label="Rua"
@@ -384,6 +478,13 @@ export function CheckoutForm({
           </div>
         </dl>
 
+        {foraDaArea && (
+          <p className="mt-3 text-sm text-red-600">
+            Esse endereço está fora da área de entrega. Você pode trocar para
+            retirada no local, se a pizzaria aceitar.
+          </p>
+        )}
+
         {belowMinimum && (
           <p className="mt-3 text-sm text-amber-700">
             Faltam {money(tenant.min_order_value - subtotal)} para atingir o
@@ -404,7 +505,7 @@ export function CheckoutForm({
           <button
             type="button"
             onClick={submit}
-            disabled={pending || !isOpen}
+            disabled={pending || !isOpen || foraDaArea}
             className="flex w-full items-center justify-between gap-3 rounded-full px-5 py-3.5 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-50"
             style={{ background: "var(--brand)", color: "var(--brand-ink)" }}
           >

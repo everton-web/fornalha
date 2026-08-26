@@ -105,6 +105,13 @@ begin
     (v_tenant, 'Azeite trufado',   6.00, 3),
     (v_tenant, 'Parmesão ralado',  5.00, 4);
 
+  -- área de entrega por bairro (a taxa sobe conforme se afasta da loja)
+  insert into delivery_zones (tenant_id, district, city, fee) values
+    (v_tenant, 'Vila Madalena', 'São Paulo', 6.00),
+    (v_tenant, 'Pinheiros',     'São Paulo', 9.00),
+    (v_tenant, 'Sumarezinho',   'São Paulo', 12.00),
+    (v_tenant, 'Perdizes',      'São Paulo', 12.00);
+
   -- bebidas e sobremesas
   insert into products (tenant_id, category_id, kind, name, description, price, sort_order) values
     (v_tenant, v_cat_bebida, 'simple', 'Coca-Cola 2L',        'Garrafa gelada',                14.00, 1),

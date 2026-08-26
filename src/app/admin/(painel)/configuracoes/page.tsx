@@ -1,4 +1,5 @@
 import { requireSession } from "@/lib/auth";
+import { listAreas } from "@/lib/delivery";
 
 import { SettingsForm } from "./settings-form";
 
@@ -6,6 +7,7 @@ export const metadata = { title: "Configurações" };
 
 export default async function ConfiguracoesPage() {
   const session = await requireSession();
+  const areas = await listAreas(session.tenant.id);
 
   return (
     <>
@@ -16,7 +18,11 @@ export default async function ConfiguracoesPage() {
         </p>
       </div>
 
-      <SettingsForm tenant={session.tenant} canEdit={session.role === "owner"} />
+      <SettingsForm
+        tenant={session.tenant}
+        areas={areas}
+        canEdit={session.role === "owner"}
+      />
     </>
   );
 }

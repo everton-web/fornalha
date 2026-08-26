@@ -75,7 +75,8 @@ export function asJson<T>(value: unknown, fallback: T): T {
  */
 export const TENANT_COLUMNS = `
   id, slug, name, tagline, logo_url, cover_url, primary_color, phone, whatsapp,
-  address, is_active, is_open_override, opening_hours, timezone, prep_time_min,
+  address, zip, refuse_outside_zones, is_active, is_open_override,
+  opening_hours, timezone, prep_time_min,
   delivery_enabled, pickup_enabled, delivery_fee, min_order_value,
   accepts_cash, accepts_card_delivery, accepts_pix_manual, pix_key,
   online_payment_enabled, payment_provider, half_pricing, created_at, updated_at,

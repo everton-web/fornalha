@@ -43,6 +43,9 @@ export type Tenant = {
   phone: string | null;
   whatsapp: string | null;
   address: string | null;
+  zip: string | null;
+  /** com bairros cadastrados, endereço fora deles é recusado em vez de cobrar a taxa padrão */
+  refuse_outside_zones: boolean;
   is_active: boolean;
   is_open_override: boolean | null;
   opening_hours: OpeningHour[];
