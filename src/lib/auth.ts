@@ -3,9 +3,9 @@ import "server-only";
 import { createHash, randomBytes } from "node:crypto";
 import { cache } from "react";
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
-import { asJson, num, sql } from "@/lib/db";
+import { asJson, num, opcional, sql } from "@/lib/db";
 import { verifyPassword } from "@/lib/password";
 import type { Tenant } from "@/lib/types";
 
@@ -83,6 +83,56 @@ export async function requireSession(): Promise<Session> {
   const session = await getSession();
   if (!session) redirect("/admin/login");
   return session;
+}
+
+/**
+ * Quem está logado, sem exigir vínculo com pizzaria.
+ *
+ * `getSession` faz join com tenant_members porque o painel da pizzaria não
+ * existe sem uma pizzaria. Quem administra a plataforma pode não ser dono de
+ * loja nenhuma — e nesse caso aquele join devolveria null, deixando a pessoa
+ * "logada" e sem sessão ao mesmo tempo.
+ */
+export type Account = {
+  userId: string;
+  email: string;
+  isPlatformAdmin: boolean;
+};
+
+export const getAccount = cache(async function getAccount(): Promise<Account | null> {
+  const token = (await cookies()).get(COOKIE)?.value;
+  if (!token) return null;
+
+  const rows = await opcional(
+    async () =>
+      await sql`
+        select u.id, u.email, u.is_platform_admin
+        from sessions s
+        join users u on u.id = s.user_id
+        where s.token_hash = ${hashToken(token)} and s.expires_at > now()
+        limit 1
+      `,
+    // Banco ainda sem a 0010: ninguém é da agência, e o painel da pizzaria
+    // segue funcionando normalmente.
+    null,
+  );
+
+  const row = rows?.[0];
+  if (!row) return null;
+
+  return {
+    userId: row.id as string,
+    email: row.email as string,
+    isPlatformAdmin: Boolean(row.is_platform_admin),
+  };
+});
+
+export async function requirePlatformAdmin(): Promise<Account> {
+  const account = await getAccount();
+  if (!account) redirect("/admin/login");
+  // Quem está logado mas não é da agência não descobre que esta área existe.
+  if (!account.isPlatformAdmin) notFound();
+  return account;
 }
 
 /** Confere e-mail e senha. Retorna o id do usuário, ou null se não bater. */

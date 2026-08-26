@@ -36,10 +36,10 @@ export function InstallForm({
           </li>
         </ul>
         <Link
-          href="/admin/pedidos"
+          href="/agencia"
           className="mt-4 inline-block rounded-full bg-emerald-700 px-5 py-2.5 text-sm font-semibold text-white"
         >
-          Abrir o painel
+          Abrir o painel da agência
         </Link>
       </div>
     );

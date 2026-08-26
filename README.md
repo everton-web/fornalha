@@ -59,10 +59,28 @@ As migrations são idempotentes: rodar de novo não quebra nada.
 
 ---
 
+## Os três níveis de acesso
+
+| Quem | Onde | O que faz |
+|---|---|---|
+| **Agência** (você) | `/agencia` | Cadastra pizzarias, liga e desliga assinatura, troca a senha do dono |
+| **Dono da pizzaria** | `/admin` | Cardápio, preços, fotos, horários, taxas, gateway e pedidos da loja dele |
+| **Cliente** | `/{slug}` | Monta a pizza e pede |
+
+A conta da agência é marcada por `users.is_platform_admin`. Ela não dá acesso
+ao painel de nenhuma pizzaria: administrar a plataforma e operar uma loja são
+coisas separadas, e quem faz as duas tem também sua linha em `tenant_members`.
+
+A primeira conta criada em `/admin/instalar` nasce como agência.
+
 ## Colocar uma pizzaria nova no ar
 
-Um comando cria o login do dono, a pizzaria e um cardápio base
-(tamanhos, categorias e bordas):
+Pela tela, em **`/agencia` → Nova pizzaria**: preencha nome, endereço, e-mail e
+senha do dono, e ela nasce com tamanhos, categorias, bordas e faixas de preço.
+No fim, a tela monta a mensagem pronta com os dois links e o login, para você
+mandar ao cliente — a senha aparece **uma vez só**, porque depois fica em hash.
+
+Pela linha de comando, quando for automação:
 
 ```bash
 npm run nova-pizzaria -- --slug=dom-luigi --nome="Dom Luigi" --email=dono@domluigi.com.br --senha=umaSenhaForte --cor=#1e5c2f --whatsapp=11987654321

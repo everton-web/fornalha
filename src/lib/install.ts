@@ -104,12 +104,19 @@ export async function instalar(input: {
   const passwordHash = await hashPassword(input.senha);
 
   await sql.begin(async (tx) => {
+    // A primeira conta é da agência: é quem instalou o sistema, e é quem vai
+    // cadastrar as pizzarias daqui em diante. Sem isto, quem instala ficaria
+    // sem a tela de cadastro e voltaria a depender de linha de comando.
     const [user] = await tx`
-      insert into users (email, password_hash)
-      values (${email}, ${passwordHash})
-      on conflict (email) do update set password_hash = excluded.password_hash
+      insert into users (email, password_hash, is_platform_admin)
+      values (${email}, ${passwordHash}, true)
+      on conflict (email) do update set
+        password_hash = excluded.password_hash,
+        is_platform_admin = true
       returning id
     `;
+    // E também dona da pizzaria de demonstração, para ter onde olhar o
+    // sistema funcionando sem precisar cadastrar nada antes.
     await tx`
       insert into tenant_members (tenant_id, user_id, role)
       values (${tenant.id}, ${user.id}, 'owner')
