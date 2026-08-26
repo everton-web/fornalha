@@ -133,6 +133,19 @@ export default function Home() {
             />
           </Notebook>
 
+          {/* A comanda que sai na impressora da cozinha. Torta de propósito:
+              papel na bancada não fica alinhado, e o leve giro é o que
+              separa uma folha de verdade de mais um retângulo na tela. */}
+          <div className="absolute -left-2 bottom-4 w-24 -rotate-6 sm:bottom-6 sm:left-2 sm:w-32">
+            <Image
+              src="/print-comanda.png"
+              alt="Comanda impressa do pedido, com itens, endereço e total"
+              width={900}
+              height={1692}
+              className="block w-full rounded-[2px] shadow-[0_18px_40px_-16px_rgba(28,25,23,0.45)]"
+            />
+          </div>
+
           {/* O celular passa um pouco além da base do notebook — é o que dá
               profundidade à cena. `bottom` fica menor que o `pb` do pai
               justamente por isso; o resto do `pb` é o respiro até a legenda. */}
@@ -150,8 +163,8 @@ export default function Home() {
         </div>
 
         <figcaption className="mt-4 text-center text-sm text-muted">
-          Seu cliente monta a pizza no celular. O pedido cai no seu painel na
-          mesma hora, já com o pagamento confirmado.
+          Seu cliente monta a pizza no celular, o pedido cai no seu painel já
+          pago, e a comanda sai na impressora da cozinha.
         </figcaption>
       </figure>
 
