@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import {
   Bell,
@@ -23,25 +24,32 @@ import {
 export default function Home() {
   return (
     <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-14 sm:py-20">
-      {/* ---------------------------------------------------------- topo */}
-      <span className="inline-flex w-fit items-center gap-2 rounded-full border border-line bg-surface px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wide text-stone-500">
-        <ChefHat className="size-3.5" />
-        Fornalha
-      </span>
+      {/* ------------------------------------------------------- herói */}
+      <div className="text-center">
+        <span className="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wide text-stone-500">
+          <ChefHat className="size-3.5" />
+          Fornalha
+        </span>
 
-      <h1 className="mt-5 max-w-3xl text-4xl font-bold leading-[1.05] tracking-tight sm:text-6xl">
-        Seu cardápio, no seu endereço.
-        <br />
-        <span className="text-brand">Sem comissão por pedido.</span>
-      </h1>
+        {/*
+          text-balance divide as linhas em pedaços de peso parecido. Sem ele
+          a primeira linha ficava com "endereço." sozinho embaixo — órfã, o
+          defeito tipográfico mais visível de um título grande.
+        */}
+        <h1 className="mx-auto mt-6 max-w-4xl text-balance text-4xl font-bold leading-[1.08] tracking-tight sm:text-5xl">
+          Seu cardápio, no seu endereço.
+          <br />
+          <span className="text-brand">Sem comissão por pedido.</span>
+        </h1>
 
-      <p className="mt-5 max-w-xl text-lg text-muted">
-        Seu cliente pede no site da sua pizzaria, o pedido cai direto na
-        cozinha e o dinheiro vai para a sua conta. Sem intermediário ficando
-        com um pedaço de cada pizza.
-      </p>
+        <p className="mx-auto mt-5 max-w-xl text-balance text-lg text-muted">
+          Seu cliente pede no site da sua pizzaria, o pedido cai direto na
+          cozinha e o dinheiro vai para a sua conta. Sem intermediário ficando
+          com um pedaço de cada pizza.
+        </p>
+      </div>
 
-      <div className="mt-8 flex flex-wrap gap-3">
+      <div className="mt-8 flex flex-wrap justify-center gap-3">
         <Link
           href="/bella-napoli"
           className="rounded-full bg-brand px-6 py-3 text-sm font-semibold text-brand-ink transition hover:opacity-90"
@@ -55,6 +63,37 @@ export default function Home() {
           Entrar no painel
         </Link>
       </div>
+
+      {/* ---------------------------------------------------- o produto
+          Print de verdade das telas, não desenho: quem decide contratar
+          quer ver o que vai receber. Os dois momentos que importam — o
+          cardápio que o cliente abre e o montador em que ele escolhe. */}
+      <figure className="mt-14">
+        {/* Sobrepostas, não lado a lado: duas telas alinhadas viram catálogo
+            de app store. Com a segunda por cima e descida, elas se tornam
+            uma cena — o cardápio, e o montador aberto sobre ele. */}
+        <div className="flex items-end justify-center">
+          <Image
+            src="/print-cardapio.png"
+            alt="Cardápio da pizzaria aberto no celular do cliente"
+            width={780}
+            height={1440}
+            priority
+            className="w-40 rounded-2xl border border-line shadow-[0_24px_60px_-28px_rgba(28,25,23,0.5)] sm:w-56"
+          />
+          <Image
+            src="/print-montador.png"
+            alt="Montador de pizza com tamanhos, sabores e preço pela média"
+            width={780}
+            height={1440}
+            className="-ml-8 w-44 translate-y-6 rounded-2xl border border-line shadow-[0_24px_60px_-28px_rgba(28,25,23,0.55)] sm:-ml-14 sm:w-64"
+          />
+        </div>
+        <figcaption className="mt-10 text-center text-sm text-muted">
+          O cardápio que seu cliente abre, e o montador onde ele escolhe os
+          sabores.
+        </figcaption>
+      </figure>
 
       {/* --------------------------------------------------------- bento */}
       <ul className="mt-16 grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
