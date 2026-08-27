@@ -41,7 +41,9 @@ const settingsSchema = z.object({
 export type SettingsInput = z.input<typeof settingsSchema>;
 
 export async function updateSettings(input: SettingsInput): Promise<ActionResult> {
-  const session = await requireEscrita();
+  const guarda = await requireEscrita();
+  if (!guarda.ok) return guarda;
+  const session = guarda.session;
 
   if (session.role !== "owner") {
     return { ok: false, error: "Só o dono pode mudar as configurações." };
@@ -112,7 +114,9 @@ const LIMITE_BYTES = 400 * 1024;
  * de novo aqui porque o cliente pode mentir sobre qualquer coisa.
  */
 export async function uploadLogo(dataUri: string): Promise<ActionResult> {
-  const session = await requireEscrita();
+  const guarda = await requireEscrita();
+  if (!guarda.ok) return guarda;
+  const session = guarda.session;
   if (session.role !== "owner") {
     return { ok: false, error: "Só o dono pode trocar a logo." };
   }
@@ -148,7 +152,9 @@ export async function uploadLogo(dataUri: string): Promise<ActionResult> {
 }
 
 export async function removeLogo(): Promise<ActionResult> {
-  const session = await requireEscrita();
+  const guarda = await requireEscrita();
+  if (!guarda.ok) return guarda;
+  const session = guarda.session;
   if (session.role !== "owner") {
     return { ok: false, error: "Só o dono pode trocar a logo." };
   }

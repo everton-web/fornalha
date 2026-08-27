@@ -33,7 +33,9 @@ export type ConectarInput = z.input<typeof conectarSchema>;
 export async function conectarGateway(
   input: ConectarInput,
 ): Promise<ActionResult> {
-  const session = await requireEscrita();
+  const guarda = await requireEscrita();
+  if (!guarda.ok) return guarda;
+  const session = guarda.session;
   if (session.role !== "owner") {
     return { ok: false, error: "Só o dono pode ligar um gateway." };
   }
@@ -108,7 +110,9 @@ export async function alternarGateway(
   provider: string,
   ativo: boolean,
 ): Promise<ActionResult> {
-  const session = await requireEscrita();
+  const guarda = await requireEscrita();
+  if (!guarda.ok) return guarda;
+  const session = guarda.session;
   if (session.role !== "owner") {
     return { ok: false, error: "Só o dono pode mudar isto." };
   }
@@ -121,7 +125,9 @@ export async function alternarGateway(
 export async function desconectarGateway(
   provider: string,
 ): Promise<ActionResult> {
-  const session = await requireEscrita();
+  const guarda = await requireEscrita();
+  if (!guarda.ok) return guarda;
+  const session = guarda.session;
   if (session.role !== "owner") {
     return { ok: false, error: "Só o dono pode desconectar um gateway." };
   }

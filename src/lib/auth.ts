@@ -104,13 +104,18 @@ export async function requireSession(): Promise<Session> {
   return session;
 }
 
-/** Lançado quando a conta de demonstração tenta escrever. */
-export class DemoSomenteLeitura extends Error {
-  constructor() {
-    super("Modo demonstração: nada aqui é salvo de verdade.");
-    this.name = "DemoSomenteLeitura";
-  }
-}
+/**
+ * O resultado da trava de escrita.
+ *
+ * Devolvido, e não lançado. Exceção em Server Action vira promessa rejeitada
+ * no navegador, e o que a pessoa vê é a página inteira caindo com "ocorreu um
+ * erro no servidor" — foi o que acontecia ao clicar qualquer botão do painel
+ * de demonstração. Devolvendo, o TypeScript obriga cada ação a tratar, e a
+ * tela mostra a frase certa no lugar de quebrar.
+ */
+export type Escrita =
+  | { ok: true; session: Session }
+  | { ok: false; error: string };
 
 /**
  * A sessão de quem pode mudar as coisas.
@@ -122,10 +127,12 @@ export class DemoSomenteLeitura extends Error {
  * A trava mora aqui, no servidor, e não em botão desabilitado na tela: Server
  * Action é endpoint POST aberto, e esconder o botão não fecha a porta.
  */
-export async function requireEscrita(): Promise<Session> {
+export async function requireEscrita(): Promise<Escrita> {
   const session = await requireSession();
-  if (session.isDemo) throw new DemoSomenteLeitura();
-  return session;
+  if (session.isDemo) {
+    return { ok: false, error: "Modo demonstração: nada aqui é salvo." };
+  }
+  return { ok: true, session };
 }
 
 /**

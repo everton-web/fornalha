@@ -50,7 +50,9 @@ const flavorSchema = z.object({
 export async function saveFlavor(
   input: z.input<typeof flavorSchema>,
 ): Promise<ActionResult> {
-  const session = await requireEscrita();
+  const guarda = await requireEscrita();
+  if (!guarda.ok) return guarda;
+  const session = guarda.session;
   const parsed = flavorSchema.safeParse(input);
   if (!parsed.success) {
     return { ok: false, error: parsed.error.issues[0]?.message ?? "Dados inválidos." };
@@ -143,7 +145,9 @@ const simpleSchema = z.object({
 export async function saveSimpleItem(
   input: z.input<typeof simpleSchema>,
 ): Promise<ActionResult> {
-  const session = await requireEscrita();
+  const guarda = await requireEscrita();
+  if (!guarda.ok) return guarda;
+  const session = guarda.session;
   const parsed = simpleSchema.safeParse(input);
   if (!parsed.success) {
     return { ok: false, error: parsed.error.issues[0]?.message ?? "Dados inválidos." };
@@ -183,7 +187,9 @@ const productSchema = z.object({
 export async function saveProduct(
   input: z.input<typeof productSchema>,
 ): Promise<ActionResult> {
-  const session = await requireEscrita();
+  const guarda = await requireEscrita();
+  if (!guarda.ok) return guarda;
+  const session = guarda.session;
   const parsed = productSchema.safeParse(input);
   if (!parsed.success) {
     return { ok: false, error: parsed.error.issues[0]?.message ?? "Dados inválidos." };
@@ -231,7 +237,9 @@ const sizeSchema = z.object({
 export async function saveSize(
   input: z.input<typeof sizeSchema>,
 ): Promise<ActionResult> {
-  const session = await requireEscrita();
+  const guarda = await requireEscrita();
+  if (!guarda.ok) return guarda;
+  const session = guarda.session;
   const parsed = sizeSchema.safeParse(input);
   if (!parsed.success) {
     return { ok: false, error: parsed.error.issues[0]?.message ?? "Dados inválidos." };
@@ -275,7 +283,9 @@ const categorySchema = z.object({
 export async function saveCategory(
   input: z.input<typeof categorySchema>,
 ): Promise<ActionResult> {
-  const session = await requireEscrita();
+  const guarda = await requireEscrita();
+  if (!guarda.ok) return guarda;
+  const session = guarda.session;
   const parsed = categorySchema.safeParse(input);
   if (!parsed.success) {
     return { ok: false, error: parsed.error.issues[0]?.message ?? "Dados inválidos." };
@@ -308,7 +318,9 @@ export async function setItemActive(
   id: string,
   isActive: boolean,
 ): Promise<ActionResult> {
-  const session = await requireEscrita();
+  const guarda = await requireEscrita();
+  if (!guarda.ok) return guarda;
+  const session = guarda.session;
   if (!EDITABLE.includes(table)) return { ok: false, error: "Tabela inválida." };
   if (!uuid.safeParse(id).success) return { ok: false, error: "Item inválido." };
 
@@ -328,7 +340,9 @@ export async function setItemActive(
  * mas apagar um sabor leva junto os preços dele.
  */
 export async function deleteItem(table: Editable, id: string): Promise<ActionResult> {
-  const session = await requireEscrita();
+  const guarda = await requireEscrita();
+  if (!guarda.ok) return guarda;
+  const session = guarda.session;
   if (!EDITABLE.includes(table)) return { ok: false, error: "Tabela inválida." };
   if (!uuid.safeParse(id).success) return { ok: false, error: "Item inválido." };
 
@@ -365,7 +379,9 @@ const groupSchema = z.object({
 export async function savePriceGroup(
   input: z.input<typeof groupSchema>,
 ): Promise<ActionResult> {
-  const session = await requireEscrita();
+  const guarda = await requireEscrita();
+  if (!guarda.ok) return guarda;
+  const session = guarda.session;
   const parsed = groupSchema.safeParse(input);
   if (!parsed.success) {
     return { ok: false, error: parsed.error.issues[0]?.message ?? "Dados inválidos." };
@@ -443,7 +459,9 @@ export async function uploadFoto(
   id: string,
   dataUri: string,
 ): Promise<ActionResult> {
-  const session = await requireEscrita();
+  const guarda = await requireEscrita();
+  if (!guarda.ok) return guarda;
+  const session = guarda.session;
   if (!(alvo in ALVOS)) return { ok: false, error: "Alvo inválido." };
   if (!uuid.safeParse(id).success) return { ok: false, error: "Item inválido." };
 
@@ -477,7 +495,9 @@ export async function removeFoto(
   alvo: AlvoFoto,
   id: string,
 ): Promise<ActionResult> {
-  const session = await requireEscrita();
+  const guarda = await requireEscrita();
+  if (!guarda.ok) return guarda;
+  const session = guarda.session;
   if (!(alvo in ALVOS)) return { ok: false, error: "Alvo inválido." };
   if (!uuid.safeParse(id).success) return { ok: false, error: "Item inválido." };
 

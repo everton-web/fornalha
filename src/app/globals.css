@@ -1,6 +1,33 @@
 @import "tailwindcss";
 
 /*
+ * O Tailwind 4 passou a deixar botão com `cursor: default`, seguindo o padrão
+ * do navegador. O efeito é que quase nada no painel parece clicável: medi 143
+ * de 172 elementos sem cursor de mão. Link escapa porque o navegador cuida
+ * dele sozinho.
+ *
+ * `:not(:disabled)` para o desabilitado não convidar o clique, e `label` só
+ * quando embrulha caixa de marcar — label de campo de texto continua com
+ * cursor de texto, que é o certo.
+ */
+@layer base {
+  button:not(:disabled),
+  select:not(:disabled),
+  summary,
+  [role="button"]:not([aria-disabled="true"]),
+  label:has(> input[type="checkbox"]:not(:disabled)),
+  label:has(> input[type="radio"]:not(:disabled)) {
+    cursor: pointer;
+  }
+
+  button:disabled,
+  select:disabled,
+  [role="button"][aria-disabled="true"] {
+    cursor: not-allowed;
+  }
+}
+
+/*
   Tema claro e fixo de propósito: cardápio é vitrine, e comida vende melhor
   sobre fundo quente. A identidade de cada pizzaria entra por --brand,
   injetada no layout do tenant a partir do banco.

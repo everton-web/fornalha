@@ -86,7 +86,9 @@ export async function setOrderStatus(input: {
   status: OrderStatus;
   reason?: string;
 }): Promise<ActionResult> {
-  const session = await requireEscrita();
+  const guarda = await requireEscrita();
+  if (!guarda.ok) return guarda;
+  const session = guarda.session;
   const parsed = statusSchema.safeParse(input);
   if (!parsed.success) return { ok: false, error: "Dados inválidos." };
 
@@ -130,7 +132,9 @@ export async function setOrderStatus(input: {
 
 /** Abre ou fecha a loja manualmente; null devolve o controle ao horário. */
 export async function setOpenOverride(value: boolean | null): Promise<ActionResult> {
-  const session = await requireEscrita();
+  const guarda = await requireEscrita();
+  if (!guarda.ok) return guarda;
+  const session = guarda.session;
 
   await sql`
     update tenants set is_open_override = ${value} where id = ${session.tenant.id}

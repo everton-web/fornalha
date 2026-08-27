@@ -19,7 +19,9 @@ const subscriptionSchema = z.object({
 export async function subscribeToPush(
   input: z.input<typeof subscriptionSchema>,
 ): Promise<ActionResult> {
-  const session = await requireEscrita();
+  const guarda = await requireEscrita();
+  if (!guarda.ok) return guarda;
+  const session = guarda.session;
   const parsed = subscriptionSchema.safeParse(input);
   if (!parsed.success) return { ok: false, error: "Assinatura inválida." };
 
@@ -46,14 +48,17 @@ export async function subscribeToPush(
 }
 
 export async function unsubscribeFromPush(endpoint: string): Promise<ActionResult> {
-  await requireEscrita();
+  const guarda = await requireEscrita();
+  if (!guarda.ok) return guarda;
   await sql`delete from push_subscriptions where endpoint = ${endpoint}`;
   return { ok: true };
 }
 
 /** Manda um aviso de teste para os aparelhos desta pizzaria. */
 export async function sendTestPush(): Promise<ActionResult> {
-  const session = await requireEscrita();
+  const guarda = await requireEscrita();
+  if (!guarda.ok) return guarda;
+  const session = guarda.session;
 
   const { enviados } = await notifyTenant(session.tenant.id, {
     title: "Aviso de teste",
