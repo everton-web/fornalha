@@ -152,11 +152,11 @@ export function ComoComeca() {
           funcionar onde não há mouse, e duplicá-lo no celular empurraria a
           página para baixo sem acrescentar nada.
         */}
-        {/* Centralizado, não grudado no topo: agora que esta é a coluna larga,
-            um painel curto encostado em cima deixava um vazio do tamanho da
-            própria seção embaixo dele. */}
-        <div className="hidden lg:col-span-3 lg:flex lg:items-center">
-          <div className="w-full rounded-2xl border border-line bg-surface p-6">
+        {/* O quadro ocupa a coluna inteira, da altura dos três passos. Antes
+            era um cartão curto centralizado, e sobrava vazio em cima e embaixo
+            dele — na coluna larga isso lê como espaço que ninguém preencheu. */}
+        <div className="hidden lg:col-span-3 lg:block">
+          <div className="flex h-full flex-col justify-center rounded-2xl border border-line bg-surface p-8">
             <p className="text-sm font-semibold">{PASSOS[ativo].resumo}</p>
             {/* key: remonta a cada troca, e o `rise` do globals.css recomeça. */}
             <div key={ativo} className="mt-4 motion-safe:animate-rise">

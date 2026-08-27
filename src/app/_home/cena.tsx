@@ -51,17 +51,25 @@ function useTampaQueLevanta() {
       /*
        * Nunca fecha de todo: a 90° a tela some, e um retângulo vazio no meio
        * da página parece defeito de carregamento, não animação.
-       *
-       * O `translateY` fecha o buraco que a rotação abre. Girando em torno da
-       * base, o topo da tampa desce — mas o espaço que ela ocupa no layout
-       * continua sendo o da tampa aberta, e sobra um vão no topo, bem embaixo
-       * dos botões. Subir a tampa por metade do que ela encolheu mantém a cena
-       * no lugar enquanto abre.
        */
-      const angulo = (1 - abertura) * -60;
-      const encolheu = 1 - Math.cos((angulo * Math.PI) / 180);
-      folha.style.transform =
-        `translateY(-${(encolheu * 50).toFixed(2)}%) rotateX(${angulo}deg)`;
+      const angulo = (1 - abertura) * -62;
+
+      /*
+       * O vão é fechado por `margin-top`, não por `translateY`.
+       *
+       * Girando em torno da base, o topo da tampa desce e o rodapé dela fica
+       * onde está — mas o espaço reservado no layout continua sendo o da tampa
+       * aberta, e sobra um vão logo abaixo dos botões. Subir a tampa com
+       * `translateY` fechava esse vão e criava outro pior: descolava a tampa da
+       * base, e o notebook aparecia com a tela flutuando acima da dobradiça.
+       *
+       * A margem negativa encolhe a caixa no layout exatamente o tanto que a
+       * rotação esvaziou. O vão some, e a base — que vem logo depois no fluxo —
+       * continua encostada no rodapé da tampa, que é onde fica a dobradiça.
+       */
+      const vazio = folha.offsetHeight * (1 - Math.cos((angulo * Math.PI) / 180));
+      folha.style.transform = `rotateX(${angulo}deg)`;
+      folha.style.marginTop = `-${vazio.toFixed(1)}px`;
     };
 
     const aoRolar = () => {

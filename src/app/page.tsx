@@ -29,9 +29,22 @@ import { Rodape } from "./_home/rodape";
 export default function Home() {
   return (
     <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-14 sm:py-20">
-      {/* ------------------------------------------------------- herói */}
-      <div className="text-center">
-        <span className="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wide text-stone-500">
+      {/*
+        --------------------------------------------------------- herói
+
+        Ocupa a primeira dobra e centraliza no eixo vertical. Antes ele
+        começava logo abaixo do topo e sobrava tela embaixo, o que fazia a
+        página abrir parecendo desalinhada. `svh` em vez de `vh` porque no
+        celular a barra do navegador entra e sai da conta: com `vh`, o herói
+        nasce mais alto que a tela e o primeiro rolar é só para achar o começo.
+
+        82svh, não 100: um pedaço da cena aparece embaixo, e é esse pedaço que
+        convida a rolar.
+      */}
+      <div className="flex min-h-[82svh] flex-col justify-center text-center">
+        {/* self-center: o herói virou coluna flex, e sem isto o selo estica
+            pela largura inteira em vez de encolher para o texto. */}
+        <span className="inline-flex self-center items-center gap-2 rounded-full border border-line bg-surface px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wide text-stone-500">
           <ChefHat className="size-3.5" />
           Fornalha
         </span>
@@ -52,8 +65,6 @@ export default function Home() {
           cozinha e o dinheiro vai para a sua conta. Sem intermediário ficando
           com um pedaço de cada pizza.
         </p>
-      </div>
-
       {/*
         Duas demonstrações, porque são dois lados: o que seu cliente vê e o que
         você vê. Mostrar só o cardápio deixava a pergunta que decide a venda —
@@ -74,6 +85,7 @@ export default function Home() {
         >
           Ver o painel por dentro
         </Link>
+      </div>
       </div>
 
       <CenaDoProduto />
