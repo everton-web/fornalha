@@ -1,22 +1,20 @@
 #!/usr/bin/env node
 /**
- * Baixa as fotos da pizzaria de demonstração.
+ * Baixa as fotos da pizzaria de demonstração no Wikimedia Commons.
  *
  * Roda à mão, não no deploy: o resultado é conferido no olho e vira arquivo
  * versionado em db/fotos/. Deploy que sai buscando imagem em serviço de
  * terceiro é deploy que quebra no dia em que o serviço cai — e ninguém vai
  * entender por que a demo ficou sem foto.
  *
- *   node scripts/fotos-demo.mjs                     # todos, pelo Openverse
- *   node scripts/fotos-demo.mjs --fonte=pexels      # todos, pelo Pexels
- *   node scripts/fotos-demo.mjs margherita --n=3    # 3ª opção de um item só
+ *   node scripts/fotos-demo.mjs --candidatos   # baixa as opções p/ escolher
+ *   node scripts/fotos-demo.mjs                # grava a escolha de ESCOLHAS
  *
- * DUAS FONTES, porque elas trocam qualidade por burocracia:
- *
- *   openverse — sem chave, licença Creative Commons de uso comercial. Acervo
- *               do Flickr e afins: irregular, mas dá para rodar agora.
- *   pexels    — precisa de PEXELS_API_KEY (grátis em pexels.com/api). Foto de
- *               comida profissional, licença livre sem atribuição exigida.
+ * POR QUE COMMONS — não precisa de chave, e a licença é limpa: domínio
+ * público, CC0 ou CC BY/BY-SA, todas permitindo obra derivada (este script
+ * redimensiona, então derivada é obrigatório; ND fica de fora na peneira
+ * abaixo). O acervo é irregular, e é por isso que existe o passo de escolher:
+ * pegar o primeiro resultado põe hambúrguer em "Marguerita Trufada".
  *
  * As fotos saem em WebP de 600px, que é exatamente o que o navegador produz
  * quando uma pizzaria envia foto pelo painel (ver `foto-field.tsx`). A demo
@@ -24,165 +22,268 @@
  * outra coisa.
  */
 
-import { mkdirSync, writeFileSync, readFileSync, existsSync } from "node:fs";
+import {
+  mkdirSync,
+  writeFileSync,
+  readFileSync,
+  existsSync,
+  copyFileSync,
+} from "node:fs";
 import { join } from "node:path";
 import sharp from "sharp";
 
 const DESTINO = "db/fotos";
+const CANDIDATOS = "db/fotos/.candidatos";
 const CREDITOS = "db/fotos/creditos.json";
 
 /**
- * A busca de cada item. A chave casa com o `slug` de db/fotos-demo.sql.
+ * As buscas de cada item — mais de uma por item de propósito.
  *
- * Alguns sabores são brasileiros e não existem no acervo com esse nome:
- * calabresa vira "sausage", catupiry vira "creamy chicken". A foto é
- * ilustrativa — o que não pode é vir pizza errada na cara de quem está
- * avaliando comprar.
+ * Prato brasileiro não existe no Commons com o nome daqui: "calabresa" volta
+ * vazio, "sausage pizza" volta cheio. E busca boa em acervo de enciclopédia é
+ * o nome canônico do prato, não a descrição do cardápio.
  */
 const ITENS = {
-  // ------------------------------------------------------------- sabores
-  margherita: "pizza margherita fresh basil",
-  calabresa: "sausage pizza red onion",
-  portuguesa: "pizza ham egg olives",
-  napolitana: "pizza tomato slices parmesan",
-  vegetariana: "vegetarian pizza vegetables",
-  "quatro-queijos": "four cheese pizza",
-  "frango-catupiry": "creamy chicken pizza",
-  pepperoni: "pepperoni pizza close up",
-  "bacon-supreme": "bacon cheddar pizza",
-  "marguerita-trufada": "gourmet truffle pizza",
+  margherita: ["pizza margherita", "pizza napoletana basil"],
+  calabresa: ["sausage pizza", "pizza salsiccia"],
+  // "pizza portuguesa" no Commons cai em gráfico de pizza sobre a língua
+  // portuguesa e na Estação de São Bento. O prato é o que importa: presunto,
+  // ovo e azeitona.
+  portuguesa: ["pizza boiled egg ham", "pizza prosciutto uovo olives"],
+  napolitana: ["pizza napolitana", "pizza tomato mozzarella slices"],
+  vegetariana: ["vegetarian pizza", "pizza vegetables"],
+  "quatro-queijos": ["quattro formaggi", "four cheese pizza"],
+  "frango-catupiry": ["pizza frango catupiry", "chicken pizza"],
+  pepperoni: ["pepperoni pizza", "pizza pepperoni slice"],
+  "bacon-supreme": ["bacon pizza", "pizza bacon cheese"],
+  "marguerita-trufada": ["truffle pizza", "gourmet pizza mozzarella di bufala"],
 
-  // --------------------------------------------------------------- doces
-  "chocolate-morango": "chocolate strawberry dessert",
-  "banana-canela": "banana cinnamon dessert",
-  prestigio: "chocolate coconut cake",
+  "chocolate-morango": ["chocolate strawberry dessert", "strawberry chocolate cake"],
+  "banana-canela": ["banana dessert cinnamon", "caramelized banana dessert"],
+  prestigio: ["chocolate coconut cake", "coconut chocolate dessert"],
 
-  // ------------------------------------------------------------ bebidas
-  "coca-cola": "cola bottle glass",
-  guarana: "soda bottle drink",
-  agua: "mineral water bottle",
-  "suco-laranja": "fresh orange juice glass",
-  cerveja: "cold beer bottle",
+  "coca-cola": ["coca-cola bottle", "cola glass bottle"],
+  guarana: ["guaraná antarctica", "guarana soft drink"],
+  // "mineral water bottle" traz a fábrica de engarrafamento, não a garrafa.
+  agua: ["water bottle table", "glass of water bottle drink"],
+  "suco-laranja": ["orange juice glass", "freshly squeezed orange juice"],
+  cerveja: ["beer bottle green", "heineken bottle"],
 
-  // --------------------------------------------------------- sobremesas
-  "petit-gateau": "chocolate lava cake",
-  tiramisu: "tiramisu dessert",
+  "petit-gateau": ["chocolate fondant cake", "lava cake ice cream"],
+  tiramisu: ["tiramisu", "tiramisu slice plate"],
 };
+
+/**
+ * A escolha, item por item: "<n>" é a posição na folha de contato.
+ *
+ * Preenchido à mão depois de olhar as folhas geradas por --candidatos. É o
+ * passo que não dá para automatizar: só olhando dá para ver que a foto de
+ * "chicken pizza" veio com um sundae.
+ */
+const ESCOLHAS = JSON.parse(
+  existsSync("db/fotos/escolhas.json")
+    ? readFileSync("db/fotos/escolhas.json", "utf8")
+    : "{}",
+);
 
 const espera = (ms) => new Promise((r) => setTimeout(r, ms));
 
 /**
- * As duas fontes, normalizadas para o mesmo formato.
+ * Busca com recuo.
  *
- * Cada uma devolve { url, autor, pagina, licenca } para as `n` primeiras
- * opções, e o resto do script não precisa saber de onde veio.
+ * O Commons corta rajada sem avisar direito: no meio de vinte itens ele
+ * simplesmente para de responder, e o resultado é uma lista de "0 candidatos"
+ * que parece busca ruim mas é ritmo. Três tentativas com espera crescente
+ * resolvem, e falhar de vez é melhor que gravar meia lista em silêncio.
  */
-const FONTES = {
-  async openverse(busca, n) {
-    const url = new URL("https://api.openverse.org/v1/images/");
-    url.searchParams.set("q", busca);
-    url.searchParams.set("page_size", String(Math.max(n, 8)));
-    /*
-     * Uso comercial E direito de modificar — as duas coisas, não uma.
-     *
-     * "commercial" sozinho deixa passar CC BY-ND, que permite vender mas
-     * proíbe obra derivada. Como este script redimensiona e converte para
-     * WebP, toda foto que sai daqui é derivada: pedir só "commercial"
-     * produzia arquivo que a licença não deixa usar do jeito que ele existe.
-     */
-    url.searchParams.set("license_type", "commercial,modification");
-    url.searchParams.set("mature", "false");
-
-    const r = await fetch(url);
-    if (!r.ok) throw new Error(`Openverse respondeu ${r.status}`);
-    const { results } = await r.json();
-    return (results ?? []).map((f) => ({
-      url: f.url,
-      autor: f.creator ?? "desconhecido",
-      pagina: f.foreign_landing_url,
-      licenca: `CC ${(f.license ?? "").toUpperCase()} ${f.license_version ?? ""}`.trim(),
-    }));
-  },
-
-  async pexels(busca, n) {
-    const chave = process.env.PEXELS_API_KEY;
-    if (!chave) {
-      throw new Error(
-        "PEXELS_API_KEY não definida. Pegue uma grátis em pexels.com/api " +
-          "e ponha no .env.local, ou rode com --fonte=openverse.",
-      );
+async function pedir(url, tentativas = 4) {
+  for (let i = 1; i <= tentativas; i++) {
+    try {
+      const r = await fetch(url, {
+        headers: { "User-Agent": "fornalha-demo/1.0 (cardapio de demonstracao)" },
+      });
+      if (r.ok) return r;
+    } catch {
+      // rede oscilando conta como tentativa
     }
+    if (i < tentativas) await espera(i * 3000);
+  }
+  return null;
+}
 
-    const url = new URL("https://api.pexels.com/v1/search");
-    url.searchParams.set("query", busca);
-    url.searchParams.set("per_page", String(Math.max(n, 8)));
-    url.searchParams.set("orientation", "square");
+/** Licença que proíbe derivada não serve: este script redimensiona. */
+function permiteDerivada(licenca = "") {
+  return !/\bND\b|NoDeriv/i.test(licenca);
+}
 
-    const r = await fetch(url, { headers: { Authorization: chave } });
-    if (!r.ok) throw new Error(`Pexels respondeu ${r.status}`);
-    const { photos } = await r.json();
-    return (photos ?? []).map((f) => ({
-      url: f.src.large,
-      autor: f.photographer,
-      pagina: f.url,
-      licenca: "Pexels License",
-    }));
-  },
-};
+/** Busca candidatos no Commons, já com URL de 800px e a licença. */
+async function candidatos(buscas) {
+  const achados = [];
+
+  for (const busca of buscas) {
+    const url = new URL("https://commons.wikimedia.org/w/api.php");
+    url.searchParams.set("action", "query");
+    url.searchParams.set("format", "json");
+    url.searchParams.set("generator", "search");
+    url.searchParams.set("gsrsearch", `filetype:bitmap ${busca}`);
+    url.searchParams.set("gsrlimit", "8");
+    url.searchParams.set("gsrnamespace", "6");
+    url.searchParams.set("prop", "imageinfo");
+    url.searchParams.set("iiprop", "url|extmetadata");
+    url.searchParams.set("iiurlwidth", "800");
+
+    const r = await pedir(url);
+    if (!r) continue;
+    const dados = await r.json();
+
+    for (const p of Object.values(dados?.query?.pages ?? {})) {
+      const info = p.imageinfo?.[0];
+      if (!info?.thumburl) continue;
+      const meta = info.extmetadata ?? {};
+      const licenca = meta.LicenseShortName?.value ?? "desconhecida";
+      if (!permiteDerivada(licenca)) continue;
+
+      achados.push({
+        url: info.thumburl,
+        titulo: p.title.replace(/^File:/, ""),
+        autor: (meta.Artist?.value ?? "desconhecido")
+          .replace(/<[^>]*>/g, "")
+          .trim()
+          .slice(0, 60),
+        pagina: info.descriptionurl,
+        licenca,
+        busca,
+      });
+    }
+    await espera(900);
+  }
+
+  // Mesmo arquivo aparece nas duas buscas; a ordem da primeira manda.
+  const vistos = new Set();
+  return achados.filter((a) => !vistos.has(a.titulo) && vistos.add(a.titulo));
+}
+
+async function baixar(url, saida, { quadrado = true } = {}) {
+  const r = await pedir(url);
+  if (!r) throw new Error("imagem não veio depois de 4 tentativas");
+  const bytes = Buffer.from(await r.arrayBuffer());
+
+  // 600px e qualidade 80: o mesmo que o painel aplica no envio.
+  await sharp(bytes)
+    .resize(600, 600, { fit: quadrado ? "cover" : "inside", position: "centre" })
+    .webp({ quality: 80 })
+    .toFile(saida);
+}
+
+// ---------------------------------------------------------------- execução
 
 const argv = process.argv.slice(2);
 const alvos = argv.filter((a) => !a.startsWith("--"));
-const opcao = Number(argv.find((a) => a.startsWith("--n="))?.slice(4) ?? 1);
-const nomeFonte = argv.find((a) => a.startsWith("--fonte="))?.slice(8) ?? "openverse";
-
-const fonte = FONTES[nomeFonte];
-if (!fonte) {
-  console.error(`✖ fonte "${nomeFonte}" não existe. Use openverse ou pexels.`);
-  process.exit(1);
-}
-
 const lista = alvos.length ? alvos : Object.keys(ITENS);
+const modoCandidatos = argv.includes("--candidatos");
 
 mkdirSync(DESTINO, { recursive: true });
-const creditos = existsSync(CREDITOS)
-  ? JSON.parse(readFileSync(CREDITOS, "utf8"))
-  : {};
 
-for (const slug of lista) {
-  const busca = ITENS[slug];
-  if (!busca) {
-    console.error(`✖ ${slug}: não está na lista`);
-    process.exitCode = 1;
-    continue;
+if (modoCandidatos) {
+  mkdirSync(CANDIDATOS, { recursive: true });
+
+  /*
+   * Parte do índice que já existe, e não de um objeto vazio.
+   *
+   * Rebuscar um item só é o caso comum — a linha inteira veio ruim e as
+   * outras dezenove estavam boas. Começando do zero, a gravação no fim
+   * apagava as dezenove: as imagens continuavam no disco, mas sem a
+   * procedência, que é o que diz de quem é a foto e sob qual licença.
+   */
+  const arquivoIndice = join(CANDIDATOS, "indice.json");
+  const indice = existsSync(arquivoIndice)
+    ? JSON.parse(readFileSync(arquivoIndice, "utf8"))
+    : {};
+
+  for (const slug of lista) {
+    const buscas = ITENS[slug];
+    if (!buscas) {
+      console.error(`✖ ${slug}: não está na lista`);
+      process.exitCode = 1;
+      continue;
+    }
+
+    const opcoes = (await candidatos(buscas)).slice(0, 8);
+    indice[slug] = [];
+
+    for (const [i, op] of opcoes.entries()) {
+      try {
+        await baixar(op.url, join(CANDIDATOS, `${slug}-${i + 1}.webp`));
+        indice[slug].push(op);
+      } catch {
+        // candidato que não baixa simplesmente não entra na folha
+      }
+    }
+    console.log(`• ${slug}: ${indice[slug].length} candidatos`);
+    await espera(300);
   }
 
-  try {
-    const opcoes = await fonte(busca, opcao);
-    const foto = opcoes[opcao - 1];
-    if (!foto) throw new Error(`sem resultado para "${busca}"`);
+  writeFileSync(arquivoIndice, `${JSON.stringify(indice, null, 2)}\n`);
+  console.log(`\nCandidatos em ${CANDIDATOS}. Monte a folha e preencha escolhas.json.`);
+} else {
+  const creditos = existsSync(CREDITOS)
+    ? JSON.parse(readFileSync(CREDITOS, "utf8"))
+    : {};
+  const indice = JSON.parse(
+    readFileSync(join(CANDIDATOS, "indice.json"), "utf8"),
+  );
 
-    const resposta = await fetch(foto.url);
-    if (!resposta.ok) throw new Error(`imagem respondeu ${resposta.status}`);
-    const bytes = await resposta.arrayBuffer();
+  for (const slug of lista) {
+    const n = ESCOLHAS[slug];
+    if (!n) {
+      console.error(`✖ ${slug}: sem escolha em escolhas.json`);
+      process.exitCode = 1;
+      continue;
+    }
 
-    // 600px e qualidade 80: o mesmo que o painel aplica no envio.
-    const saida = join(DESTINO, `${slug}.webp`);
-    await sharp(Buffer.from(bytes))
-      .resize(600, 600, { fit: "cover", position: "centre" })
-      .webp({ quality: 80 })
-      .toFile(saida);
+    const op = indice[slug]?.[n - 1];
+    if (!op) {
+      console.error(`✖ ${slug}: candidato ${n} não existe`);
+      process.exitCode = 1;
+      continue;
+    }
 
-    creditos[slug] = { ...foto, fonte: nomeFonte, busca, opcao };
-    delete creditos[slug].url;
-    console.log(`✓ ${slug} — ${foto.autor} (${foto.licenca})`);
-  } catch (erro) {
-    console.error(`✖ ${slug}: ${erro.message}`);
-    process.exitCode = 1;
+    /*
+     * Um item que falha não derruba os outros dezenove.
+     *
+     * O Commons recusa por ritmo, não por a foto não existir: uma exceção
+     * solta aqui abortava o laço no terceiro item e perdia as escolhas já
+     * feitas. Registrar e seguir deixa o rodar de novo pegar só o que faltou.
+     */
+    try {
+      /*
+       * O candidato já foi baixado, com o mesmo tamanho e a mesma qualidade,
+       * na hora de montar a folha de contato. Se o Commons estiver cortando
+       * por ritmo (429), copiar o arquivo local dá exatamente o mesmo
+       * resultado que baixar de novo — e evita a situação boba de ter a
+       * imagem certa em disco e mesmo assim falhar.
+       */
+      const jaBaixado = join(CANDIDATOS, `${slug}-${n}.webp`);
+      if (existsSync(jaBaixado)) {
+        copyFileSync(jaBaixado, join(DESTINO, `${slug}.webp`));
+      } else {
+        await baixar(op.url, join(DESTINO, `${slug}.webp`));
+      }
+      creditos[slug] = {
+        titulo: op.titulo,
+        autor: op.autor,
+        pagina: op.pagina,
+        licenca: op.licenca,
+        fonte: "Wikimedia Commons",
+      };
+      console.log(`✓ ${slug} — ${op.titulo} (${op.licenca})`);
+    } catch (erro) {
+      console.error(`✖ ${slug}: ${erro.message}`);
+      process.exitCode = 1;
+    }
+    await espera(900);
   }
 
-  // Sem chave o acervo limita rajada; com chave a pausa não custa nada.
-  await espera(700);
+  writeFileSync(CREDITOS, `${JSON.stringify(creditos, null, 2)}\n`);
+  console.log(`\n${lista.length} item(ns). Créditos em ${CREDITOS}.`);
 }
-
-writeFileSync(CREDITOS, `${JSON.stringify(creditos, null, 2)}\n`);
-console.log(`\n${lista.length} item(ns) pelo ${nomeFonte}. Créditos em ${CREDITOS}.`);

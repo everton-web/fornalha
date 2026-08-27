@@ -50,3 +50,7 @@ next-env.d.ts
 # copias locais que nunca sobem
 backups/
 CREDENCIAIS.local.txt
+
+# candidatos das fotos da demo: 160 imagens de rascunho, ~11 MB.
+# O que vale é a escolha (escolhas.json) e o resultado (*.webp).
+db/fotos/.candidatos/

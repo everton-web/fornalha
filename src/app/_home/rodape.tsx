@@ -71,9 +71,14 @@ export function Rodape() {
         </div>
       </div>
 
-      <p className="mt-10 border-t border-line pt-6 text-xs text-muted">
-        © {new Date().getFullYear()} Fornalha
-      </p>
+      {/* O crédito das fotos não é cortesia: as licenças CC BY e CC BY-SA do
+          cardápio de demonstração exigem autor, original e licença à vista. */}
+      <div className="mt-10 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-6 text-xs text-muted">
+        <p>© {new Date().getFullYear()} Fornalha</p>
+        <Link href="/creditos" className="transition hover:text-foreground">
+          Créditos das fotos
+        </Link>
+      </div>
     </footer>
   );
 }
