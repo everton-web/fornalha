@@ -27,6 +27,8 @@ import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import postgres from "postgres";
 
+import { fotosParaOBanco } from "./fotos-para-o-banco.mjs";
+
 function loadEnv() {
   for (const file of [".env.local", ".env"]) {
     try {
@@ -78,6 +80,15 @@ try {
   process.stdout.write("• demo.sql … ");
   await sql.unsafe(readFileSync("db/demo.sql", "utf8")).simple();
   console.log("ok");
+
+  // As fotos do cardápio de demonstração. Depois do demo.sql pelo mesmo
+  // motivo: dependem de a pizzaria existir. Pasta vazia não é erro — é um
+  // banco de cliente de verdade, ou uma cópia sem os arquivos.
+  process.stdout.write("• fotos da demo … ");
+  const { gravadas, ausentes } = await fotosParaOBanco(sql);
+  console.log(
+    ausentes ? `${gravadas} gravadas, ${ausentes} sem arquivo` : `${gravadas} gravadas`,
+  );
 
   console.log("\n✓ Banco pronto.\n");
 } catch (error) {
