@@ -20,7 +20,13 @@ type Passo = {
   titulo: string;
   texto: string;
   resumo: string;
-  detalhe: React.ReactNode;
+  /** Rótulo à esquerda, valor à direita. Três em todos os passos, para o
+   *  quadro da direita ter sempre o mesmo peso ao trocar. */
+  linhas: [string, string][];
+  /** Monoespaçado quando o valor é endereço ou preço — dá para comparar
+   *  coluna a coluna, que é o ponto de mostrar três de uma vez. */
+  mono?: boolean;
+  nota: string;
 };
 
 const PASSOS: Passo[] = [
@@ -28,71 +34,39 @@ const PASSOS: Passo[] = [
     titulo: "A gente monta sua loja",
     texto:
       "Criamos sua conta e o cardápio base — tamanhos, categorias, bordas e faixas de preço prontos.",
-    resumo: "Você recebe dois links: o do cardápio e o do painel.",
-    detalhe: (
-      <div className="space-y-2 font-mono text-xs">
-        <div className="rounded-lg bg-background px-3 py-2">
-          <span className="text-muted">cardápio</span>
-          <span className="ml-2 font-semibold">/sua-pizzaria</span>
-        </div>
-        <div className="rounded-lg bg-background px-3 py-2">
-          <span className="text-muted">painel</span>
-          <span className="ml-2 font-semibold">/admin</span>
-        </div>
-        <p className="pt-1 font-sans text-xs text-muted">
-          Tamanhos, categorias, bordas e três faixas de preço já vêm criados.
-        </p>
-      </div>
-    ),
+    resumo: "Você recebe os links prontos, e o cardápio já montado.",
+    mono: true,
+    linhas: [
+      ["cardápio", "/sua-pizzaria"],
+      ["painel", "/admin"],
+      ["domínio próprio", "suapizzaria.com.br"],
+    ],
+    nota: "Tamanhos, categorias, bordas e três faixas de preço já vêm criados.",
   },
   {
     titulo: "Você põe os sabores",
     texto:
       "Preços, fotos, horários e área de entrega, pelo painel. Sem depender de ninguém para mudar preço.",
     resumo: "Mexe na faixa e todos os sabores dela sobem juntos.",
-    detalhe: (
-      <div className="space-y-1.5 font-mono text-xs">
-        {[
-          ["Tradicionais", "R$ 66"],
-          ["Especiais", "R$ 74"],
-          ["Doces", "R$ 64"],
-        ].map(([faixa, preco]) => (
-          <div
-            key={faixa}
-            className="flex justify-between rounded-lg bg-background px-3 py-2"
-          >
-            <span className="text-muted">{faixa}</span>
-            <span className="font-semibold">{preco}</span>
-          </div>
-        ))}
-        <p className="pt-1 font-sans text-xs text-muted">
-          O preço próprio do sabor continua valendo como exceção.
-        </p>
-      </div>
-    ),
+    mono: true,
+    linhas: [
+      ["Tradicionais", "R$ 66"],
+      ["Especiais", "R$ 74"],
+      ["Doces", "R$ 64"],
+    ],
+    nota: "O preço próprio do sabor continua valendo como exceção.",
   },
   {
     titulo: "Seus clientes pedem",
     texto:
       "Pelo seu link ou pelo seu domínio. O pedido cai na cozinha com aviso sonoro.",
-    resumo: "Chega no painel, na impressora e no celular do dono.",
-    detalhe: (
-      <div className="space-y-1.5 text-xs">
-        {[
-          ["Painel", "com aviso sonoro"],
-          ["Impressora", "comanda de 80 mm"],
-          ["Celular", "aviso mesmo com o painel fechado"],
-        ].map(([onde, como]) => (
-          <div
-            key={onde}
-            className="flex items-baseline gap-2 rounded-lg bg-background px-3 py-2"
-          >
-            <span className="font-semibold">{onde}</span>
-            <span className="text-muted">{como}</span>
-          </div>
-        ))}
-      </div>
-    ),
+    resumo: "O mesmo pedido chega em três lugares ao mesmo tempo.",
+    linhas: [
+      ["Painel", "com aviso sonoro"],
+      ["Impressora", "comanda de 80 mm"],
+      ["Celular", "mesmo com o painel fechado"],
+    ],
+    nota: "Um não depende do outro: impressora sem papel não segura o pedido no painel.",
   },
 ];
 
@@ -152,15 +126,45 @@ export function ComoComeca() {
           funcionar onde não há mouse, e duplicá-lo no celular empurraria a
           página para baixo sem acrescentar nada.
         */}
-        {/* O quadro ocupa a coluna inteira, da altura dos três passos. Antes
-            era um cartão curto centralizado, e sobrava vazio em cima e embaixo
-            dele — na coluna larga isso lê como espaço que ninguém preencheu. */}
+        {/*
+          O quadro ocupa a coluna inteira e distribui a altura em três zonas:
+          rótulo em cima, linhas no meio e nota embaixo. Antes o conteúdo ficava
+          centralizado numa caixa alta e boiava, com vazio igual em cima e
+          embaixo — a altura era ocupada, mas não preenchida.
+
+          As linhas é que crescem: `flex-1` em cada uma reparte a sobra entre
+          elas, então o espaço extra vira respiro dentro do conteúdo em vez de
+          margem morta em volta dele.
+        */}
         <div className="hidden lg:col-span-3 lg:block">
-          <div className="flex h-full flex-col justify-center rounded-2xl border border-line bg-surface p-8">
-            <p className="text-sm font-semibold">{PASSOS[ativo].resumo}</p>
+          <div className="flex h-full flex-col rounded-2xl border border-line bg-surface p-7">
+            <p className="text-xs font-bold uppercase tracking-wide text-stone-400">
+              Passo {ativo + 1} de {PASSOS.length}
+            </p>
+
             {/* key: remonta a cada troca, e o `rise` do globals.css recomeça. */}
-            <div key={ativo} className="mt-4 motion-safe:animate-rise">
-              {PASSOS[ativo].detalhe}
+            <div key={ativo} className="flex flex-1 flex-col motion-safe:animate-rise">
+              <p className="mt-4 text-lg font-semibold leading-snug">
+                {PASSOS[ativo].resumo}
+              </p>
+
+              <div className="mt-5 flex flex-1 flex-col gap-2">
+                {PASSOS[ativo].linhas.map(([rotulo, valor]) => (
+                  <div
+                    key={rotulo}
+                    className={`flex flex-1 items-center justify-between gap-4 rounded-xl bg-background px-4 ${
+                      PASSOS[ativo].mono ? "font-mono text-sm" : "text-sm"
+                    }`}
+                  >
+                    <span className="text-muted">{rotulo}</span>
+                    <span className="truncate font-semibold">{valor}</span>
+                  </div>
+                ))}
+              </div>
+
+              <p className="mt-5 border-t border-line pt-4 text-sm text-muted">
+                {PASSOS[ativo].nota}
+              </p>
             </div>
           </div>
         </div>
