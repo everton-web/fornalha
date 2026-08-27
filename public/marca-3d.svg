@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="0.4" y2="1">
+      <stop offset="0" stop-color="#e33b2b"/><stop offset="1" stop-color="#a81616"/>
+    </linearGradient>
+    <linearGradient id="fogo" x1="0.3" y1="1" x2="0.7" y2="0">
+      <stop offset="0" stop-color="#ffd166"/><stop offset="0.45" stop-color="#ffa421"/>
+      <stop offset="1" stop-color="#ff6a2b"/>
+    </linearGradient>
+    <linearGradient id="queijo" x1="0.2" y1="0" x2="0.8" y2="1">
+      <stop offset="0" stop-color="#fff6e2"/><stop offset="0.55" stop-color="#f7dfae"/>
+      <stop offset="1" stop-color="#e8c489"/>
+    </linearGradient>
+    <linearGradient id="borda" x1="0" y1="0" x2="0.3" y2="1">
+      <stop offset="0" stop-color="#e8a25a"/><stop offset="1" stop-color="#c9762f"/>
+    </linearGradient>
+    <radialGradient id="brilho" cx="0.32" cy="0.2" r="0.75">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="sombra" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="2.5" stdDeviation="2.4" flood-color="#5c0d0d" flood-opacity="0.45"/>
+    </filter>
+  </defs>
+
+  <rect width="120" height="120" rx="26" fill="url(#tile)"/>
+  <rect width="120" height="120" rx="26" fill="url(#brilho)"/>
+
+  <g filter="url(#sombra)">
+    <path fill="url(#fogo)" d="M 62 52 C 51 47, 45 37, 49 24 C 51 30, 55 32, 57 30 C 56 17, 63 8, 73 4 C 69 17, 75 23, 77 31 C 79 41, 72 52, 62 52 Z"/>
+    <!-- núcleo mais claro: é o que faz a chama parecer ter volume -->
+    <path fill="#ffe9a8" opacity="0.85" d="M 63 46 C 57 43, 54 37, 56 29 C 58 33, 60 34, 61 33 C 61 24, 65 18, 70 15 C 68 23, 71 27, 72 32 C 73 39, 69 46, 63 46 Z"/>
+
+    <path fill="url(#borda)" d="M 60 110 L 24 60 C 35 50, 47 46, 60 46 C 73 46, 85 50, 96 60 Z"/>
+    <path fill="url(#queijo)" d="M 60 103 L 30 61 C 39 53, 49 50, 60 50 C 71 50, 81 53, 90 61 Z"/>
+  </g>
+
+  <circle cx="47" cy="69" r="5" fill="#c0342a"/>
+  <circle cx="45.6" cy="67.6" r="3.4" fill="#e4584a"/>
+  <circle cx="70" cy="66" r="4.6" fill="#c0342a"/>
+  <circle cx="68.8" cy="64.7" r="3.1" fill="#e4584a"/>
+  <circle cx="60" cy="85" r="4.4" fill="#c0342a"/>
+  <circle cx="58.9" cy="83.8" r="3" fill="#e4584a"/>
+</svg>

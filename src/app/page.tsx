@@ -1,7 +1,6 @@
 import Link from "next/link";
 import {
   Bell,
-  ChefHat,
   Globe,
   Layers,
   MapPin,
@@ -10,6 +9,7 @@ import {
 } from "lucide-react";
 
 import { CenaDoProduto } from "./_home/cena";
+import { Marca } from "./_home/marca";
 import { Comanda } from "./_home/comanda";
 import { Faq } from "./_home/faq";
 import { Montador } from "./_home/montador";
@@ -45,7 +45,7 @@ export default function Home() {
         {/* self-center: o herói virou coluna flex, e sem isto o selo estica
             pela largura inteira em vez de encolher para o texto. */}
         <span className="inline-flex self-center items-center gap-2 rounded-full border border-line bg-surface px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wide text-stone-500">
-          <ChefHat className="size-3.5" />
+          <Marca className="size-4" />
           Fornalha
         </span>
 

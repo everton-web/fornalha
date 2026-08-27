@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { ChefHat } from "lucide-react";
+
+import { Marca } from "./marca";
 
 /**
  * Rodapé.
@@ -17,7 +18,7 @@ export function Rodape() {
       <div className="flex flex-wrap items-start justify-between gap-8">
         <div>
           <span className="inline-flex items-center gap-2 font-semibold">
-            <ChefHat className="size-4 text-brand" />
+            <Marca className="size-[18px]" />
             Fornalha
           </span>
           <p className="mt-2 max-w-xs text-sm text-muted">
