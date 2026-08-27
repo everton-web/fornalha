@@ -17,7 +17,7 @@
     "trocar-senha": "node scripts/trocar-senha.mjs",
     "db:backup": "node scripts/backup.mjs",
     "testa-pagamentos": "node scripts/testa-pagamentos.mjs",
-    "testa-cardapio": "node scripts/testa-cardapio.mjs",
+    "testa-cardapio": "node --experimental-strip-types --no-warnings scripts/testa-cardapio.mjs",
     "testa-demo": "node scripts/testa-demo.mjs"
   },
   "dependencies": {

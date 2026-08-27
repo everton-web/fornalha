@@ -35,15 +35,22 @@ function checa(nome, condicao, extra = "") {
   if (!condicao) falhas++;
 }
 
-/** Mesma conta de src/lib/pricing.ts. */
-function round2(n) {
-  return Math.round((n + Number.EPSILON) * 100) / 100;
-}
-function pizzaBasePrice(precos, regra) {
-  if (precos.length === 0) return 0;
-  if (regra === "max") return Math.max(...precos);
-  return round2(precos.reduce((a, p) => a + p, 0) / precos.length);
-}
+/*
+ * A função de verdade, importada de src/lib/pricing.ts — não uma cópia.
+ *
+ * Aqui existia uma reimplementação da conta, com o comentário "mesma conta de
+ * src/lib/pricing.ts". Ela conferia a si mesma: trocando o corpo do
+ * `pizzaBasePrice` de verdade por `Math.max(...)`, de modo que toda pizza
+ * multi-sabor passasse a cobrar o sabor mais caro no lugar da média, esta
+ * bateria inteira continuava imprimindo "Tudo passou". Um teste de preço que
+ * não vê o preço mudar não é teste, é decoração.
+ *
+ * O import roda com --experimental-strip-types (ver o script no package.json):
+ * o arquivo só traz `import type`, que o Node apaga junto com as anotações,
+ * então não é preciso compilar nada para chamar a mesma função que atende o
+ * cliente.
+ */
+const { pizzaBasePrice } = await import("../src/lib/pricing.ts");
 
 class Desfaz extends Error {}
 
