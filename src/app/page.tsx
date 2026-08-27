@@ -28,7 +28,22 @@ import { Rodape } from "./_home/rodape";
  */
 export default function Home() {
   return (
-    <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-14 sm:py-20">
+    /*
+      overflow-x-clip: a página arrastava 7px para o lado num celular de
+      430px, e só enquanto a tampa do notebook estava fechada.
+
+      A causa é a perspectiva, não largura de elemento: inclinada em -62°, a
+      borda de baixo da tampa fica mais perto da câmera e é ampliada — a
+      mesma tampa mede 444px inclinada e 382px deitada. Nenhuma classe de
+      largura resolve, porque a largura não está errada; é a projeção 3D que
+      transborda.
+
+      O corte fica aqui, na largura da janela, e não no `figure`: ali a caixa
+      tem 382px e cortaria 31px de cada lado da tampa inclinada, decepando o
+      notebook. Aqui corta exatamente o que passa da tela. `clip` e não
+      `hidden` para não criar um contêiner de rolagem.
+    */
+    <main className="mx-auto w-full max-w-5xl flex-1 overflow-x-clip px-6 py-14 sm:py-20">
       {/*
         --------------------------------------------------------- herói
 
@@ -53,8 +68,24 @@ export default function Home() {
           text-balance divide as linhas em pedaços de peso parecido. Sem ele
           a primeira linha ficava com "endereço." sozinho embaixo — órfã, o
           defeito tipográfico mais visível de um título grande.
+
+          No celular o corpo é fluido, não fixo. Com `text-4xl` para todo
+          telefone, a linha mais longa ("Sem comissão por") dava os mesmos
+          307px em qualquer aparelho: encostava na margem num iPhone SE de
+          360px e deixava 75px de sobra num Pro Max de 430px. Um número só
+          não serve para os dois — ou aperta o menor, ou o maior fica com o
+          título pequeno no meio da tela.
+
+          9.75vw saiu de medir, não de chutar: é o maior coeficiente que ainda
+          deixa a linha mais longa a 15–24px da margem entre 375 e 430px.
+          A 10.25vw ela parava a 1px de encostar num iPhone 12.
+
+          O clamp segura as pontas — nunca menor que os 36px de hoje, nunca
+          maior que os 48px do desktop, para o título não seguir crescendo em
+          tablet até virar cartaz. Nos aparelhos de 320 e 360px o piso é que
+          vale, então lá nada muda.
         */}
-        <h1 className="mx-auto mt-6 max-w-4xl text-balance text-4xl font-bold leading-[1.08] tracking-tight sm:text-5xl">
+        <h1 className="mx-auto mt-6 max-w-4xl text-balance text-[clamp(2.25rem,9.75vw,3rem)] font-bold leading-[1.08] tracking-tight sm:text-5xl">
           Seu cardápio, no seu endereço.
           <br />
           <span className="text-brand">Sem comissão por pedido.</span>
