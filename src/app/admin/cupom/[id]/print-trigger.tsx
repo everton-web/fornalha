@@ -3,6 +3,8 @@
 import { useEffect } from "react";
 import { Printer } from "lucide-react";
 
+import { Button } from "@/components/ui/button";
+
 /**
  * Sem `asButton`, dispara a impressão sozinho ao abrir (é o modo usado quando
  * o pedido novo abre o cupom automaticamente). Com ele, vira só o botão.
@@ -18,13 +20,13 @@ export function PrintTrigger({ asButton = false }: { asButton?: boolean }) {
   if (!asButton) return null;
 
   return (
-    <button
+    <Button
       type="button"
       onClick={() => window.print()}
-      className="inline-flex items-center gap-1.5 rounded-full bg-foreground px-4 py-2 text-sm font-semibold text-white"
+      className="rounded-full bg-foreground text-background hover:bg-foreground/90"
     >
       <Printer className="size-4" />
       Imprimir
-    </button>
+    </Button>
   );
 }

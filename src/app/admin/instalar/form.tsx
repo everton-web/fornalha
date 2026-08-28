@@ -5,6 +5,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { CheckCircle2 } from "lucide-react";
 
+import { Aviso } from "@/components/aviso";
+import { Campo } from "@/components/campo";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import { instalarSistema } from "@/app/admin/install-actions";
 import type { ResultadoInstalacao } from "@/lib/install";
 
@@ -35,12 +40,9 @@ export function InstallForm({
             {pronto.email} é dono de <strong>{pronto.pizzaria}</strong>
           </li>
         </ul>
-        <Link
-          href="/agencia"
-          className="mt-4 inline-block rounded-full bg-emerald-700 px-5 py-2.5 text-sm font-semibold text-white"
-        >
-          Abrir o painel da agência
-        </Link>
+        <Button asChild size="pill" className="mt-4 bg-emerald-700 py-2.5 text-white hover:bg-emerald-800">
+          <Link href="/agencia">Abrir o painel da agência</Link>
+        </Button>
       </div>
     );
   }
@@ -59,68 +61,59 @@ export function InstallForm({
         });
       }}
     >
-      <label className="block">
-        <span className="mb-1 block text-sm font-medium">Seu e-mail</span>
-        <input
-          type="email"
-          required
-          autoComplete="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full rounded-xl border border-line bg-background px-3 py-2.5 outline-none focus:border-stone-400"
-          placeholder="voce@exemplo.com"
-        />
-      </label>
+      <Campo
+        label="Seu e-mail"
+        type="email"
+        required
+        autoComplete="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        placeholder="voce@exemplo.com"
+      />
 
-      <label className="block">
-        <span className="mb-1 block text-sm font-medium">Crie uma senha</span>
-        <input
-          type="password"
-          required
-          minLength={8}
-          autoComplete="new-password"
-          value={senha}
-          onChange={(e) => setSenha(e.target.value)}
-          className="w-full rounded-xl border border-line bg-background px-3 py-2.5 outline-none focus:border-stone-400"
-          placeholder="pelo menos 8 caracteres"
-        />
-      </label>
+      <Campo
+        label="Crie uma senha"
+        type="password"
+        required
+        minLength={8}
+        autoComplete="new-password"
+        value={senha}
+        onChange={(e) => setSenha(e.target.value)}
+        placeholder="pelo menos 8 caracteres"
+      />
 
       {!temPizzaria && (
-        <label className="flex items-start gap-2 text-sm">
-          <input
-            type="checkbox"
+        <div className="flex items-start gap-2 text-sm">
+          <Checkbox
+            id="criar-demo"
             checked={criarDemo}
-            onChange={(e) => setCriarDemo(e.target.checked)}
-            className="mt-0.5 size-4"
+            onCheckedChange={(v) => setCriarDemo(v === true)}
+            className="mt-0.5"
           />
-          <span>
+          <Label htmlFor="criar-demo" className="block font-normal leading-snug">
             Criar um cardápio de demonstração
-            <span className="block text-xs text-muted-foreground">
+            <span className="mt-0.5 block text-xs font-normal text-muted-foreground">
               Pizzaria Bella Napoli, com tamanhos, sabores e faixas de preço para
               você ver o sistema funcionando. Dá para apagar depois.
             </span>
-          </span>
-        </label>
+          </Label>
+        </div>
       )}
 
-      {erro && (
-        <p className="rounded-xl border border-red-200 bg-red-50 px-3 py-2.5 text-sm text-red-700">
-          {erro}
-        </p>
-      )}
+      {erro && <Aviso>{erro}</Aviso>}
 
-      <button
+      <Button
         type="submit"
+        size="pill"
         disabled={pendente}
-        className="w-full rounded-full bg-foreground px-5 py-3 text-sm font-semibold text-white disabled:opacity-50"
+        className="w-full bg-foreground text-background hover:bg-foreground/90"
       >
         {pendente
           ? "Instalando…"
           : temTabelas
             ? "Criar meu acesso"
             : "Preparar o banco e criar meu acesso"}
-      </button>
+      </Button>
     </form>
   );
 }

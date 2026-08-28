@@ -4,6 +4,11 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Check, Plus, Trash2 } from "lucide-react";
 
+import { Campo } from "@/components/campo";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import type { DeliveryArea } from "@/lib/delivery";
 import { money } from "@/lib/format";
 
@@ -61,60 +66,57 @@ export function AreasField({
       )}
 
       <div className="mt-3 flex flex-wrap items-end gap-2">
-        <label className="min-w-40 flex-1">
-          <span className="mb-1 block text-xs font-medium text-stone-500">Bairro</span>
-          <input
-            value={novoBairro}
-            onChange={(e) => setNovoBairro(e.target.value)}
-            placeholder="Vila Madalena"
-            className="w-full rounded-lg border border-line bg-background px-2.5 py-2 text-sm outline-none focus:border-stone-400"
-          />
-        </label>
-        <label className="w-28">
-          <span className="mb-1 block text-xs font-medium text-stone-500">Taxa</span>
-          <input
-            value={novaTaxa}
-            onChange={(e) => setNovaTaxa(e.target.value)}
-            placeholder="8,00"
-            inputMode="decimal"
-            className="w-full rounded-lg border border-line bg-background px-2.5 py-2 text-sm outline-none focus:border-stone-400"
-          />
-        </label>
-        <button
+        <Campo
+          label="Bairro"
+          className="min-w-40 flex-1"
+          value={novoBairro}
+          onChange={(e) => setNovoBairro(e.target.value)}
+          placeholder="Vila Madalena"
+        />
+        <Campo
+          label="Taxa"
+          className="w-28"
+          value={novaTaxa}
+          onChange={(e) => setNovaTaxa(e.target.value)}
+          placeholder="8,00"
+          inputMode="decimal"
+        />
+        <Button
           type="button"
+          size="sm"
           disabled={!canEdit || pending || novoBairro.trim().length < 2}
           onClick={adicionar}
-          className="inline-flex items-center gap-1.5 rounded-full bg-foreground px-4 py-2 text-xs font-semibold text-white disabled:opacity-40"
+          className="rounded-full bg-foreground text-xs text-background hover:bg-foreground/90"
         >
           <Plus className="size-3.5" />
           Adicionar
-        </button>
+        </Button>
       </div>
 
       {erro && <p className="mt-2 text-xs text-red-600">{erro}</p>}
 
       {areas.length > 0 && (
-        <label className="mt-4 flex items-start gap-2 text-sm">
-          <input
-            type="checkbox"
+        <div className="mt-4 flex items-start gap-2 text-sm">
+          <Checkbox
+            id="recusar-fora"
             checked={refuseOutside}
             disabled={!canEdit || pending}
-            onChange={(e) =>
+            onCheckedChange={(v) =>
               startTransition(async () => {
-                await setRefuseOutside(e.target.checked);
+                await setRefuseOutside(v === true);
                 router.refresh();
               })
             }
-            className="mt-0.5 size-4"
+            className="mt-0.5"
           />
-          <span>
+          <Label htmlFor="recusar-fora" className="block font-normal leading-snug">
             Recusar endereço fora desses bairros
-            <span className="block text-xs text-muted-foreground">
+            <span className="mt-0.5 block text-xs font-normal text-muted-foreground">
               Desmarcado, o pedido é aceito e cobra a taxa única de{" "}
               {money(taxaPadrao)}.
             </span>
-          </span>
-        </label>
+          </Label>
+        </div>
       )}
     </div>
   );
@@ -130,17 +132,19 @@ function AreaRow({ area, canEdit }: { area: DeliveryArea; canEdit: boolean }) {
     <li className="flex items-center gap-2 px-3 py-2">
       <span className="flex-1 truncate text-sm font-medium">{area.district}</span>
 
-      <input
+      <Input
         value={taxa}
         onChange={(e) => setTaxa(e.target.value)}
         inputMode="decimal"
         disabled={!canEdit}
-        className="w-20 rounded-lg border border-line bg-background px-2 py-1.5 text-sm outline-none focus:border-stone-400"
+        className="h-9 w-20 px-2 py-1.5 text-sm"
+        aria-label={`Taxa de ${area.district}`}
       />
 
       {mudou && (
-        <button
+        <Button
           type="button"
+          size="icon-sm"
           disabled={pending}
           onClick={() =>
             startTransition(async () => {
@@ -152,15 +156,17 @@ function AreaRow({ area, canEdit }: { area: DeliveryArea; canEdit: boolean }) {
               router.refresh();
             })
           }
-          className="grid size-8 place-items-center rounded-full bg-foreground text-white"
+          className="rounded-full bg-foreground text-background hover:bg-foreground/90"
           aria-label="Salvar taxa"
         >
           <Check className="size-3.5" />
-        </button>
+        </Button>
       )}
 
-      <button
+      <Button
         type="button"
+        variant="outline"
+        size="icon-sm"
         disabled={!canEdit || pending}
         onClick={() =>
           startTransition(async () => {
@@ -168,11 +174,11 @@ function AreaRow({ area, canEdit }: { area: DeliveryArea; canEdit: boolean }) {
             router.refresh();
           })
         }
-        className="grid size-8 place-items-center rounded-full border border-line text-muted-foreground transition hover:border-red-300 hover:text-red-600"
+        className="rounded-full text-muted-foreground hover:border-red-300 hover:text-red-600"
         aria-label={`Remover ${area.district}`}
       >
         <Trash2 className="size-3.5" />
-      </button>
+      </Button>
     </li>
   );
 }

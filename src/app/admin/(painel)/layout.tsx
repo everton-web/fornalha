@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ExternalLink, Eye, LogOut } from "lucide-react";
 
+import { Button } from "@/components/ui/button";
 import { requireSession } from "@/lib/auth";
 import { isOpenNow } from "@/lib/hours";
 
@@ -36,14 +37,16 @@ export default async function PainelLayout({ children }: LayoutProps<"/admin">) 
               override={tenant.is_open_override}
             />
             <form action={signOut}>
-              <button
+              <Button
                 type="submit"
-                className="grid size-9 place-items-center rounded-full border border-line transition hover:border-stone-300"
+                variant="outline"
+                size="icon"
+                className="rounded-full"
                 aria-label="Sair"
                 title="Sair"
               >
                 <LogOut className="size-4" />
-              </button>
+              </Button>
             </form>
           </div>
         </div>

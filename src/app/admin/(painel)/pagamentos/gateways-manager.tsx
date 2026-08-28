@@ -3,6 +3,11 @@
 import { useState, useTransition } from "react";
 import { Check, Copy, Link2, Plus, Trash2, X } from "lucide-react";
 
+import { Campo } from "@/components/campo";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+
 import {
   alternarGateway,
   conectarGateway,
@@ -120,20 +125,23 @@ export function GatewaysManager({
                 <div className="flex shrink-0 gap-2">
                   {conta && (
                     <>
-                      <button
+                      <Button
                         type="button"
+                        variant="outline"
                         disabled={pendente}
                         onClick={() =>
                           rodar(() =>
                             alternarGateway(gateway.id, !conta.isActive),
                           )
                         }
-                        className="rounded-full border border-line px-4 py-2 text-sm font-semibold transition hover:border-stone-300 disabled:opacity-50"
+                        className="rounded-full font-semibold"
                       >
                         {conta.isActive ? "Pausar" : "Religar"}
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         type="button"
+                        variant="outline"
+                        size="icon"
                         disabled={pendente}
                         onClick={() => {
                           if (
@@ -144,20 +152,20 @@ export function GatewaysManager({
                             rodar(() => desconectarGateway(gateway.id));
                           }
                         }}
-                        className="grid size-9 place-items-center rounded-full border border-line text-red-600 transition hover:border-red-300 disabled:opacity-50"
+                        className="rounded-full text-red-600 hover:border-red-300"
                         aria-label={`Desconectar ${gateway.label}`}
                       >
                         <Trash2 className="size-4" />
-                      </button>
+                      </Button>
                     </>
                   )}
-                  <button
+                  <Button
                     type="button"
                     onClick={() => {
                       setErro(null);
                       setAbrindo(aberto ? null : gateway.id);
                     }}
-                    className="flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold"
+                    className="rounded-full font-semibold"
                     style={{
                       background: aberto ? "var(--line)" : "var(--brand)",
                       color: aberto ? "inherit" : "var(--brand-ink)",
@@ -173,7 +181,7 @@ export function GatewaysManager({
                         {conta ? "Trocar credencial" : "Conectar"}
                       </>
                     )}
-                  </button>
+                  </Button>
                 </div>
               )}
             </div>
@@ -248,50 +256,49 @@ function FormularioConexao({
       }}
     >
       {gateway.credentialFields.map((campo) => (
-        <label key={campo.name} className="block">
-          <span className="text-sm font-medium">{campo.label}</span>
-          {campo.help && (
-            <span className="mt-0.5 block text-xs text-muted-foreground">{campo.help}</span>
-          )}
-          <input
-            type={campo.secret ? "password" : "text"}
-            autoComplete="off"
-            spellCheck={false}
-            value={credenciais[campo.name] ?? ""}
-            onChange={(event) =>
-              setCredenciais((atual) => ({
-                ...atual,
-                [campo.name]: event.target.value,
-              }))
-            }
-            className="mt-1.5 w-full rounded-xl border border-line bg-background px-3 py-2 font-mono text-sm outline-none focus:border-stone-400"
-            placeholder={campo.secret ? "cole aqui" : ""}
-          />
-        </label>
+        <Campo
+          key={campo.name}
+          label={<span className="text-sm font-medium text-foreground">{campo.label}</span>}
+          hint={campo.help}
+          type={campo.secret ? "password" : "text"}
+          autoComplete="off"
+          spellCheck={false}
+          value={credenciais[campo.name] ?? ""}
+          onChange={(event) =>
+            setCredenciais((atual) => ({
+              ...atual,
+              [campo.name]: event.target.value,
+            }))
+          }
+          className="font-mono"
+          placeholder={campo.secret ? "cole aqui" : ""}
+        />
       ))}
 
       <div className="flex flex-wrap gap-4">
         {gateway.supports.includes("pix") && (
-          <label className="flex items-center gap-2 text-sm">
-            <input
-              type="checkbox"
+          <div className="flex items-center gap-2 text-sm">
+            <Checkbox
+              id="receber-pix"
               checked={pix}
-              onChange={(event) => setPix(event.target.checked)}
-              className="size-4"
+              onCheckedChange={(v) => setPix(v === true)}
             />
-            Receber por Pix
-          </label>
+            <Label htmlFor="receber-pix" className="font-normal">
+              Receber por Pix
+            </Label>
+          </div>
         )}
         {gateway.supports.includes("card") && (
-          <label className="flex items-center gap-2 text-sm">
-            <input
-              type="checkbox"
+          <div className="flex items-center gap-2 text-sm">
+            <Checkbox
+              id="receber-cartao"
               checked={cartao}
-              onChange={(event) => setCartao(event.target.checked)}
-              className="size-4"
+              onCheckedChange={(v) => setCartao(v === true)}
             />
-            Receber por cartão
-          </label>
+            <Label htmlFor="receber-cartao" className="font-normal">
+              Receber por cartão
+            </Label>
+          </div>
         )}
       </div>
 
@@ -308,10 +315,12 @@ function FormularioConexao({
           <code className="min-w-0 flex-1 truncate rounded-lg border border-line bg-surface px-3 py-2 font-mono text-xs">
             {webhookUrl}
           </code>
-          <button
+          <Button
             type="button"
+            variant="outline"
+            size="icon"
             onClick={copiar}
-            className="grid size-9 shrink-0 place-items-center rounded-lg border border-line transition hover:border-stone-300"
+            className="shrink-0"
             aria-label="Copiar endereço do webhook"
           >
             {copiado ? (
@@ -319,18 +328,13 @@ function FormularioConexao({
             ) : (
               <Copy className="size-4" />
             )}
-          </button>
+          </Button>
         </div>
       </div>
 
-      <button
-        type="submit"
-        disabled={pendente}
-        className="w-full rounded-full px-5 py-3 text-sm font-semibold disabled:opacity-50"
-        style={{ background: "var(--brand)", color: "var(--brand-ink)" }}
-      >
+      <Button type="submit" size="pill" disabled={pendente} className="w-full">
         {pendente ? "Salvando…" : "Salvar e ligar"}
-      </button>
+      </Button>
     </form>
   );
 }

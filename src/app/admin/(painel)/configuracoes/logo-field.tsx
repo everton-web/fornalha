@@ -4,6 +4,10 @@ import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { ImageUp, Link2, Trash2 } from "lucide-react";
 
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+
 import { prepararImagemQuadrada } from "@/lib/browser-image";
 import type { Tenant } from "@/lib/types";
 import { logoSrc } from "@/lib/utils";
@@ -77,19 +81,21 @@ export function LogoField({
           onChange={(e) => aoEscolher(e.target.files?.[0])}
         />
 
-        <button
+        <Button
           type="button"
+          variant="outline"
           disabled={!canEdit || pending}
           onClick={() => inputRef.current?.click()}
-          className="inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-4 py-2 text-sm font-medium transition hover:border-stone-300 disabled:opacity-40"
+          className="rounded-full"
         >
           <ImageUp className="size-4" />
           {pending ? "Enviando…" : "Enviar imagem"}
-        </button>
+        </Button>
 
         {tenant.has_logo && (
-          <button
+          <Button
             type="button"
+            variant="outline"
             disabled={!canEdit || pending}
             onClick={() =>
               startTransition(async () => {
@@ -98,27 +104,31 @@ export function LogoField({
                 router.refresh();
               })
             }
-            className="inline-flex items-center gap-1.5 rounded-full border border-line px-3 py-2 text-sm text-muted-foreground transition hover:border-red-300 hover:text-red-600 disabled:opacity-40"
+            className="rounded-full text-muted-foreground hover:border-red-300 hover:text-red-600"
           >
             <Trash2 className="size-3.5" />
             Remover
-          </button>
+          </Button>
         )}
       </div>
 
-      <label className="mt-3 block">
-        <span className="mb-1 flex items-center gap-1.5 text-xs text-muted-foreground">
+      <div className="mt-3 space-y-1">
+        <Label
+          htmlFor="logo-url"
+          className="flex items-center gap-1.5 text-xs font-normal text-muted-foreground"
+        >
           <Link2 className="size-3" />
           ou cole o endereço de uma imagem na internet
-        </span>
-        <input
+        </Label>
+        <Input
+          id="logo-url"
           value={urlValue}
           onChange={(e) => onUrlChange(e.target.value)}
           placeholder="https://..."
           disabled={tenant.has_logo}
-          className="w-full rounded-lg border border-line bg-background px-2.5 py-2 text-sm outline-none focus:border-stone-400 disabled:opacity-50"
+          className="text-sm"
         />
-      </label>
+      </div>
 
       {tenant.has_logo && (
         <p className="mt-1 text-xs text-muted-foreground">

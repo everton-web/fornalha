@@ -14,6 +14,12 @@ import {
   X,
 } from "lucide-react";
 
+import { Aviso } from "@/components/aviso";
+import { Campo } from "@/components/campo";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+
 import {
   alternarPizzaria,
   atualizarBanco,
@@ -55,10 +61,10 @@ export function PizzariasManager({
         <h2 className="text-sm font-bold uppercase tracking-wide text-stone-500">
           Pizzarias
         </h2>
-        <button
+        <Button
           type="button"
           onClick={() => setCadastrando((v) => !v)}
-          className="flex items-center gap-1.5 rounded-full bg-foreground px-4 py-2 text-sm font-semibold text-white"
+          className="rounded-full bg-foreground text-background hover:bg-foreground/90"
         >
           {cadastrando ? (
             <>
@@ -69,7 +75,7 @@ export function PizzariasManager({
               <Plus className="size-4" /> Nova pizzaria
             </>
           )}
-        </button>
+        </Button>
       </div>
 
       {cadastrando && <FormularioNova onPronto={() => setCadastrando(false)} />}
@@ -115,7 +121,8 @@ function AtualizarBanco() {
             no schema, aperte aqui uma vez. Rodar de novo não estraga nada.
           </p>
         </div>
-        <button
+        <Button
+          variant="outline"
           type="button"
           disabled={pendente}
           onClick={() =>
@@ -133,7 +140,7 @@ function AtualizarBanco() {
         >
           <DatabaseZap className="size-4" />
           {pendente ? "Atualizando…" : "Atualizar"}
-        </button>
+        </Button>
       </div>
 
       {estado?.tipo === "pronto" && (
@@ -192,29 +199,27 @@ function FormularioNova({ onPronto }: { onPronto: () => void }) {
       }}
     >
       <div className="grid gap-3 sm:grid-cols-2">
-        <label className="block">
-          <span className="mb-1 block text-xs font-medium text-stone-500">
-            Nome da pizzaria
-          </span>
-          <input
-            required
-            value={nome}
-            onChange={(e) => {
-              setNome(e.target.value);
-              if (!slugEditado) setSlug(sugereSlug(e.target.value));
-            }}
-            placeholder="Dom Luigi"
-            className="w-full rounded-xl border border-line bg-background px-3 py-2.5 text-sm outline-none focus:border-stone-400"
-          />
-        </label>
+        <Campo
+          label="Nome da pizzaria"
+          required
+          value={nome}
+          onChange={(e) => {
+            setNome(e.target.value);
+            if (!slugEditado) setSlug(sugereSlug(e.target.value));
+          }}
+          placeholder="Dom Luigi"
+        />
 
-        <label className="block">
-          <span className="mb-1 block text-xs font-medium text-stone-500">
+        {/* A barra fica dentro do campo porque ela faz parte do endereço, e
+            não é editável: ninguém digita "/" aqui. */}
+        <div className="space-y-1">
+          <Label htmlFor="slug" className="text-xs font-medium text-stone-500">
             Endereço do cardápio
-          </span>
-          <div className="flex items-center gap-1 rounded-xl border border-line bg-background px-3 py-2.5">
+          </Label>
+          <div className="flex h-10 items-center gap-1 rounded-xl border border-input bg-surface px-3 shadow-xs focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/50">
             <span className="shrink-0 text-sm text-muted-foreground">/</span>
             <input
+              id="slug"
               required
               value={slug}
               onChange={(e) => {
@@ -225,90 +230,82 @@ function FormularioNova({ onPronto }: { onPronto: () => void }) {
               className="w-full bg-transparent font-mono text-sm outline-none"
             />
           </div>
-        </label>
+        </div>
 
-        <label className="block">
-          <span className="mb-1 block text-xs font-medium text-stone-500">
-            E-mail do dono
-          </span>
-          <input
-            required
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="dono@domluigi.com.br"
-            className="w-full rounded-xl border border-line bg-background px-3 py-2.5 text-sm outline-none focus:border-stone-400"
-          />
-        </label>
+        <Campo
+          label="E-mail do dono"
+          required
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="dono@domluigi.com.br"
+        />
 
-        <label className="block">
-          <span className="mb-1 block text-xs font-medium text-stone-500">
+        <div className="space-y-1">
+          <Label htmlFor="senha-inicial" className="text-xs font-medium text-stone-500">
             Senha inicial
-          </span>
+          </Label>
           <div className="flex gap-2">
-            <input
+            <Input
+              id="senha-inicial"
               required
               minLength={8}
               value={senha}
               onChange={(e) => setSenha(e.target.value)}
-              className="w-full rounded-xl border border-line bg-background px-3 py-2.5 font-mono text-sm outline-none focus:border-stone-400"
+              className="font-mono"
             />
-            <button
+            <Button
               type="button"
+              variant="outline"
               onClick={() => setSenha(senhaForte())}
-              className="shrink-0 rounded-xl border border-line px-3 text-xs font-medium transition hover:border-stone-300"
+              className="h-10 shrink-0 rounded-xl text-xs"
             >
               Sortear
-            </button>
+            </Button>
           </div>
-        </label>
+        </div>
 
-        <label className="block">
-          <span className="mb-1 block text-xs font-medium text-stone-500">
-            WhatsApp (opcional)
-          </span>
-          <input
-            value={whatsapp}
-            onChange={(e) => setWhatsapp(e.target.value)}
-            placeholder="11987654321"
-            inputMode="tel"
-            className="w-full rounded-xl border border-line bg-background px-3 py-2.5 text-sm outline-none focus:border-stone-400"
-          />
-        </label>
+        <Campo
+          label="WhatsApp (opcional)"
+          value={whatsapp}
+          onChange={(e) => setWhatsapp(e.target.value)}
+          placeholder="11987654321"
+          inputMode="tel"
+        />
 
-        <label className="block">
-          <span className="mb-1 block text-xs font-medium text-stone-500">
+        <div className="space-y-1">
+          <Label htmlFor="cor-nova" className="text-xs font-medium text-stone-500">
             Cor da marca
-          </span>
+          </Label>
           <div className="flex items-center gap-2">
+            {/* Nativo de propósito: abre a paleta do sistema. */}
             <input
+              id="cor-nova"
               type="color"
               value={cor}
               onChange={(e) => setCor(e.target.value)}
-              className="size-11 shrink-0 cursor-pointer rounded-xl border border-line bg-background"
+              className="size-10 shrink-0 cursor-pointer rounded-xl border border-line bg-surface"
             />
-            <input
+            <Input
               value={cor}
               onChange={(e) => setCor(e.target.value)}
-              className="w-full rounded-xl border border-line bg-background px-3 py-2.5 font-mono text-sm outline-none focus:border-stone-400"
+              className="font-mono"
+              aria-label="Cor da marca em hexadecimal"
             />
           </div>
-        </label>
+        </div>
       </div>
 
-      {erro && (
-        <p className="mt-3 rounded-xl border border-red-200 bg-red-50 px-3 py-2.5 text-sm text-red-700">
-          {erro}
-        </p>
-      )}
+      {erro && <Aviso className="mt-3">{erro}</Aviso>}
 
-      <button
+      <Button
         type="submit"
+        size="pill"
         disabled={pendente}
-        className="mt-4 w-full rounded-full bg-foreground px-5 py-3 text-sm font-semibold text-white disabled:opacity-50"
+        className="mt-4 w-full bg-foreground text-background hover:bg-foreground/90"
       >
         {pendente ? "Criando…" : "Criar pizzaria"}
-      </button>
+      </Button>
 
       <p className="mt-2 text-center text-xs text-muted-foreground">
         Ela já nasce com tamanhos, categorias, bordas e faixas de preço. O dono
@@ -363,7 +360,7 @@ Troque a senha assim que entrar.`;
       </pre>
 
       <div className="mt-3 flex flex-wrap gap-2">
-        <button
+        <Button
           type="button"
           onClick={async () => {
             try {
@@ -378,14 +375,15 @@ Troque a senha assim que entrar.`;
         >
           {copiado ? <Check className="size-4" /> : <Copy className="size-4" />}
           {copiado ? "Copiado" : "Copiar mensagem"}
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="outline"
           type="button"
           onClick={onFechar}
-          className="rounded-full border border-emerald-300 px-4 py-2 text-sm font-semibold text-emerald-900"
+          className="rounded-full border-emerald-300 font-semibold text-emerald-900"
         >
           Concluir
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -483,13 +481,14 @@ function LinhaPizzaria({ pizzaria: p }: { pizzaria: PizzariaNaAgencia }) {
             voltar a usar só <code>/{p.slug}</code>.
           </p>
           <div className="flex flex-wrap gap-2">
-            <input
+            <Input
               value={dominio}
               onChange={(e) => setDominio(e.target.value)}
               placeholder="pizzariadobairro.com.br"
-              className="min-w-56 flex-1 rounded-xl border border-line bg-background px-3 py-2 font-mono text-sm outline-none focus:border-stone-400"
+              className="min-w-56 flex-1 font-mono"
             />
-            <button
+            <Button
+              variant="outline"
               type="button"
               disabled={pendente}
               onClick={() =>
@@ -504,31 +503,33 @@ function LinhaPizzaria({ pizzaria: p }: { pizzaria: PizzariaNaAgencia }) {
                   setEditandoDominio(false);
                 })
               }
-              className="rounded-full bg-foreground px-4 py-2 text-sm font-semibold text-white disabled:opacity-40"
+              className="rounded-full bg-foreground text-background hover:bg-foreground/90"
             >
               Salvar
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="outline"
               type="button"
               onClick={() => {
                 setDominio(p.dominio ?? "");
                 setEditandoDominio(false);
               }}
-              className="rounded-full border border-line px-4 py-2 text-sm"
+              className="rounded-full"
             >
               Cancelar
-            </button>
+            </Button>
           </div>
         </div>
       ) : trocando ? (
         <div className="mt-4 flex flex-wrap gap-2 border-t border-line pt-4">
-          <input
+          <Input
             value={novaSenha}
             onChange={(e) => setNovaSenha(e.target.value)}
             placeholder="nova senha do dono"
-            className="min-w-48 flex-1 rounded-xl border border-line bg-background px-3 py-2 font-mono text-sm outline-none focus:border-stone-400"
+            className="min-w-48 flex-1 font-mono"
           />
-          <button
+          <Button
+            variant="outline"
             type="button"
             disabled={pendente || novaSenha.length < 8}
             onClick={() =>
@@ -542,34 +543,37 @@ function LinhaPizzaria({ pizzaria: p }: { pizzaria: PizzariaNaAgencia }) {
                 setNovaSenha("");
               })
             }
-            className="rounded-full bg-foreground px-4 py-2 text-sm font-semibold text-white disabled:opacity-40"
+            className="rounded-full bg-foreground text-background hover:bg-foreground/90"
           >
             Salvar
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="outline"
             type="button"
             onClick={() => setTrocando(false)}
-            className="rounded-full border border-line px-4 py-2 text-sm"
+            className="rounded-full"
           >
             Cancelar
-          </button>
+          </Button>
         </div>
       ) : (
         <div className="mt-4 flex flex-wrap gap-2 border-t border-line pt-4">
-          <button
+          <Button
+            variant="outline"
             type="button"
             disabled={pendente}
             onClick={() => {
               setAviso(null);
               setEditandoDominio(true);
             }}
-            className="flex items-center gap-1.5 rounded-full border border-line px-4 py-2 text-sm font-medium transition hover:border-stone-300 disabled:opacity-40"
+            className="rounded-full font-medium"
           >
             <Globe className="size-3.5" />
             {p.dominio ? "Trocar domínio" : "Domínio próprio"}
-          </button>
+          </Button>
 
-          <button
+          <Button
+            variant="outline"
             type="button"
             disabled={pendente}
             onClick={() => {
@@ -577,13 +581,14 @@ function LinhaPizzaria({ pizzaria: p }: { pizzaria: PizzariaNaAgencia }) {
               setNovaSenha(senhaForte());
               setTrocando(true);
             }}
-            className="flex items-center gap-1.5 rounded-full border border-line px-4 py-2 text-sm font-medium transition hover:border-stone-300 disabled:opacity-40"
+            className="rounded-full font-medium"
           >
             <KeyRound className="size-3.5" />
             Trocar senha do dono
-          </button>
+          </Button>
 
-          <button
+          <Button
+            variant="outline"
             type="button"
             disabled={pendente}
             onClick={() => {
@@ -606,7 +611,7 @@ function LinhaPizzaria({ pizzaria: p }: { pizzaria: PizzariaNaAgencia }) {
             }`}
           >
             {p.ativa ? "Desligar" : "Religar"}
-          </button>
+          </Button>
         </div>
       )}
     </section>

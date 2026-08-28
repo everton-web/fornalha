@@ -4,6 +4,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { CloudOff, RefreshCw, Wifi } from "lucide-react";
 
+import { Button } from "@/components/ui/button";
+
 const INTERVALO_MS = 10_000;
 /** Duas falhas seguidas antes de acusar queda: uma sozinha costuma ser soluço. */
 const FALHAS_PARA_ALERTAR = 2;
@@ -135,14 +137,16 @@ export function OrdersLive({ activeCount }: { activeCount: number }) {
             usando os dados móveis até a internet voltar.
           </p>
         </div>
-        <button
+        <Button
           type="button"
+          variant="outline"
+          size="xs"
           onClick={bater}
-          className="inline-flex items-center gap-1.5 rounded-full border border-red-300 px-3.5 py-1.5 text-xs font-semibold text-red-800 transition hover:bg-red-100"
+          className="rounded-full border-red-300 bg-transparent px-3.5 py-1.5 font-semibold text-red-800 hover:bg-red-100"
         >
           <RefreshCw className="size-3.5" />
           Tentar agora
-        </button>
+        </Button>
       </div>
     );
   }
@@ -157,13 +161,15 @@ export function OrdersLive({ activeCount }: { activeCount: number }) {
             ? "1 pedido entrou enquanto a tela estava fora do ar."
             : `${entraramOffline} pedidos entraram enquanto a tela estava fora do ar.`}
         </p>
-        <button
+        <Button
           type="button"
+          variant="outline"
+          size="xs"
           onClick={() => setEntraramOffline(0)}
-          className="rounded-full border border-emerald-300 px-3.5 py-1.5 text-xs font-semibold text-emerald-800 transition hover:bg-emerald-100"
+          className="rounded-full border-emerald-300 bg-transparent px-3.5 py-1.5 font-semibold text-emerald-800 hover:bg-emerald-100"
         >
           Entendi
-        </button>
+        </Button>
       </div>
     );
   }

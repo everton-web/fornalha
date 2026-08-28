@@ -2,6 +2,13 @@
 
 import { useTransition } from "react";
 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { setOpenOverride } from "../../actions";
 
 /**
@@ -39,20 +46,24 @@ export function OpenToggle({
         {override !== null && " (manual)"}
       </span>
 
-      <select
+      <Select
         value={override === null ? "auto" : override ? "open" : "closed"}
         disabled={pending}
-        onChange={(e) => {
-          const v = e.target.value;
-          apply(v === "auto" ? null : v === "open");
-        }}
-        className="rounded-full border border-line bg-surface px-3 py-1.5 text-xs outline-none"
-        aria-label="Controle de abertura"
+        onValueChange={(v) => apply(v === "auto" ? null : v === "open")}
       >
-        <option value="auto">Seguir horário</option>
-        <option value="open">Forçar aberto</option>
-        <option value="closed">Forçar fechado</option>
-      </select>
+        <SelectTrigger
+          size="sm"
+          className="rounded-full px-3 py-1.5 text-xs"
+          aria-label="Controle de abertura"
+        >
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="auto">Seguir horário</SelectItem>
+          <SelectItem value="open">Forçar aberto</SelectItem>
+          <SelectItem value="closed">Forçar fechado</SelectItem>
+        </SelectContent>
+      </Select>
     </div>
   );
 }

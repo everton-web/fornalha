@@ -4,6 +4,17 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Check, Plus, Trash2 } from "lucide-react";
 
+import { Campo } from "@/components/campo";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import type {
   AdminFlavor,
   AdminMenu,
@@ -51,18 +62,20 @@ export function MenuEditor({ menu }: { menu: AdminMenu }) {
     <>
       <div className="no-scrollbar mb-4 flex gap-2 overflow-x-auto">
         {TABS.map((t) => (
-          <button
+          <Button
             key={t.id}
             type="button"
+            variant="ghost"
+            size="sm"
             onClick={() => setTab(t.id)}
-            className={`shrink-0 rounded-full border px-4 py-1.5 text-sm font-medium transition ${
+            className={`shrink-0 rounded-full border px-4 py-1.5 text-sm font-medium ${
               tab === t.id
                 ? "border-foreground bg-foreground text-white"
                 : "border-line bg-surface hover:border-stone-300"
             }`}
           >
             {t.label}
-          </button>
+          </Button>
         ))}
       </div>
 
@@ -185,77 +198,88 @@ function FlavorRow({
       </div>
 
       <div className="mt-3 grid gap-3 sm:grid-cols-2">
-        <label>
-          <span className="mb-1 block text-xs font-medium text-stone-500">
+        {/*
+          "" não serve como value de SelectItem no Radix — a string vazia é o
+          jeito de limpar a seleção, e um item com ela é rejeitado. Daí o
+          sentinela "sem": ele existe só na tela, e vira "" no estado.
+        */}
+        <div className="space-y-1">
+          <Label htmlFor="faixa-preco" className="text-xs font-medium text-stone-500">
             Faixa de preço
-          </span>
-          <select
-            value={groupId}
-            onChange={(e) => setGroupId(e.target.value)}
-            className="w-full rounded-lg border border-line bg-background px-2.5 py-2 text-sm outline-none"
+          </Label>
+          <Select
+            value={groupId || "sem"}
+            onValueChange={(v) => setGroupId(v === "sem" ? "" : v)}
           >
-            <option value="">Preço próprio (sem faixa)</option>
-            {menu.priceGroups.map((g) => (
-              <option key={g.id} value={g.id}>
-                {g.name}
-                {g.is_active ? "" : " (pausada)"}
-              </option>
-            ))}
-          </select>
-        </label>
+            <SelectTrigger id="faixa-preco" className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="sem">Preço próprio (sem faixa)</SelectItem>
+              {menu.priceGroups.map((g) => (
+                <SelectItem key={g.id} value={g.id}>
+                  {g.name}
+                  {g.is_active ? "" : " (pausada)"}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
 
-        <label>
-          <span className="mb-1 block text-xs font-medium text-stone-500">
+        <div className="space-y-1">
+          <Label htmlFor="categoria" className="text-xs font-medium text-stone-500">
             Categoria
-          </span>
-          <select
-            value={categoryId}
-            onChange={(e) => setCategoryId(e.target.value)}
-            className="w-full rounded-lg border border-line bg-background px-2.5 py-2 text-sm outline-none"
+          </Label>
+          <Select
+            value={categoryId || "sem"}
+            onValueChange={(v) => setCategoryId(v === "sem" ? "" : v)}
           >
-            <option value="">Sem categoria</option>
-            {menu.categories.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-              </option>
-            ))}
-          </select>
-        </label>
+            <SelectTrigger id="categoria" className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="sem">Sem categoria</SelectItem>
+              {menu.categories.map((c) => (
+                <SelectItem key={c.id} value={c.id}>
+                  {c.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       <div className="mt-3 flex flex-wrap items-end gap-3">
         {menu.sizes.map((size) => {
           const daFaixa = grupo?.prices[size.id];
           return (
-            <label key={size.id} className="w-24">
-              <span className="mb-1 block text-xs font-medium text-stone-500">
-                {size.name}
-              </span>
-              <input
-                value={prices[size.id] ?? ""}
-                onChange={(e) =>
-                  setPrices((prev) => ({ ...prev, [size.id]: e.target.value }))
-                }
-                inputMode="decimal"
-                // Com faixa, o campo em branco não é "sem preço": é o preço da
-                // faixa. Mostrá-lo como sugestão evita que alguém o redigite e
-                // crie sem querer uma exceção que nunca mais acompanha a tabela.
-                placeholder={daFaixa != null ? daFaixa.toFixed(2) : "—"}
-                className="w-full rounded-lg border border-line bg-background px-2.5 py-2 text-sm outline-none focus:border-stone-400"
-              />
-            </label>
+            <Campo
+              key={size.id}
+              className="w-24"
+              label={size.name}
+              value={prices[size.id] ?? ""}
+              onChange={(e) =>
+                setPrices((prev) => ({ ...prev, [size.id]: e.target.value }))
+              }
+              inputMode="decimal"
+              // Com faixa, o campo em branco não é "sem preço": é o preço da
+              // faixa. Mostrá-lo como sugestão evita que alguém o redigite e
+              // crie sem querer uma exceção que nunca mais acompanha a tabela.
+              placeholder={daFaixa != null ? daFaixa.toFixed(2) : "—"}
+            />
           );
         })}
 
-        <label className="flex items-center gap-2 pb-2 text-sm">
-          <input
-            type="checkbox"
+        <div className="flex items-center gap-2 pb-2 text-sm">
+          <Checkbox
+            id="sabor-doce"
             checked={isSweet}
-            onChange={(e) => setIsSweet(e.target.checked)}
-            className="size-4"
+            onCheckedChange={(v) => setIsSweet(v === true)}
           />
-          Doce
-        </label>
+          <Label htmlFor="sabor-doce" className="font-normal">
+            Doce
+          </Label>
+        </div>
       </div>
 
       {grupo && (
@@ -398,33 +422,26 @@ function PriceGroupRow({
   return (
     <Row inactive={!grupo.is_active && !isNew}>
       <div className="flex flex-wrap items-end gap-3">
-        <label className="min-w-40 flex-1">
-          <span className="mb-1 block text-xs font-medium text-stone-500">
-            Nome da faixa
-          </span>
-          <input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Especiais"
-            className="w-full rounded-lg border border-line bg-background px-2.5 py-2 text-sm outline-none focus:border-stone-400"
-          />
-        </label>
+        <Campo
+          className="min-w-40 flex-1"
+          label="Nome da faixa"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Especiais"
+        />
 
         {sizes.map((size) => (
-          <label key={size.id} className="w-24">
-            <span className="mb-1 block text-xs font-medium text-stone-500">
-              {size.name}
-            </span>
-            <input
-              value={prices[size.id] ?? ""}
-              onChange={(e) =>
-                setPrices((prev) => ({ ...prev, [size.id]: e.target.value }))
-              }
-              inputMode="decimal"
-              placeholder="—"
-              className="w-full rounded-lg border border-line bg-background px-2.5 py-2 text-sm outline-none focus:border-stone-400"
-            />
-          </label>
+          <Campo
+            key={size.id}
+            className="w-24"
+            label={size.name}
+            value={prices[size.id] ?? ""}
+            onChange={(e) =>
+              setPrices((prev) => ({ ...prev, [size.id]: e.target.value }))
+            }
+            inputMode="decimal"
+            placeholder="—"
+          />
         ))}
       </div>
 
@@ -736,23 +753,27 @@ function ProductRow({
           placeholder="14,00"
           inputMode="decimal"
         />
-        <label>
-          <span className="mb-1 block text-xs font-medium text-stone-500">
+        <div className="space-y-1">
+          <Label htmlFor="cat-produto" className="text-xs font-medium text-stone-500">
             Categoria
-          </span>
-          <select
-            value={categoryId}
-            onChange={(e) => setCategoryId(e.target.value)}
-            className="w-full rounded-lg border border-line bg-background px-2.5 py-2 text-sm outline-none"
+          </Label>
+          <Select
+            value={categoryId || "sem"}
+            onValueChange={(v) => setCategoryId(v === "sem" ? "" : v)}
           >
-            <option value="">Sem categoria</option>
-            {menu.categories.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-              </option>
-            ))}
-          </select>
-        </label>
+            <SelectTrigger id="cat-produto" className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="sem">Sem categoria</SelectItem>
+              {menu.categories.map((c) => (
+                <SelectItem key={c.id} value={c.id}>
+                  {c.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       <div className="mt-3">
@@ -804,8 +825,10 @@ function CategoriesSection({ menu }: { menu: AdminMenu }) {
         <Row key={category.id} inactive={!category.is_active}>
           <div className="flex items-center gap-3">
             <span className="flex-1 font-medium">{category.name}</span>
-            <button
+            <Button
               type="button"
+              variant="outline"
+              size="xs"
               disabled={pending}
               onClick={() =>
                 startTransition(async () => {
@@ -813,12 +836,14 @@ function CategoriesSection({ menu }: { menu: AdminMenu }) {
                   router.refresh();
                 })
               }
-              className="rounded-full border border-line px-3 py-1.5 text-xs font-medium transition hover:border-stone-300"
+              className="rounded-full px-3 py-1.5"
             >
               {category.is_active ? "Ocultar" : "Mostrar"}
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
+              variant="outline"
+              size="xs"
               disabled={pending}
               onClick={() =>
                 startTransition(async () => {
@@ -826,11 +851,11 @@ function CategoriesSection({ menu }: { menu: AdminMenu }) {
                   router.refresh();
                 })
               }
-              className="grid size-8 place-items-center rounded-full border border-line text-muted-foreground transition hover:border-red-300 hover:text-red-600"
+              className="rounded-full text-muted-foreground hover:border-red-300 hover:text-red-600"
               aria-label="Excluir categoria"
             >
               <Trash2 className="size-3.5" />
-            </button>
+            </Button>
           </div>
         </Row>
       ))}
@@ -845,8 +870,9 @@ function CategoriesSection({ menu }: { menu: AdminMenu }) {
               placeholder="Pizzas doces"
             />
           </div>
-          <button
+          <Button
             type="button"
+            size="sm"
             disabled={pending || name.trim().length < 2}
             onClick={() =>
               startTransition(async () => {
@@ -858,7 +884,7 @@ function CategoriesSection({ menu }: { menu: AdminMenu }) {
             className="rounded-full bg-foreground px-4 py-2.5 text-xs font-semibold text-white disabled:opacity-40"
           >
             Adicionar
-          </button>
+          </Button>
         </div>
       </Row>
     </div>
@@ -906,45 +932,52 @@ function RowFooter({
     <>
       {error && <p className="mt-2 text-xs text-red-600">{error}</p>}
       <div className="mt-3 flex flex-wrap items-center gap-2">
-        <button
+        <Button
           type="button"
+          size="sm"
           disabled={pending}
           onClick={onSave}
-          className="flex items-center gap-1.5 rounded-full bg-foreground px-4 py-2 text-xs font-semibold text-white disabled:opacity-40"
+          className="rounded-full bg-foreground text-xs text-background hover:bg-foreground/90"
         >
           <Check className="size-3.5" />
           {isNew ? "Criar" : "Salvar"}
-        </button>
+        </Button>
 
         {isNew ? (
           onCancel && (
-            <button
+            <Button
               type="button"
+              variant="outline"
+              size="sm"
               onClick={onCancel}
-              className="rounded-full border border-line px-4 py-2 text-xs font-medium text-muted-foreground"
+              className="rounded-full text-xs text-muted-foreground"
             >
               Cancelar
-            </button>
+            </Button>
           )
         ) : (
           <>
-            <button
+            <Button
               type="button"
+              variant="outline"
+              size="sm"
               disabled={pending}
               onClick={onToggleActive}
-              className="rounded-full border border-line px-4 py-2 text-xs font-medium transition hover:border-stone-300"
+              className="rounded-full text-xs"
             >
               {isActive ? "Ocultar do cardápio" : "Mostrar no cardápio"}
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
+              variant="outline"
+              size="icon-sm"
               disabled={pending}
               onClick={onDelete}
-              className="ml-auto grid size-8 place-items-center rounded-full border border-line text-muted-foreground transition hover:border-red-300 hover:text-red-600"
+              className="ml-auto rounded-full text-muted-foreground hover:border-red-300 hover:text-red-600"
               aria-label="Excluir"
             >
               <Trash2 className="size-3.5" />
-            </button>
+            </Button>
           </>
         )}
       </div>
@@ -965,17 +998,15 @@ function Input({
   placeholder?: string;
   inputMode?: "decimal" | "numeric";
 }) {
+  // Atalho para a assinatura de onChange, como em settings-form.
   return (
-    <label className="block">
-      <span className="mb-1 block text-xs font-medium text-stone-500">{label}</span>
-      <input
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        inputMode={inputMode}
-        className="w-full rounded-lg border border-line bg-background px-2.5 py-2 text-sm outline-none focus:border-stone-400"
-      />
-    </label>
+    <Campo
+      label={label}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      placeholder={placeholder}
+      inputMode={inputMode}
+    />
   );
 }
 
@@ -987,14 +1018,15 @@ function AddButton({
   children: React.ReactNode;
 }) {
   return (
-    <button
+    <Button
       type="button"
+      variant="outline"
       onClick={onClick}
-      className="flex w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-line bg-surface px-4 py-4 text-sm font-medium text-muted-foreground transition hover:border-stone-300 hover:text-foreground"
+      className="h-auto w-full rounded-2xl border-dashed px-4 py-4 text-sm font-medium text-muted-foreground hover:text-foreground"
     >
       <Plus className="size-4" />
       {children}
-    </button>
+    </Button>
   );
 }
 

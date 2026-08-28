@@ -4,6 +4,8 @@ import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { ImageUp, Trash2 } from "lucide-react";
 
+import { Button } from "@/components/ui/button";
+
 import { removeFoto, uploadFoto } from "@/app/admin/menu-actions";
 import { prepararImagemQuadrada } from "@/lib/browser-image";
 
@@ -96,19 +98,23 @@ export function FotoField({
           onChange={(e) => aoEscolher(e.target.files?.[0])}
         />
 
-        <button
+        <Button
           type="button"
+          variant="outline"
+          size="xs"
           disabled={pending}
           onClick={() => inputRef.current?.click()}
-          className="inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-3.5 py-1.5 text-xs font-medium transition hover:border-stone-300 disabled:opacity-40"
+          className="rounded-full px-3.5 py-1.5"
         >
           <ImageUp className="size-3.5" />
           {pending ? "Enviando…" : hasImage ? "Trocar foto" : "Enviar foto"}
-        </button>
+        </Button>
 
         {hasImage && (
-          <button
+          <Button
             type="button"
+            variant="outline"
+            size="xs"
             disabled={pending}
             onClick={() =>
               startTransition(async () => {
@@ -117,11 +123,11 @@ export function FotoField({
                 router.refresh();
               })
             }
-            className="inline-flex items-center gap-1.5 rounded-full border border-line px-3 py-1.5 text-xs text-muted-foreground transition hover:border-red-300 hover:text-red-600 disabled:opacity-40"
+            className="rounded-full px-3 py-1.5 text-muted-foreground hover:border-red-300 hover:text-red-600"
           >
             <Trash2 className="size-3.5" />
             Remover
-          </button>
+          </Button>
         )}
       </div>
 

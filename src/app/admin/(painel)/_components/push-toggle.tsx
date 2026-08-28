@@ -3,6 +3,8 @@
 import { useEffect, useState, useTransition } from "react";
 import { Bell, BellOff, BellRing } from "lucide-react";
 
+import { Button } from "@/components/ui/button";
+
 import { sendTestPush, subscribeToPush, unsubscribeFromPush } from "../../push-actions";
 
 type Estado = "carregando" | "indisponivel" | "negado" | "desligado" | "ligado";
@@ -145,8 +147,10 @@ export function PushToggle({ vapidKey }: { vapidKey: string }) {
 
         {estado === "ligado" ? (
           <div className="flex gap-2">
-            <button
+            <Button
               type="button"
+              variant="outline"
+              size="xs"
               disabled={pending}
               onClick={() =>
                 startTransition(async () => {
@@ -154,28 +158,31 @@ export function PushToggle({ vapidKey }: { vapidKey: string }) {
                   setMensagem(r.ok ? "Aviso de teste enviado." : r.error);
                 })
               }
-              className="rounded-full border border-line px-3.5 py-1.5 text-xs font-medium transition hover:border-stone-300"
+              className="rounded-full px-3.5 py-1.5"
             >
               Testar
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
+              variant="outline"
+              size="xs"
               disabled={pending}
               onClick={desligar}
-              className="rounded-full border border-line px-3.5 py-1.5 text-xs font-medium text-muted-foreground transition hover:border-stone-300"
+              className="rounded-full px-3.5 py-1.5 text-muted-foreground"
             >
               Desligar
-            </button>
+            </Button>
           </div>
         ) : (
-          <button
+          <Button
             type="button"
+            size="sm"
             disabled={pending}
             onClick={ligar}
-            className="rounded-full bg-foreground px-4 py-2 text-xs font-semibold text-white disabled:opacity-40"
+            className="rounded-full bg-foreground text-xs text-background hover:bg-foreground/90"
           >
             Ligar avisos
-          </button>
+          </Button>
         )}
       </div>
 

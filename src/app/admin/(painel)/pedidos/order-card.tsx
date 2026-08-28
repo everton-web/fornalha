@@ -4,6 +4,9 @@ import { useState, useTransition } from "react";
 import Link from "next/link";
 import { Bike, Clock, MapPin, Phone, Printer, ShoppingBag, X } from "lucide-react";
 
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+
 import { formatTime, money } from "@/lib/format";
 import type { OrderRow } from "@/lib/orders";
 import { PAYMENT_LABEL, STATUS_LABEL, nextStatuses } from "@/lib/status";
@@ -166,54 +169,62 @@ export function OrderCard({
       {askCancel ? (
         <div className="mt-3 rounded-xl border border-red-200 bg-red-50 p-3">
           <p className="text-xs font-semibold text-red-800">Cancelar o pedido?</p>
-          <input
+          <Input
             value={reason}
             onChange={(e) => setReason(e.target.value)}
             placeholder="Motivo (o cliente vê)"
-            className="mt-2 w-full rounded-lg border border-red-200 bg-white px-2.5 py-2 text-xs outline-none"
+            className="mt-2 h-9 border-red-200 px-2.5 py-2 text-xs"
+            aria-label="Motivo do cancelamento"
           />
           <div className="mt-2 flex gap-2">
-            <button
+            <Button
               type="button"
+              variant="destructive"
+              size="sm"
               disabled={pending}
               onClick={() => apply("cancelled", reason.trim() || undefined)}
-              className="flex-1 rounded-full bg-red-600 px-3 py-2 text-xs font-semibold text-white disabled:opacity-50"
+              className="flex-1 rounded-full text-xs"
             >
               Confirmar cancelamento
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
+              variant="outline"
+              size="icon-sm"
               onClick={() => setAskCancel(false)}
-              className="grid size-8 place-items-center rounded-full border border-red-200"
+              className="rounded-full border-red-200"
               aria-label="Voltar"
             >
               <X className="size-4" />
-            </button>
+            </Button>
           </div>
         </div>
       ) : (
         (advance.length > 0 || canCancel) && (
           <div className="mt-3 flex gap-2">
             {advance.map((status) => (
-              <button
+              <Button
                 key={status}
                 type="button"
+                size="sm"
                 disabled={pending}
                 onClick={() => apply(status)}
-                className="flex-1 rounded-full bg-foreground px-3 py-2.5 text-xs font-semibold text-white transition disabled:opacity-50"
+                className="h-auto flex-1 rounded-full bg-foreground py-2.5 text-xs text-background hover:bg-foreground/90"
               >
                 {ACTION_LABEL[status] ?? STATUS_LABEL[status]}
-              </button>
+              </Button>
             ))}
             {canCancel && (
-              <button
+              <Button
                 type="button"
+                variant="outline"
+                size="sm"
                 disabled={pending}
                 onClick={() => setAskCancel(true)}
-                className="rounded-full border border-line px-3 py-2.5 text-xs font-medium text-muted-foreground transition hover:border-red-300 hover:text-red-600"
+                className="h-auto rounded-full py-2.5 text-xs text-muted-foreground hover:border-red-300 hover:text-red-600"
               >
                 Cancelar
-              </button>
+              </Button>
             )}
           </div>
         )

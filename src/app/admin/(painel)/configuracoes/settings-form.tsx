@@ -2,7 +2,21 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { AlertCircle, Check, Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
+
+import { Aviso } from "@/components/aviso";
+import { Campo } from "@/components/campo";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 import type { DeliveryArea } from "@/lib/delivery";
 import { dayName } from "@/lib/hours";
@@ -74,10 +88,10 @@ export function SettingsForm({
   return (
     <div className="space-y-5 pb-24">
       {!canEdit && (
-        <p className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+        <Aviso tom="info" className="border-amber-200 bg-amber-50 text-amber-900">
           Seu acesso é de equipe: você vê as configurações, mas só o dono pode
           alterá-las.
-        </p>
+        </Aviso>
       )}
 
       <Card title="Identidade">
@@ -89,24 +103,29 @@ export function SettingsForm({
             onChange={(v) => set("tagline", v)}
             placeholder="Forno a lenha desde 1998"
           />
-          <label className="block">
-            <span className="mb-1 block text-xs font-medium text-stone-500">
+          <div className="space-y-1">
+            <Label htmlFor="cor-marca" className="text-xs font-medium text-stone-500">
               Cor da marca
-            </span>
+            </Label>
             <div className="flex items-center gap-2">
+              {/* Sem equivalente no shadcn, e é o certo: o seletor de cor
+                  nativo abre a paleta do sistema operacional. */}
               <input
+                id="cor-marca"
                 type="color"
                 value={form.primaryColor}
                 onChange={(e) => set("primaryColor", e.target.value)}
                 className="size-10 shrink-0 cursor-pointer rounded-lg border border-line bg-surface"
+                aria-label="Cor da marca"
               />
-              <input
+              <Input
                 value={form.primaryColor}
                 onChange={(e) => set("primaryColor", e.target.value)}
-                className="w-full rounded-lg border border-line bg-background px-2.5 py-2 font-mono text-sm outline-none"
+                className="font-mono text-sm"
+                aria-label="Cor da marca em hexadecimal"
               />
             </div>
-          </label>
+          </div>
           <LogoField
             tenant={tenant}
             urlValue={form.logoUrl}
@@ -169,19 +188,23 @@ export function SettingsForm({
           />
         </div>
 
-        <label className="mt-4 block max-w-sm">
-          <span className="mb-1 block text-xs font-medium text-stone-500">
+        <div className="mt-4 max-w-sm space-y-1">
+          <Label htmlFor="regra-preco" className="text-xs font-medium text-stone-500">
             Preço da pizza com mais de um sabor
-          </span>
-          <select
+          </Label>
+          <Select
             value={form.halfPricing}
-            onChange={(e) => set("halfPricing", e.target.value as "max" | "avg")}
-            className="w-full rounded-lg border border-line bg-background px-2.5 py-2 text-sm outline-none"
+            onValueChange={(v) => set("halfPricing", v as "max" | "avg")}
           >
-            <option value="max">Cobrar o sabor mais caro</option>
-            <option value="avg">Cobrar a média dos sabores</option>
-          </select>
-        </label>
+            <SelectTrigger id="regra-preco" className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="max">Cobrar o sabor mais caro</SelectItem>
+              <SelectItem value="avg">Cobrar a média dos sabores</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </Card>
 
       <Card title="Área de entrega">
@@ -234,32 +257,20 @@ export function SettingsForm({
       </Card>
 
       {message && (
-        <p
-          className={`flex items-start gap-2 rounded-2xl border px-4 py-3 text-sm ${
-            message.type === "ok"
-              ? "border-emerald-200 bg-emerald-50 text-emerald-800"
-              : "border-red-200 bg-red-50 text-red-700"
-          }`}
-        >
-          {message.type === "ok" ? (
-            <Check className="mt-0.5 size-4 shrink-0" />
-          ) : (
-            <AlertCircle className="mt-0.5 size-4 shrink-0" />
-          )}
-          {message.text}
-        </p>
+        <Aviso tom={message.type === "ok" ? "ok" : "erro"}>{message.text}</Aviso>
       )}
 
       <div className="fixed inset-x-0 bottom-0 border-t border-line bg-surface/95 p-3 backdrop-blur">
         <div className="mx-auto max-w-6xl px-1">
-          <button
+          <Button
             type="button"
+            size="pill"
             onClick={save}
             disabled={pending || !canEdit}
-            className="rounded-full bg-foreground px-6 py-3 text-sm font-semibold text-white disabled:opacity-40"
+            className="bg-foreground px-6 text-background hover:bg-foreground/90"
           >
             {pending ? "Salvando…" : "Salvar configurações"}
-          </button>
+          </Button>
         </div>
       </div>
     </div>
@@ -291,7 +302,7 @@ function HoursEditor({
               const globalIndex = hours.indexOf(shift);
               return (
                 <span key={index} className="flex items-center gap-1">
-                  <input
+                  <Input
                     type="time"
                     value={shift.open}
                     onChange={(e) => {
@@ -299,10 +310,11 @@ function HoursEditor({
                       next[globalIndex] = { ...shift, open: e.target.value };
                       onChange(next);
                     }}
-                    className="rounded-lg border border-line bg-background px-2 py-1.5 text-sm outline-none"
+                    className="h-9 w-auto px-2 py-1.5 text-sm"
+                    aria-label={`Abre ${dayName(day)}`}
                   />
                   <span className="text-muted-foreground">até</span>
-                  <input
+                  <Input
                     type="time"
                     value={shift.close}
                     onChange={(e) => {
@@ -310,30 +322,35 @@ function HoursEditor({
                       next[globalIndex] = { ...shift, close: e.target.value };
                       onChange(next);
                     }}
-                    className="rounded-lg border border-line bg-background px-2 py-1.5 text-sm outline-none"
+                    className="h-9 w-auto px-2 py-1.5 text-sm"
+                    aria-label={`Fecha ${dayName(day)}`}
                   />
-                  <button
+                  <Button
                     type="button"
+                    variant="ghost"
+                    size="icon-sm"
                     onClick={() => onChange(hours.filter((_, i) => i !== globalIndex))}
-                    className="grid size-7 place-items-center rounded-full text-muted-foreground hover:text-red-600"
+                    className="rounded-full text-muted-foreground hover:text-red-600"
                     aria-label="Remover turno"
                   >
                     <Trash2 className="size-3.5" />
-                  </button>
+                  </Button>
                 </span>
               );
             })}
 
-            <button
+            <Button
               type="button"
+              variant="outline"
+              size="xs"
               onClick={() =>
                 onChange([...hours, { day, open: "18:00", close: "23:00" }])
               }
-              className="ml-auto flex items-center gap-1 rounded-full border border-line px-3 py-1 text-xs text-muted-foreground transition hover:border-stone-300 hover:text-foreground"
+              className="ml-auto rounded-full text-muted-foreground hover:text-foreground"
             >
               <Plus className="size-3" />
               turno
-            </button>
+            </Button>
           </div>
         );
       })}
@@ -352,6 +369,13 @@ function Card({ title, children }: { title: string; children: React.ReactNode })
   );
 }
 
+/**
+ * Atalho local sobre o <Campo>, só para a assinatura de onChange.
+ *
+ * As doze chamadas desta tela passam `(valor) => set(...)`, e o Campo recebe o
+ * evento do DOM como qualquer input. Converter aqui, num lugar, evita reescrever
+ * doze chamadas para ganhar nada.
+ */
 function Field({
   label,
   value,
@@ -368,16 +392,14 @@ function Field({
   inputMode?: "decimal" | "numeric";
 }) {
   return (
-    <label className={`block ${className}`}>
-      <span className="mb-1 block text-xs font-medium text-stone-500">{label}</span>
-      <input
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        inputMode={inputMode}
-        className="w-full rounded-lg border border-line bg-background px-2.5 py-2 text-sm outline-none focus:border-stone-400"
-      />
-    </label>
+    <Campo
+      label={label}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      placeholder={placeholder}
+      inputMode={inputMode}
+      className={className}
+    />
   );
 }
 
@@ -390,15 +412,18 @@ function Toggle({
   checked: boolean;
   onChange: (value: boolean) => void;
 }) {
+  // O id sai do rótulo: são poucos por tela e o texto é estável.
+  const id = `toggle-${label.toLowerCase().replace(/[^a-z]+/g, "-")}`;
   return (
-    <label className="flex items-center gap-2 text-sm">
-      <input
-        type="checkbox"
+    <div className="flex items-center gap-2 text-sm">
+      <Checkbox
+        id={id}
         checked={checked}
-        onChange={(e) => onChange(e.target.checked)}
-        className="size-4"
+        onCheckedChange={(v) => onChange(v === true)}
       />
-      {label}
-    </label>
+      <Label htmlFor={id} className="font-normal">
+        {label}
+      </Label>
+    </div>
   );
 }
