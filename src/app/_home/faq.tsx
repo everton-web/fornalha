@@ -110,7 +110,7 @@ export function Faq() {
               <span className="min-w-0 flex-1">{pergunta}</span>
               <ChevronDown className="size-4 shrink-0 text-stone-400 transition group-open:rotate-180" />
             </summary>
-            <p className="px-5 pb-4 text-sm leading-relaxed text-muted">
+            <p className="px-5 pb-4 text-sm leading-relaxed text-muted-foreground">
               {resposta}
             </p>
           </details>

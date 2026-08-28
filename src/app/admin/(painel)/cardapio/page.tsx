@@ -13,7 +13,7 @@ export default async function CardapioPage() {
     <>
       <div className="mb-5">
         <h1 className="text-xl font-bold tracking-tight">Cardápio</h1>
-        <p className="text-sm text-muted">
+        <p className="text-sm text-muted-foreground">
           O que você mudar aqui aparece na hora no link do cliente.
         </p>
       </div>

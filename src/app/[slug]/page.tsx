@@ -25,7 +25,7 @@ export default async function StorePage({ params }: PageProps<"/[slug]">) {
           {tenant.name}
         </h1>
         {tenant.tagline && (
-          <p className="mt-1 text-muted">{tenant.tagline}</p>
+          <p className="mt-1 text-muted-foreground">{tenant.tagline}</p>
         )}
 
         <div className="mt-4 flex flex-wrap gap-2 text-sm">
@@ -52,7 +52,7 @@ export default async function StorePage({ params }: PageProps<"/[slug]">) {
             href={mapsUrl(tenant.address)}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-3 flex items-start gap-1.5 text-sm text-muted underline decoration-dotted underline-offset-4 transition hover:text-foreground"
+            className="mt-3 flex items-start gap-1.5 text-sm text-muted-foreground underline decoration-dotted underline-offset-4 transition hover:text-foreground"
           >
             <MapPin className="mt-0.5 size-3.5 shrink-0" />
             <span>

@@ -42,13 +42,13 @@ export function AreasField({
 
   return (
     <div>
-      <p className="mb-3 text-sm text-muted">
+      <p className="mb-3 text-sm text-muted-foreground">
         Cadastre o quanto custa entregar em cada bairro. O cliente digita o CEP
         no pedido e a taxa aparece sozinha.
       </p>
 
       {areas.length === 0 ? (
-        <p className="rounded-xl bg-background px-3 py-2.5 text-sm text-muted">
+        <p className="rounded-xl bg-background px-3 py-2.5 text-sm text-muted-foreground">
           Nenhum bairro cadastrado. Enquanto for assim, toda entrega custa a taxa
           única de <strong className="text-foreground">{money(taxaPadrao)}</strong>.
         </p>
@@ -109,7 +109,7 @@ export function AreasField({
           />
           <span>
             Recusar endereço fora desses bairros
-            <span className="block text-xs text-muted">
+            <span className="block text-xs text-muted-foreground">
               Desmarcado, o pedido é aceito e cobra a taxa única de{" "}
               {money(taxaPadrao)}.
             </span>
@@ -168,7 +168,7 @@ function AreaRow({ area, canEdit }: { area: DeliveryArea; canEdit: boolean }) {
             router.refresh();
           })
         }
-        className="grid size-8 place-items-center rounded-full border border-line text-muted transition hover:border-red-300 hover:text-red-600"
+        className="grid size-8 place-items-center rounded-full border border-line text-muted-foreground transition hover:border-red-300 hover:text-red-600"
         aria-label={`Remover ${area.district}`}
       >
         <Trash2 className="size-3.5" />

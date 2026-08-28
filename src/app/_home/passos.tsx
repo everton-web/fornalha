@@ -107,7 +107,7 @@ export function ComoComeca() {
                   </span>
                   <span className="min-w-0">
                     <span className="block font-semibold">{passo.titulo}</span>
-                    <span className="mt-1 block text-sm text-muted">
+                    <span className="mt-1 block text-sm text-muted-foreground">
                       {passo.texto}
                     </span>
                     {/* No celular não existe hover: o resumo vem junto. */}
@@ -156,13 +156,13 @@ export function ComoComeca() {
                       PASSOS[ativo].mono ? "font-mono text-sm" : "text-sm"
                     }`}
                   >
-                    <span className="text-muted">{rotulo}</span>
+                    <span className="text-muted-foreground">{rotulo}</span>
                     <span className="truncate font-semibold">{valor}</span>
                   </div>
                 ))}
               </div>
 
-              <p className="mt-5 border-t border-line pt-4 text-sm text-muted">
+              <p className="mt-5 border-t border-line pt-4 text-sm text-muted-foreground">
                 {PASSOS[ativo].nota}
               </p>
             </div>

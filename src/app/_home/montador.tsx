@@ -75,7 +75,7 @@ export function Montador() {
             <span className="text-brand">confusão de preço.</span>
           </h2>
 
-          <p className="mt-4 text-muted">
+          <p className="mt-4 text-muted-foreground">
             Seu cliente escolhe o tamanho, combina os sabores, põe a borda e os
             adicionais — no celular dele, sem instalar nada. O preço muda na
             tela enquanto ele monta.
@@ -98,7 +98,7 @@ export function Montador() {
             ].map(([titulo, texto]) => (
               <li key={titulo} className="border-l-2 border-line pl-4">
                 <p className="font-semibold">{titulo}</p>
-                <p className="mt-0.5 text-sm text-muted">{texto}</p>
+                <p className="mt-0.5 text-sm text-muted-foreground">{texto}</p>
               </li>
             ))}
           </ul>

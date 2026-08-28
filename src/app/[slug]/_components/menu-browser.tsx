@@ -72,7 +72,7 @@ export function MenuBrowser({ menu }: { menu: Menu }) {
           </span>
           <span>
             <span className="block font-semibold">Montar pizza do zero</span>
-            <span className="block text-sm text-muted">
+            <span className="block text-sm text-muted-foreground">
               Escolha o tamanho, combine sabores e a borda
             </span>
           </span>
@@ -154,13 +154,13 @@ function FlavorCard({
       <span className="min-w-0 flex-1">
         <span className="block font-semibold">{flavor.name}</span>
         {flavor.description && (
-          <span className="mt-0.5 line-clamp-2 block text-sm text-muted">
+          <span className="mt-0.5 line-clamp-2 block text-sm text-muted-foreground">
             {flavor.description}
           </span>
         )}
         {from != null && (
           <span className="mt-1 block text-sm">
-            <span className="text-muted">a partir de </span>
+            <span className="text-muted-foreground">a partir de </span>
             <span className="font-semibold">{money(from)}</span>
           </span>
         )}
@@ -196,7 +196,7 @@ function ProductCard({
       <div className="min-w-0 flex-1">
         <p className="font-semibold">{product.name}</p>
         {product.description && (
-          <p className="mt-0.5 line-clamp-2 text-sm text-muted">
+          <p className="mt-0.5 line-clamp-2 text-sm text-muted-foreground">
             {product.description}
           </p>
         )}

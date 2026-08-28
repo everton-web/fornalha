@@ -154,7 +154,7 @@ export function CenaDoProduto() {
 
       </div>
 
-      <figcaption className="mt-4 text-center text-sm text-muted">
+      <figcaption className="mt-4 text-center text-sm text-muted-foreground">
         O painel que você abre na cozinha: os pedidos do momento, o que cada um
         pediu e em que pé está.
       </figcaption>

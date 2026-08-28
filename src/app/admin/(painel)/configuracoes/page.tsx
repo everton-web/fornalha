@@ -13,7 +13,7 @@ export default async function ConfiguracoesPage() {
     <>
       <div className="mb-5">
         <h1 className="text-xl font-bold tracking-tight">Configurações</h1>
-        <p className="text-sm text-muted">
+        <p className="text-sm text-muted-foreground">
           Identidade, horários, entrega e formas de pagamento.
         </p>
       </div>

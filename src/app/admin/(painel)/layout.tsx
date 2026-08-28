@@ -23,7 +23,7 @@ export default async function PainelLayout({ children }: LayoutProps<"/admin">) 
             <Link
               href={`/${tenant.slug}`}
               target="_blank"
-              className="inline-flex items-center gap-1 text-xs text-muted hover:text-foreground"
+              className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
             >
               /{tenant.slug}
               <ExternalLink className="size-3" />

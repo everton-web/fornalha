@@ -19,7 +19,7 @@ export function NavLink({
       className={`-mb-px border-b-2 px-3 py-2.5 text-sm font-medium transition ${
         active
           ? "border-foreground text-foreground"
-          : "border-transparent text-muted hover:text-foreground"
+          : "border-transparent text-muted-foreground hover:text-foreground"
       }`}
     >
       {children}

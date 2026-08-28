@@ -223,7 +223,7 @@ export function SettingsForm({
           </div>
         )}
 
-        <p className="mt-4 rounded-xl bg-background px-3 py-2.5 text-xs text-muted">
+        <p className="mt-4 rounded-xl bg-background px-3 py-2.5 text-xs text-muted-foreground">
           Pagamento online (Pix e cartão com confirmação automática) precisa da
           conta do gateway conectada. Fale com a agência para ativar.
         </p>
@@ -284,7 +284,7 @@ function HoursEditor({
             <span className="w-20 text-sm font-medium">{dayName(day)}</span>
 
             {shifts.length === 0 && (
-              <span className="text-sm text-muted">Fechado</span>
+              <span className="text-sm text-muted-foreground">Fechado</span>
             )}
 
             {shifts.map((shift, index) => {
@@ -301,7 +301,7 @@ function HoursEditor({
                     }}
                     className="rounded-lg border border-line bg-background px-2 py-1.5 text-sm outline-none"
                   />
-                  <span className="text-muted">até</span>
+                  <span className="text-muted-foreground">até</span>
                   <input
                     type="time"
                     value={shift.close}
@@ -315,7 +315,7 @@ function HoursEditor({
                   <button
                     type="button"
                     onClick={() => onChange(hours.filter((_, i) => i !== globalIndex))}
-                    className="grid size-7 place-items-center rounded-full text-muted hover:text-red-600"
+                    className="grid size-7 place-items-center rounded-full text-muted-foreground hover:text-red-600"
                     aria-label="Remover turno"
                   >
                     <Trash2 className="size-3.5" />
@@ -329,7 +329,7 @@ function HoursEditor({
               onClick={() =>
                 onChange([...hours, { day, open: "18:00", close: "23:00" }])
               }
-              className="ml-auto flex items-center gap-1 rounded-full border border-line px-3 py-1 text-xs text-muted transition hover:border-stone-300 hover:text-foreground"
+              className="ml-auto flex items-center gap-1 rounded-full border border-line px-3 py-1 text-xs text-muted-foreground transition hover:border-stone-300 hover:text-foreground"
             >
               <Plus className="size-3" />
               turno

@@ -21,7 +21,7 @@ export default async function CheckoutPage({
     <main className="mx-auto max-w-3xl px-4 pb-32 pt-5">
       <Link
         href={`/${slug}`}
-        className="mb-4 inline-flex items-center gap-1.5 text-sm text-muted transition hover:text-foreground"
+        className="mb-4 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition hover:text-foreground"
       >
         <ArrowLeft className="size-4" />
         Voltar ao cardápio

@@ -46,7 +46,7 @@ export function ResetForm({ token }: { token: string }) {
           autoFocus
           className="w-full rounded-xl border border-line bg-surface px-3 py-2.5 text-sm outline-none focus:border-stone-400"
         />
-        <span className="mt-1 block text-xs text-muted">
+        <span className="mt-1 block text-xs text-muted-foreground">
           Pelo menos 10 caracteres.
         </span>
       </label>

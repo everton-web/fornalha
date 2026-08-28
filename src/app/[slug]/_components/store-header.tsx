@@ -34,7 +34,7 @@ export function StoreHeader({ tenant }: { tenant: Tenant }) {
             <span className="block truncate font-semibold leading-tight">
               {tenant.name}
             </span>
-            <span className="flex items-center gap-1.5 text-xs text-muted">
+            <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
               <span
                 className={`size-1.5 rounded-full ${open ? "bg-emerald-500" : "bg-stone-400"}`}
               />

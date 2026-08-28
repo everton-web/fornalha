@@ -14,7 +14,7 @@ export default function EsqueciPage() {
       </Link>
 
       <h1 className="text-2xl font-bold tracking-tight">Esqueceu a senha?</h1>
-      <p className="mt-1 text-sm text-muted">
+      <p className="mt-1 text-sm text-muted-foreground">
         Informe o e-mail do painel e enviamos um link para você criar uma nova.
       </p>
 
@@ -22,7 +22,7 @@ export default function EsqueciPage() {
 
       <Link
         href="/admin/login"
-        className="mt-6 inline-flex items-center gap-1.5 text-sm text-muted transition hover:text-foreground"
+        className="mt-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition hover:text-foreground"
       >
         <ArrowLeft className="size-4" />
         Voltar para o login

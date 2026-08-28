@@ -96,7 +96,7 @@ export function InstallForm({
           />
           <span>
             Criar um cardápio de demonstração
-            <span className="block text-xs text-muted">
+            <span className="block text-xs text-muted-foreground">
               Pizzaria Bella Napoli, com tamanhos, sabores e faixas de preço para
               você ver o sistema funcionando. Dá para apagar depois.
             </span>

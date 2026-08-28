@@ -28,7 +28,7 @@ export default async function InstalarPage() {
         <div className="rounded-3xl border border-line bg-surface p-6 text-center">
           <CheckCircle2 className="mx-auto size-10 text-emerald-600" />
           <h1 className="mt-3 text-lg font-bold">Sistema já instalado</h1>
-          <p className="mt-1.5 text-sm text-muted">
+          <p className="mt-1.5 text-sm text-muted-foreground">
             Já existe uma conta de agência, então esta página está desativada.
           </p>
           <Link
@@ -37,7 +37,7 @@ export default async function InstalarPage() {
           >
             Ir para o login
           </Link>
-          <p className="mt-3 text-xs text-muted">
+          <p className="mt-3 text-xs text-muted-foreground">
             Esqueceu a senha? Use{" "}
             <Link href="/admin/esqueci" className="underline underline-offset-2">
               esqueci minha senha
@@ -52,7 +52,7 @@ export default async function InstalarPage() {
   return (
     <main className="mx-auto flex min-h-full max-w-md flex-col justify-center px-4 py-12">
       <h1 className="text-xl font-bold tracking-tight">Instalar a Fornalha</h1>
-      <p className="mt-1.5 text-sm text-muted">
+      <p className="mt-1.5 text-sm text-muted-foreground">
         {!estado.temTabelas
           ? "Primeira vez: vamos preparar o banco e criar o seu acesso de agência."
           : estado.contas > 0
@@ -62,7 +62,7 @@ export default async function InstalarPage() {
 
       <InstallForm temTabelas={estado.temTabelas} temPizzaria={estado.pizzarias > 0} />
 
-      <p className="mt-5 text-xs text-muted">
+      <p className="mt-5 text-xs text-muted-foreground">
         Esta página se desativa sozinha assim que a primeira conta existir.
       </p>
     </main>

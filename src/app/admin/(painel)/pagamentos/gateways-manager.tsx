@@ -101,10 +101,10 @@ export function GatewaysManager({
                       </span>
                     ))}
                 </div>
-                <p className="mt-1 text-sm text-muted">{gateway.summary}</p>
+                <p className="mt-1 text-sm text-muted-foreground">{gateway.summary}</p>
 
                 {conta && (
-                  <p className="mt-2 text-xs text-muted">
+                  <p className="mt-2 text-xs text-muted-foreground">
                     {[
                       conta.acceptsPix && "Pix",
                       conta.acceptsCard && "Cartão",
@@ -190,7 +190,7 @@ export function GatewaysManager({
         );
       })}
 
-      <p className="rounded-3xl border border-dashed border-line px-5 py-4 text-sm text-muted">
+      <p className="rounded-3xl border border-dashed border-line px-5 py-4 text-sm text-muted-foreground">
         Vai receber por outro gateway? Asaas, Pagar.me (Stone), InfinitePay,
         PicPay e Stripe entram sem mexer no resto do sistema — é só pedir.
         <br />
@@ -251,7 +251,7 @@ function FormularioConexao({
         <label key={campo.name} className="block">
           <span className="text-sm font-medium">{campo.label}</span>
           {campo.help && (
-            <span className="mt-0.5 block text-xs text-muted">{campo.help}</span>
+            <span className="mt-0.5 block text-xs text-muted-foreground">{campo.help}</span>
           )}
           <input
             type={campo.secret ? "password" : "text"}
@@ -300,7 +300,7 @@ function FormularioConexao({
           <Link2 className="size-3.5" />
           Endereço do webhook
         </p>
-        <p className="mt-1 text-xs text-muted">
+        <p className="mt-1 text-xs text-muted-foreground">
           Cadastre este endereço no painel do {gateway.label}. É por ele que o
           gateway avisa quando um pagamento cai.
         </p>

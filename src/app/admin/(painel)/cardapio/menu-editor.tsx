@@ -259,7 +259,7 @@ function FlavorRow({
       </div>
 
       {grupo && (
-        <p className="mt-2 text-xs text-muted">
+        <p className="mt-2 text-xs text-muted-foreground">
           Em branco, vale o preço da faixa <strong>{grupo.name}</strong>.
           Preencher um tamanho cria uma exceção só para este sabor.
         </p>
@@ -324,7 +324,7 @@ function PriceGroupsSection({ menu }: { menu: AdminMenu }) {
 
   return (
     <div className="space-y-3">
-      <p className="rounded-2xl border border-line bg-surface px-4 py-3 text-sm text-muted">
+      <p className="rounded-2xl border border-line bg-surface px-4 py-3 text-sm text-muted-foreground">
         Em vez de digitar o preço sabor por sabor, junte os sabores em faixas —
         Tradicionais, Especiais, Premium — e mexa no preço de todos de uma vez.
         Um sabor sempre pode ter preço próprio como exceção.
@@ -429,7 +429,7 @@ function PriceGroupRow({
       </div>
 
       {!isNew && (
-        <p className="mt-2 text-xs text-muted">
+        <p className="mt-2 text-xs text-muted-foreground">
           {sabores === 0
             ? "Nenhum sabor nesta faixa ainda."
             : `${sabores} sabor${sabores > 1 ? "es" : ""} nesta faixa — mudar o preço aqui muda o de todos.`}
@@ -826,7 +826,7 @@ function CategoriesSection({ menu }: { menu: AdminMenu }) {
                   router.refresh();
                 })
               }
-              className="grid size-8 place-items-center rounded-full border border-line text-muted transition hover:border-red-300 hover:text-red-600"
+              className="grid size-8 place-items-center rounded-full border border-line text-muted-foreground transition hover:border-red-300 hover:text-red-600"
               aria-label="Excluir categoria"
             >
               <Trash2 className="size-3.5" />
@@ -921,7 +921,7 @@ function RowFooter({
             <button
               type="button"
               onClick={onCancel}
-              className="rounded-full border border-line px-4 py-2 text-xs font-medium text-muted"
+              className="rounded-full border border-line px-4 py-2 text-xs font-medium text-muted-foreground"
             >
               Cancelar
             </button>
@@ -940,7 +940,7 @@ function RowFooter({
               type="button"
               disabled={pending}
               onClick={onDelete}
-              className="ml-auto grid size-8 place-items-center rounded-full border border-line text-muted transition hover:border-red-300 hover:text-red-600"
+              className="ml-auto grid size-8 place-items-center rounded-full border border-line text-muted-foreground transition hover:border-red-300 hover:text-red-600"
               aria-label="Excluir"
             >
               <Trash2 className="size-3.5" />
@@ -990,7 +990,7 @@ function AddButton({
     <button
       type="button"
       onClick={onClick}
-      className="flex w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-line bg-surface px-4 py-4 text-sm font-medium text-muted transition hover:border-stone-300 hover:text-foreground"
+      className="flex w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-line bg-surface px-4 py-4 text-sm font-medium text-muted-foreground transition hover:border-stone-300 hover:text-foreground"
     >
       <Plus className="size-4" />
       {children}
@@ -1000,7 +1000,7 @@ function AddButton({
 
 function Empty({ children }: { children: React.ReactNode }) {
   return (
-    <div className="rounded-2xl border border-dashed border-line bg-surface p-8 text-center text-sm text-muted">
+    <div className="rounded-2xl border border-dashed border-line bg-surface p-8 text-center text-sm text-muted-foreground">
       {children}
     </div>
   );

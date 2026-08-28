@@ -14,7 +14,7 @@ export default function DemoPage() {
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-6 py-16">
       <Link
         href="/"
-        className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted transition hover:text-foreground"
+        className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition hover:text-foreground"
       >
         <ArrowLeft className="size-4" />
         Voltar
@@ -23,7 +23,7 @@ export default function DemoPage() {
       <h1 className="text-2xl font-bold tracking-tight">
         O painel por dentro
       </h1>
-      <p className="mt-2 text-muted">
+      <p className="mt-2 text-muted-foreground">
         Você vai entrar no painel da Bella Napoli, a pizzaria de demonstração —
         os pedidos chegando, o cardápio, as taxas por bairro e as configurações.
       </p>
@@ -60,7 +60,7 @@ export default function DemoPage() {
 
       {erro && <p className="mt-3 text-sm font-medium text-red-600">{erro}</p>}
 
-      <p className="mt-6 text-sm text-muted">
+      <p className="mt-6 text-sm text-muted-foreground">
         Já é cliente?{" "}
         <Link href="/admin/login" className="font-medium underline decoration-dotted underline-offset-4">
           Entrar na sua conta

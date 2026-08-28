@@ -38,7 +38,7 @@ export default function Creditos() {
     <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-14">
       <Link
         href="/"
-        className="text-sm text-muted transition hover:text-foreground"
+        className="text-sm text-muted-foreground transition hover:text-foreground"
       >
         ← Fornalha
       </Link>
@@ -46,7 +46,7 @@ export default function Creditos() {
       <h1 className="mt-6 text-3xl font-bold tracking-tight">
         Créditos das fotos
       </h1>
-      <p className="mt-4 max-w-xl text-muted">
+      <p className="mt-4 max-w-xl text-muted-foreground">
         A pizzaria de demonstração é fictícia, e as fotos do cardápio dela vêm
         do Wikimedia Commons, sob licenças que permitem uso comercial e
         modificação. Cada uma foi recortada e convertida para WebP. Abaixo, o
@@ -56,7 +56,7 @@ export default function Creditos() {
       <ul className="mt-8 divide-y divide-line border-y border-line">
         {lista.map(([slug, c]) => (
           <li key={slug} className="flex flex-wrap items-baseline gap-x-3 py-3">
-            <span className="w-44 shrink-0 font-mono text-sm text-muted">
+            <span className="w-44 shrink-0 font-mono text-sm text-muted-foreground">
               {slug}
             </span>
             <span className="min-w-0 flex-1 text-sm">
@@ -68,7 +68,7 @@ export default function Creditos() {
               >
                 {c.titulo}
               </a>
-              <span className="text-muted">
+              <span className="text-muted-foreground">
                 {" "}
                 — {c.autor}, {c.licenca}
               </span>
@@ -77,7 +77,7 @@ export default function Creditos() {
         ))}
       </ul>
 
-      <p className="mt-8 text-sm text-muted">
+      <p className="mt-8 text-sm text-muted-foreground">
         Fonte: {" "}
         <a
           href="https://commons.wikimedia.org"

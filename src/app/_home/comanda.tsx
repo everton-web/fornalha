@@ -20,7 +20,7 @@ export function Comanda() {
             <span className="text-brand">E no WhatsApp, se precisar.</span>
           </h2>
 
-          <p className="mt-4 text-muted">
+          <p className="mt-4 text-muted-foreground">
             A comanda sai na largura da bobina de 80&nbsp;mm, com tudo que a
             cozinha e o entregador precisam: itens, borda, observação, endereço
             e o total já com a taxa.
@@ -52,7 +52,7 @@ export function Comanda() {
                   <span className="block font-semibold">
                     {titulo as string}
                   </span>
-                  <span className="mt-0.5 block text-sm text-muted">
+                  <span className="mt-0.5 block text-sm text-muted-foreground">
                     {texto as string}
                   </span>
                 </span>

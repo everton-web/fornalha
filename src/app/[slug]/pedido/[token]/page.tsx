@@ -63,7 +63,7 @@ export default async function OrderPage({
               ? "Falta pagar"
               : "Pedido recebido!"}
         </h1>
-        <p className="mt-1 text-sm text-muted">
+        <p className="mt-1 text-sm text-muted-foreground">
           {cobranca
             ? "Seu pedido está guardado. Assim que o pagamento cair, a pizzaria começa."
             : STATUS_HINT[order.status]}
@@ -71,7 +71,7 @@ export default async function OrderPage({
         <p className="mt-4 inline-block rounded-full bg-background px-4 py-1.5 font-mono text-sm font-bold tracking-wider">
           #{order.code}
         </p>
-        <p className="mt-2 text-xs text-muted">
+        <p className="mt-2 text-xs text-muted-foreground">
           Feito às {formatTime(order.created_at, tenant.timezone)} · previsão de{" "}
           {tenant.prep_time_min} min
         </p>
@@ -121,7 +121,7 @@ export default async function OrderPage({
                       />
                     )}
                   </span>
-                  <span className={`pb-1 text-sm ${active ? "font-semibold" : done ? "" : "text-muted"}`}>
+                  <span className={`pb-1 text-sm ${active ? "font-semibold" : done ? "" : "text-muted-foreground"}`}>
                     {STATUS_LABEL[step]}
                   </span>
                 </li>
@@ -149,7 +149,7 @@ export default async function OrderPage({
                   {item.quantity}× {item.title}
                 </span>
                 {item.notes && (
-                  <span className="block text-xs italic text-muted">
+                  <span className="block text-xs italic text-muted-foreground">
                     “{item.notes}”
                   </span>
                 )}
@@ -163,11 +163,11 @@ export default async function OrderPage({
 
         <dl className="mt-4 space-y-1.5 border-t border-line pt-3 text-sm">
           <div className="flex justify-between">
-            <dt className="text-muted">Subtotal</dt>
+            <dt className="text-muted-foreground">Subtotal</dt>
             <dd>{money(order.subtotal)}</dd>
           </div>
           <div className="flex justify-between">
-            <dt className="text-muted">Taxa de entrega</dt>
+            <dt className="text-muted-foreground">Taxa de entrega</dt>
             <dd>{order.delivery_fee > 0 ? money(order.delivery_fee) : "Grátis"}</dd>
           </div>
           <div className="flex justify-between border-t border-line pt-1.5 font-bold">
@@ -176,7 +176,7 @@ export default async function OrderPage({
           </div>
         </dl>
 
-        <p className="mt-3 text-xs text-muted">
+        <p className="mt-3 text-xs text-muted-foreground">
           {PAYMENT_LABEL[order.payment_method]}
           {order.change_for ? ` · troco para ${money(order.change_for)}` : ""}
         </p>
@@ -187,7 +187,7 @@ export default async function OrderPage({
           {order.delivery_type === "delivery" ? "Entrega" : "Retirada"}
         </h2>
         {order.delivery_type === "delivery" ? (
-          <p className="text-muted">
+          <p className="text-muted-foreground">
             {order.address_street}, {order.address_number}
             {order.address_complement ? ` — ${order.address_complement}` : ""}
             {order.address_district ? `, ${order.address_district}` : ""}
@@ -199,14 +199,14 @@ export default async function OrderPage({
             href={mapsUrl(tenant.address)}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-muted underline decoration-dotted underline-offset-4 transition hover:text-foreground"
+            className="text-muted-foreground underline decoration-dotted underline-offset-4 transition hover:text-foreground"
           >
             {tenant.address} · como chegar
           </a>
         ) : (
-          <p className="text-muted">Retirar no balcão</p>
+          <p className="text-muted-foreground">Retirar no balcão</p>
         )}
-        <p className="mt-2 text-muted">
+        <p className="mt-2 text-muted-foreground">
           {order.customer_name} · {order.customer_phone}
         </p>
       </section>
@@ -232,7 +232,7 @@ export default async function OrderPage({
         </Link>
       </div>
 
-      <p className="mt-4 text-center text-xs text-muted">
+      <p className="mt-4 text-center text-xs text-muted-foreground">
         Salve este link para acompanhar seu pedido.
       </p>
     </main>

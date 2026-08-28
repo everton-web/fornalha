@@ -5,7 +5,7 @@ export default function NotFound() {
     <main className="mx-auto flex max-w-lg flex-1 flex-col items-center justify-center px-6 py-20 text-center">
       <p className="text-5xl">🍕</p>
       <h1 className="mt-4 text-2xl font-bold">Página não encontrada</h1>
-      <p className="mt-2 text-muted">
+      <p className="mt-2 text-muted-foreground">
         O link pode estar errado ou a pizzaria não está mais ativa.
       </p>
       <Link

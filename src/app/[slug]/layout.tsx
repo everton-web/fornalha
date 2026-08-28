@@ -49,7 +49,7 @@ export default async function StoreLayout({
       <CartProvider menu={menu}>
         <StoreHeader tenant={menu.tenant} />
         <div className="flex-1">{children}</div>
-        <footer className="border-t border-line py-8 text-center text-xs text-muted">
+        <footer className="border-t border-line py-8 text-center text-xs text-muted-foreground">
           <p className="font-medium text-foreground">{menu.tenant.name}</p>
           {menu.tenant.address && <p className="mt-1">{menu.tenant.address}</p>}
           <p className="mt-3">Pedidos online por Fornalha</p>

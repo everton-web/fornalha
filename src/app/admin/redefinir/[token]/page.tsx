@@ -23,7 +23,7 @@ export default async function RedefinirPage({
       {check.valid ? (
         <>
           <h1 className="text-2xl font-bold tracking-tight">Criar senha nova</h1>
-          <p className="mt-1 text-sm text-muted">
+          <p className="mt-1 text-sm text-muted-foreground">
             Para <strong className="font-medium text-foreground">{check.email}</strong>
           </p>
           <ResetForm token={token} />
@@ -31,7 +31,7 @@ export default async function RedefinirPage({
       ) : (
         <>
           <h1 className="text-2xl font-bold tracking-tight">Link não vale mais</h1>
-          <p className="mt-2 text-sm text-muted">
+          <p className="mt-2 text-sm text-muted-foreground">
             {check.reason === "expired"
               ? "Este link passou dos 30 minutos de validade."
               : check.reason === "used"

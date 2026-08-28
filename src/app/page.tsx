@@ -91,7 +91,7 @@ export default function Home() {
           <span className="text-brand">Sem comissão por pedido.</span>
         </h1>
 
-        <p className="mx-auto mt-5 max-w-xl text-balance text-lg text-muted">
+        <p className="mx-auto mt-5 max-w-xl text-balance text-lg text-muted-foreground">
           Seu cliente pede no site da sua pizzaria, o pedido cai direto na
           cozinha e o dinheiro vai para a sua conta. Sem intermediário ficando
           com um pedaço de cada pizza.
@@ -168,7 +168,7 @@ export default function Home() {
                     <span className="block truncate text-xs font-medium">
                       {nome}
                     </span>
-                    <span className="block truncate text-[11px] text-muted">
+                    <span className="block truncate text-[11px] text-muted-foreground">
                       {desc}
                     </span>
                   </span>
@@ -191,11 +191,11 @@ export default function Home() {
           </Texto>
           <div className="mt-auto space-y-1.5 pt-4 font-mono text-xs">
             <div className="flex justify-between rounded-lg bg-background px-2.5 py-1.5">
-              <span className="text-muted">Tradicionais</span>
+              <span className="text-muted-foreground">Tradicionais</span>
               <span className="font-semibold">R$ 66</span>
             </div>
             <div className="flex justify-between rounded-lg bg-background px-2.5 py-1.5">
-              <span className="text-muted">Especiais</span>
+              <span className="text-muted-foreground">Especiais</span>
               <span className="font-semibold">R$ 74</span>
             </div>
           </div>
@@ -232,7 +232,7 @@ export default function Home() {
                 key={bairro}
                 className="flex items-center gap-2 rounded-lg bg-background px-2.5 py-1.5"
               >
-                <span className="text-muted">{bairro}</span>
+                <span className="text-muted-foreground">{bairro}</span>
                 <span className="ml-auto font-semibold">{taxa}</span>
               </div>
             ))}
@@ -330,6 +330,6 @@ function Titulo({ children }: { children: React.ReactNode }) {
 
 function Texto({ children }: { children: React.ReactNode }) {
   return (
-    <p className="mt-1 text-sm leading-relaxed text-muted">{children}</p>
+    <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{children}</p>
   );
 }

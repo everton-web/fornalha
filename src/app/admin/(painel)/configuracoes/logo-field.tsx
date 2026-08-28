@@ -98,7 +98,7 @@ export function LogoField({
                 router.refresh();
               })
             }
-            className="inline-flex items-center gap-1.5 rounded-full border border-line px-3 py-2 text-sm text-muted transition hover:border-red-300 hover:text-red-600 disabled:opacity-40"
+            className="inline-flex items-center gap-1.5 rounded-full border border-line px-3 py-2 text-sm text-muted-foreground transition hover:border-red-300 hover:text-red-600 disabled:opacity-40"
           >
             <Trash2 className="size-3.5" />
             Remover
@@ -107,7 +107,7 @@ export function LogoField({
       </div>
 
       <label className="mt-3 block">
-        <span className="mb-1 flex items-center gap-1.5 text-xs text-muted">
+        <span className="mb-1 flex items-center gap-1.5 text-xs text-muted-foreground">
           <Link2 className="size-3" />
           ou cole o endereço de uma imagem na internet
         </span>
@@ -121,7 +121,7 @@ export function LogoField({
       </label>
 
       {tenant.has_logo && (
-        <p className="mt-1 text-xs text-muted">
+        <p className="mt-1 text-xs text-muted-foreground">
           Remova a imagem enviada para voltar a usar um endereço.
         </p>
       )}

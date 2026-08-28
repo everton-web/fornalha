@@ -230,14 +230,14 @@ export function CheckoutForm({
   }
 
   if (!ready) {
-    return <p className="py-10 text-center text-sm text-muted">Carregando…</p>;
+    return <p className="py-10 text-center text-sm text-muted-foreground">Carregando…</p>;
   }
 
   if (count === 0) {
     return (
       <div className="rounded-3xl border border-line bg-surface p-10 text-center">
         <p className="font-semibold">Seu carrinho está vazio</p>
-        <p className="mt-1 text-sm text-muted">
+        <p className="mt-1 text-sm text-muted-foreground">
           Escolha uma pizza para começar seu pedido.
         </p>
         <Link
@@ -261,10 +261,10 @@ export function CheckoutForm({
               <div className="min-w-0 flex-1">
                 <p className="font-medium leading-snug">{item.title}</p>
                 {item.subtitle && (
-                  <p className="text-sm text-muted">{item.subtitle}</p>
+                  <p className="text-sm text-muted-foreground">{item.subtitle}</p>
                 )}
                 {item.notes && (
-                  <p className="mt-0.5 text-xs italic text-muted">“{item.notes}”</p>
+                  <p className="mt-0.5 text-xs italic text-muted-foreground">“{item.notes}”</p>
                 )}
                 <p className="mt-1 text-sm font-semibold">{money(item.totalPrice)}</p>
               </div>
@@ -294,7 +294,7 @@ export function CheckoutForm({
                 <button
                   type="button"
                   onClick={() => remove(item.uid)}
-                  className="flex items-center gap-1 text-xs text-muted hover:text-red-600"
+                  className="flex items-center gap-1 text-xs text-muted-foreground hover:text-red-600"
                 >
                   <Trash2 className="size-3.5" />
                   Remover
@@ -352,7 +352,7 @@ export function CheckoutForm({
         </div>
 
         {deliveryType === "pickup" && tenant.address && (
-          <p className="mt-3 rounded-xl bg-background px-3 py-2.5 text-sm text-muted">
+          <p className="mt-3 rounded-xl bg-background px-3 py-2.5 text-sm text-muted-foreground">
             Retirada em {tenant.address}
           </p>
         )}
@@ -369,7 +369,7 @@ export function CheckoutForm({
                 className="w-full rounded-xl border border-line bg-background px-3 py-2.5 text-sm outline-none focus:border-stone-400"
               />
               {cepState.status === "buscando" && (
-                <span className="mt-1 block text-xs text-muted">Buscando endereço…</span>
+                <span className="mt-1 block text-xs text-muted-foreground">Buscando endereço…</span>
               )}
               {cepState.status === "ok" && (
                 <span className="mt-1 flex items-center gap-1 text-xs font-medium text-emerald-700">
@@ -483,9 +483,9 @@ export function CheckoutForm({
 
         {paymentMethod === "pix_manual" && tenant.pix_key && (
           <p className="mt-3 rounded-xl bg-background px-3 py-2.5 text-sm">
-            <span className="text-muted">Chave Pix: </span>
+            <span className="text-muted-foreground">Chave Pix: </span>
             <strong className="font-mono">{tenant.pix_key}</strong>
-            <span className="mt-1 block text-xs text-muted">
+            <span className="mt-1 block text-xs text-muted-foreground">
               Envie o comprovante no WhatsApp depois de finalizar.
             </span>
           </p>
@@ -691,7 +691,7 @@ function Choice({
       </span>
       <span className="min-w-0">
         <span className="block text-sm font-semibold leading-tight">{title}</span>
-        <span className="block truncate text-xs text-muted">{subtitle}</span>
+        <span className="block truncate text-xs text-muted-foreground">{subtitle}</span>
       </span>
     </button>
   );
@@ -718,7 +718,7 @@ function Field({
     <label className={`block ${className}`}>
       <span className="mb-1 block text-xs font-medium text-stone-500">
         {label}
-        {optional && <span className="font-normal text-muted"> (opcional)</span>}
+        {optional && <span className="font-normal text-muted-foreground"> (opcional)</span>}
       </span>
       <input
         value={value}
@@ -742,7 +742,7 @@ function Row({
 }) {
   return (
     <div className="flex justify-between">
-      <dt className={strong ? "font-semibold" : "text-muted"}>{label}</dt>
+      <dt className={strong ? "font-semibold" : "text-muted-foreground"}>{label}</dt>
       <dd className={strong ? "font-bold" : ""}>{value}</dd>
     </div>
   );

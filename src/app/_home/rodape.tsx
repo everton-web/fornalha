@@ -21,7 +21,7 @@ export function Rodape() {
             <Marca className="size-[18px]" />
             Fornalha
           </span>
-          <p className="mt-2 max-w-xs text-sm text-muted">
+          <p className="mt-2 max-w-xs text-sm text-muted-foreground">
             Sistema de pedidos para pizzarias. Seu cardápio no seu endereço, sem
             comissão por pedido.
           </p>
@@ -34,17 +34,17 @@ export function Rodape() {
             </p>
             <ul className="mt-3 space-y-2 text-sm">
               <li>
-                <Link href="/bella-napoli" className="text-muted transition hover:text-foreground">
+                <Link href="/bella-napoli" className="text-muted-foreground transition hover:text-foreground">
                   Cardápio de exemplo
                 </Link>
               </li>
               <li>
-                <Link href="/admin/demo" className="text-muted transition hover:text-foreground">
+                <Link href="/admin/demo" className="text-muted-foreground transition hover:text-foreground">
                   Painel por dentro
                 </Link>
               </li>
               <li>
-                <Link href="#faq" className="text-muted transition hover:text-foreground">
+                <Link href="#faq" className="text-muted-foreground transition hover:text-foreground">
                   Perguntas frequentes
                 </Link>
               </li>
@@ -57,12 +57,12 @@ export function Rodape() {
             </p>
             <ul className="mt-3 space-y-2 text-sm">
               <li>
-                <Link href="/admin" className="text-muted transition hover:text-foreground">
+                <Link href="/admin" className="text-muted-foreground transition hover:text-foreground">
                   Entrar no painel
                 </Link>
               </li>
               <li>
-                <Link href="/admin/esqueci" className="text-muted transition hover:text-foreground">
+                <Link href="/admin/esqueci" className="text-muted-foreground transition hover:text-foreground">
                   Esqueci minha senha
                 </Link>
               </li>
@@ -73,7 +73,7 @@ export function Rodape() {
 
       {/* O crédito das fotos não é cortesia: as licenças CC BY e CC BY-SA do
           cardápio de demonstração exigem autor, original e licença à vista. */}
-      <div className="mt-10 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-6 text-xs text-muted">
+      <div className="mt-10 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-6 text-xs text-muted-foreground">
         <p>© {new Date().getFullYear()} Fornalha</p>
         <Link href="/creditos" className="transition hover:text-foreground">
           Créditos das fotos

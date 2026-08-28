@@ -68,7 +68,7 @@ export default async function CupomPage({
       <div className="no-print mx-auto flex max-w-3xl flex-wrap items-center gap-2 px-4 py-4">
         <Link
           href="/admin/pedidos"
-          className="inline-flex items-center gap-1.5 text-sm text-muted transition hover:text-foreground"
+          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition hover:text-foreground"
         >
           <ArrowLeft className="size-4" />
           Voltar aos pedidos

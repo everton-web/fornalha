@@ -24,7 +24,7 @@ export default async function PagamentosPage() {
     <>
       <div className="mb-5">
         <h1 className="text-xl font-bold tracking-tight">Pagamentos online</h1>
-        <p className="text-sm text-muted">
+        <p className="text-sm text-muted-foreground">
           Onde você recebe. O dinheiro cai direto na sua conta do gateway — não
           passa por ninguém no caminho.
         </p>

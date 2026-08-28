@@ -42,7 +42,7 @@ export function FotoField({
 
   if (!id) {
     return (
-      <p className="text-xs text-muted">
+      <p className="text-xs text-muted-foreground">
         Salve o {tipo} para poder enviar uma foto.
       </p>
     );
@@ -117,7 +117,7 @@ export function FotoField({
                 router.refresh();
               })
             }
-            className="inline-flex items-center gap-1.5 rounded-full border border-line px-3 py-1.5 text-xs text-muted transition hover:border-red-300 hover:text-red-600 disabled:opacity-40"
+            className="inline-flex items-center gap-1.5 rounded-full border border-line px-3 py-1.5 text-xs text-muted-foreground transition hover:border-red-300 hover:text-red-600 disabled:opacity-40"
           >
             <Trash2 className="size-3.5" />
             Remover

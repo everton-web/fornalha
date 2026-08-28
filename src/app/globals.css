@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+/* As classes `animate-in`, `fade-in` e `zoom-in` que os componentes do
+   shadcn usam para entrar e sair. Sem isto o Dialog aparece seco, e pior:
+   as classes ficam sem efeito em silêncio, sem erro nenhum. */
+@import "tw-animate-css";
+
 /*
  * O Tailwind 4 passou a deixar botão com `cursor: default`, seguindo o padrão
  * do navegador. O efeito é que quase nada no painel parece clicável: medi 143
@@ -36,21 +41,94 @@
   --background: #faf7f2;
   --surface: #ffffff;
   --foreground: #1c1917;
-  --muted: #78716c;
   --line: #e7e2da;
   --brand: #c81e1e;
   --brand-ink: #ffffff;
+
+  /*
+   * ------------------------------------------------- nomes do shadcn/ui
+   *
+   * Apelidos da paleta acima, não uma segunda paleta. O `shadcn init` escreve
+   * o tema cinza dele por cima do que existe — trocaria o creme #faf7f2 por
+   * branco puro e apagaria a identidade — então estes ficam à mão, apontando
+   * para os tokens da Fornalha.
+   *
+   * --primary aponta para --brand de propósito: --brand é reescrito por
+   * pizzaria, no layout do tenant, a partir do primary_color do banco. Com o
+   * cinza padrão do shadcn no lugar, todo componente novo nasceria ignorando
+   * a cor do cliente.
+   *
+   * --muted mudou de significado, e é a única armadilha real desta mudança:
+   * aqui ele era a cor do TEXTO secundário (#78716c, em 138 lugares); no
+   * shadcn é um FUNDO de baixo contraste, e o texto é --muted-foreground.
+   * Mantido o nome antigo, todo `text-muted` viraria quase-branco sobre
+   * branco. Por isso a cor foi para --muted-foreground, que é o nome certo
+   * para o que ela sempre foi, e --muted virou o fundo que o shadcn espera.
+   */
+  --card: var(--surface);
+  --card-foreground: var(--foreground);
+  --popover: var(--surface);
+  --popover-foreground: var(--foreground);
+  --primary: var(--brand);
+  --primary-foreground: var(--brand-ink);
+  --secondary: #f2ede4;
+  --secondary-foreground: var(--foreground);
+  --muted: #f2ede4;
+  --muted-foreground: #78716c;
+  --accent: #f2ede4;
+  --accent-foreground: var(--foreground);
+  --destructive: #b91c1c;
+  --border: var(--line);
+  --input: var(--line);
+  --ring: var(--brand);
+
+  /*
+   * 0.5rem, e não o 0.625rem que o shadcn sugere.
+   *
+   * As fórmulas de raio dele (--radius-lg: var(--radius), --radius-md:
+   * calc(var(--radius) - 2px), e assim por diante) não acrescentam nomes: elas
+   * SUBSTITUEM a escala `rounded-*` do Tailwind, que os 56 arquivos deste
+   * projeto já usam. Com 0.75rem, todo canto do site mudou de curvatura de uma
+   * vez — a comparação pixel a pixel acusou justamente os cantos dos cards.
+   *
+   * Em 8px as contas caem em cima do padrão do Tailwind: sm 4px, md 6px,
+   * lg 8px, xl 12px. Os componentes do shadcn ganham a variável que esperam e
+   * o resto do site não sente nada.
+   */
+  --radius: 0.5rem;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-surface: var(--surface);
   --color-foreground: var(--foreground);
-  --color-muted: var(--muted);
   --color-line: var(--line);
   --color-brand: var(--brand);
   --color-brand-ink: var(--brand-ink);
   --font-sans: var(--font-sans-custom);
+
+  /* os mesmos apelidos, agora como utilitárias do Tailwind */
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
 }
 
 body {

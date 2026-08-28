@@ -147,7 +147,7 @@ export function PizzaBuilder({
                   }
                 >
                   <span className="block text-sm font-semibold">{s.name}</span>
-                  <span className="block text-xs text-muted">
+                  <span className="block text-xs text-muted-foreground">
                     {s.slices ? `${s.slices} fatias · ` : ""}
                     até {s.max_flavors} sabor{s.max_flavors > 1 ? "es" : ""}
                   </span>
@@ -214,12 +214,12 @@ export function PizzaBuilder({
                       <span className="min-w-0 flex-1">
                         <span className="block text-sm font-medium">{f.name}</span>
                         {f.description && (
-                          <span className="line-clamp-1 block text-xs text-muted">
+                          <span className="line-clamp-1 block text-xs text-muted-foreground">
                             {f.description}
                           </span>
                         )}
                       </span>
-                      <span className="shrink-0 text-sm text-muted">
+                      <span className="shrink-0 text-sm text-muted-foreground">
                         {unavailable ? "—" : money(price)}
                       </span>
                     </button>
@@ -248,7 +248,7 @@ export function PizzaBuilder({
                     }
                   >
                     <span className="block font-medium">{c.name}</span>
-                    <span className="text-xs text-muted">
+                    <span className="text-xs text-muted-foreground">
                       {c.price > 0 ? `+ ${money(c.price)}` : "Grátis"}
                     </span>
                   </button>
@@ -363,7 +363,7 @@ function Group({
         <h3 className="text-sm font-bold uppercase tracking-wide text-stone-500">
           {title}
         </h3>
-        {hint && <span className="text-xs text-muted">{hint}</span>}
+        {hint && <span className="text-xs text-muted-foreground">{hint}</span>}
       </div>
       {children}
     </section>

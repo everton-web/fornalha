@@ -52,7 +52,7 @@ export default async function PedidosPage({
         </h1>
 
         <div className="ml-auto flex items-center gap-3 text-sm">
-          <span className="text-muted">
+          <span className="text-muted-foreground">
             {orders.length} pedido(s) · {money(revenue)}
           </span>
           <a
@@ -68,7 +68,7 @@ export default async function PedidosPage({
         <div className="rounded-3xl border border-dashed border-line bg-surface p-12 text-center">
           <p className="text-3xl">🍕</p>
           <p className="mt-3 font-semibold">Nenhum pedido por aqui</p>
-          <p className="mt-1 text-sm text-muted">
+          <p className="mt-1 text-sm text-muted-foreground">
             Os pedidos novos aparecem nesta tela automaticamente.
           </p>
         </div>

@@ -127,7 +127,7 @@ export function PushToggle({ vapidKey }: { vapidKey: string }) {
         {estado === "ligado" ? (
           <BellRing className="size-5 shrink-0 text-emerald-600" />
         ) : (
-          <Bell className="size-5 shrink-0 text-muted" />
+          <Bell className="size-5 shrink-0 text-muted-foreground" />
         )}
 
         <div className="min-w-0 flex-1">
@@ -136,7 +136,7 @@ export function PushToggle({ vapidKey }: { vapidKey: string }) {
               ? "Avisos ligados neste aparelho"
               : "Avisar quando entrar pedido"}
           </p>
-          <p className="text-sm text-muted">
+          <p className="text-sm text-muted-foreground">
             {estado === "ligado"
               ? "Você recebe a notificação mesmo com o painel fechado."
               : "Receba a notificação no celular mesmo com o painel fechado."}
@@ -162,7 +162,7 @@ export function PushToggle({ vapidKey }: { vapidKey: string }) {
               type="button"
               disabled={pending}
               onClick={desligar}
-              className="rounded-full border border-line px-3.5 py-1.5 text-xs font-medium text-muted transition hover:border-stone-300"
+              className="rounded-full border border-line px-3.5 py-1.5 text-xs font-medium text-muted-foreground transition hover:border-stone-300"
             >
               Desligar
             </button>
@@ -179,7 +179,7 @@ export function PushToggle({ vapidKey }: { vapidKey: string }) {
         )}
       </div>
 
-      {mensagem && <p className="mt-2 text-xs text-muted">{mensagem}</p>}
+      {mensagem && <p className="mt-2 text-xs text-muted-foreground">{mensagem}</p>}
     </div>
   );
 }

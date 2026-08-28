@@ -25,7 +25,7 @@ export default async function AgenciaPage() {
         <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-3 px-4 py-3">
           <div className="min-w-0">
             <p className="truncate font-semibold leading-tight">Painel da agência</p>
-            <p className="truncate text-xs text-muted">{conta.email}</p>
+            <p className="truncate text-xs text-muted-foreground">{conta.email}</p>
           </div>
           <form action={signOut} className="ml-auto">
             <button
@@ -66,7 +66,7 @@ export default async function AgenciaPage() {
         <PizzariasManager pizzarias={pizzarias} />
 
         {pizzarias.length > 0 && (
-          <p className="mt-6 text-xs text-muted">
+          <p className="mt-6 text-xs text-muted-foreground">
             Cada pizzaria recebe dois links: <code>/slug</code> para divulgar ao
             cliente e <code>/admin</code> para o dono trabalhar.{" "}
             <Link href="/admin" className="underline underline-offset-2">
@@ -95,7 +95,7 @@ function Resumo({
         {titulo}
       </p>
       <p className="mt-1 text-2xl font-bold tabular-nums">{valor}</p>
-      <p className="text-xs text-muted">{detalhe}</p>
+      <p className="text-xs text-muted-foreground">{detalhe}</p>
     </div>
   );
 }

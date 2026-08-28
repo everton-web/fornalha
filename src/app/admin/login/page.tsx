@@ -19,7 +19,7 @@ export default async function LoginPage() {
       </Link>
 
       <h1 className="text-2xl font-bold tracking-tight">Painel da pizzaria</h1>
-      <p className="mt-1 text-sm text-muted">
+      <p className="mt-1 text-sm text-muted-foreground">
         Entre para ver os pedidos e cuidar do cardápio.
       </p>
 

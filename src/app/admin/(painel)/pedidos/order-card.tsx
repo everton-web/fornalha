@@ -64,7 +64,7 @@ export function OrderCard({
       <header className="flex items-start gap-2">
         <div>
           <p className="font-mono text-sm font-bold tracking-wider">#{order.code}</p>
-          <p className="flex items-center gap-1 text-xs text-muted">
+          <p className="flex items-center gap-1 text-xs text-muted-foreground">
             <Clock className="size-3" />
             {formatTime(order.created_at, timezone)}
           </p>
@@ -74,7 +74,7 @@ export function OrderCard({
           target="_blank"
           title="Imprimir cupom"
           aria-label={`Imprimir cupom do pedido ${order.code}`}
-          className="ml-auto grid size-8 shrink-0 place-items-center rounded-full border border-line text-muted transition hover:border-stone-300 hover:text-foreground"
+          className="ml-auto grid size-8 shrink-0 place-items-center rounded-full border border-line text-muted-foreground transition hover:border-stone-300 hover:text-foreground"
         >
           <Printer className="size-4" />
         </Link>
@@ -88,14 +88,14 @@ export function OrderCard({
 
       <div className="mt-3 flex items-center gap-1.5 text-sm">
         {order.delivery_type === "delivery" ? (
-          <Bike className="size-3.5 shrink-0 text-muted" />
+          <Bike className="size-3.5 shrink-0 text-muted-foreground" />
         ) : (
-          <ShoppingBag className="size-3.5 shrink-0 text-muted" />
+          <ShoppingBag className="size-3.5 shrink-0 text-muted-foreground" />
         )}
         <span className="truncate font-medium">{order.customer_name}</span>
         <a
           href={`tel:${order.customer_phone.replace(/\D/g, "")}`}
-          className="ml-auto flex shrink-0 items-center gap-1 text-xs text-muted hover:text-foreground"
+          className="ml-auto flex shrink-0 items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
         >
           <Phone className="size-3" />
           {order.customer_phone}
@@ -103,7 +103,7 @@ export function OrderCard({
       </div>
 
       {order.delivery_type === "delivery" && (
-        <p className="mt-1.5 flex items-start gap-1.5 text-xs text-muted">
+        <p className="mt-1.5 flex items-start gap-1.5 text-xs text-muted-foreground">
           <MapPin className="mt-0.5 size-3 shrink-0" />
           <span>
             {order.address_street}, {order.address_number}
@@ -136,7 +136,7 @@ export function OrderCard({
       )}
 
       <div className="mt-3 flex items-baseline justify-between border-t border-line pt-3">
-        <span className="text-xs text-muted">
+        <span className="text-xs text-muted-foreground">
           {PAYMENT_LABEL[order.payment_method]}
           {order.change_for ? ` · troco p/ ${money(order.change_for)}` : ""}
         </span>
@@ -210,7 +210,7 @@ export function OrderCard({
                 type="button"
                 disabled={pending}
                 onClick={() => setAskCancel(true)}
-                className="rounded-full border border-line px-3 py-2.5 text-xs font-medium text-muted transition hover:border-red-300 hover:text-red-600"
+                className="rounded-full border border-line px-3 py-2.5 text-xs font-medium text-muted-foreground transition hover:border-red-300 hover:text-red-600"
               >
                 Cancelar
               </button>
