@@ -68,10 +68,19 @@ export function MenuEditor({ menu }: { menu: AdminMenu }) {
             variant="ghost"
             size="sm"
             onClick={() => setTab(t.id)}
+            /*
+             * O `hover:bg-*` repetindo o fundo de repouso não é redundância.
+             * A variante `ghost` traz `hover:bg-accent hover:text-accent-foreground`,
+             * e o twMerge não resolve isso contra um `bg-*` sem hover — são
+             * estados diferentes, então os dois ficam. Efeito: ao clicar numa
+             * aba, o mouse continua sobre ela e a aba ativa virava bege, com
+             * cara de desativada. Fixar o hover devolve o comportamento de
+             * antes, em que a aba escolhida não muda de cor sob o cursor.
+             */
             className={`shrink-0 rounded-full border px-4 py-1.5 text-sm font-medium ${
               tab === t.id
-                ? "border-foreground bg-foreground text-white"
-                : "border-line bg-surface hover:border-stone-300"
+                ? "border-foreground bg-foreground text-white hover:bg-foreground hover:text-white"
+                : "border-line bg-surface hover:border-stone-300 hover:bg-surface"
             }`}
           >
             {t.label}

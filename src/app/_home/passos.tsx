@@ -93,10 +93,17 @@ export function ComoComeca() {
                   onMouseEnter={() => setAtivo(i)}
                   onFocus={() => setAtivo(i)}
                   aria-current={emFoco}
+                  /*
+                   * `hover:bg-*` igual ao fundo de repouso: a variante `ghost`
+                   * traz `hover:bg-accent`, e sem isto o passo ficava bege sob
+                   * o cursor. Aqui doía mais que nas abas — este bloco reage
+                   * justamente ao mouse, então a cor mudava em todo passo que
+                   * a pessoa lesse.
+                   */
                   className={`h-auto w-full justify-start gap-4 rounded-2xl border p-5 text-left font-normal whitespace-normal ${
                     emFoco
-                      ? "border-stone-300 bg-surface shadow-[0_10px_30px_-20px_rgba(28,25,23,0.5)]"
-                      : "border-line bg-surface/60 hover:border-stone-300"
+                      ? "border-stone-300 bg-surface shadow-[0_10px_30px_-20px_rgba(28,25,23,0.5)] hover:bg-surface"
+                      : "border-line bg-surface/60 hover:border-stone-300 hover:bg-surface/60"
                   }`}
                 >
                   <span
