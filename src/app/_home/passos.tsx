@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+import { Button } from "@/components/ui/button";
+
 /**
  * Como uma pizzaria entra no ar, um passo por linha.
  *
@@ -85,12 +87,13 @@ export function ComoComeca() {
             const emFoco = i === ativo;
             return (
               <li key={passo.titulo}>
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
                   onMouseEnter={() => setAtivo(i)}
                   onFocus={() => setAtivo(i)}
                   aria-current={emFoco}
-                  className={`flex w-full gap-4 rounded-2xl border p-5 text-left transition ${
+                  className={`h-auto w-full justify-start gap-4 rounded-2xl border p-5 text-left font-normal whitespace-normal ${
                     emFoco
                       ? "border-stone-300 bg-surface shadow-[0_10px_30px_-20px_rgba(28,25,23,0.5)]"
                       : "border-line bg-surface/60 hover:border-stone-300"
@@ -115,7 +118,7 @@ export function ComoComeca() {
                       {passo.resumo}
                     </span>
                   </span>
-                </button>
+                </Button>
               </li>
             );
           })}

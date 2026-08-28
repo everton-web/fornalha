@@ -3,6 +3,8 @@
 import { useMemo, useState } from "react";
 import { Plus } from "lucide-react";
 
+import { Button } from "@/components/ui/button";
+
 import { money } from "@/lib/format";
 import type { Flavor, Menu, Product } from "@/lib/types";
 import { fotoSrc } from "@/lib/utils";
@@ -59,10 +61,11 @@ export function MenuBrowser({ menu }: { menu: Menu }) {
       </nav>
 
       {menu.sizes.length > 0 && (
-        <button
+        <Button
           type="button"
+          variant="ghost"
           onClick={() => openBuilder(null)}
-          className="mb-6 flex w-full items-center gap-3 rounded-2xl border border-dashed border-line bg-surface px-4 py-4 text-left transition hover:border-stone-300"
+          className="mb-6 h-auto w-full justify-start gap-3 rounded-2xl border border-dashed border-line bg-surface px-4 py-4 text-left font-normal whitespace-normal hover:border-stone-300 hover:bg-surface"
         >
           <span
             className="grid size-10 shrink-0 place-items-center rounded-full"
@@ -76,7 +79,7 @@ export function MenuBrowser({ menu }: { menu: Menu }) {
               Escolha o tamanho, combine sabores e a borda
             </span>
           </span>
-        </button>
+        </Button>
       )}
 
       <div className="space-y-10">
@@ -137,10 +140,11 @@ function FlavorCard({
   const from = prices.length ? Math.min(...prices) : null;
 
   return (
-    <button
+    <Button
       type="button"
+      variant="ghost"
       onClick={onClick}
-      className="flex w-full items-center gap-3 rounded-2xl border border-line bg-surface p-3 text-left transition hover:border-stone-300 active:scale-[0.995]"
+      className="h-auto w-full justify-start gap-3 rounded-2xl border border-line bg-surface p-3 text-left font-normal whitespace-normal hover:border-stone-300 hover:bg-surface active:scale-[0.995]"
     >
       {fotoSrc("sabor", flavor) && (
         // eslint-disable-next-line @next/next/no-img-element
@@ -171,7 +175,7 @@ function FlavorCard({
       >
         <Plus className="size-4" />
       </span>
-    </button>
+    </Button>
   );
 }
 
@@ -202,15 +206,17 @@ function ProductCard({
         )}
         <p className="mt-1 text-sm font-semibold">{money(product.price)}</p>
       </div>
-      <button
+      <Button
         type="button"
+        variant="ghost"
+        size="icon-sm"
         onClick={onAdd}
         aria-label={`Adicionar ${product.name}`}
-        className="grid size-8 shrink-0 place-items-center rounded-full transition active:scale-90"
+        className="size-8 shrink-0 rounded-full active:scale-90"
         style={{ background: "var(--brand)", color: "var(--brand-ink)" }}
       >
         <Plus className="size-4" />
-      </button>
+      </Button>
     </div>
   );
 }

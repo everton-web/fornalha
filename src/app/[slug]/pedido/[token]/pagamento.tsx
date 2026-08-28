@@ -4,6 +4,8 @@ import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Check, Copy, ExternalLink, QrCode } from "lucide-react";
 
+import { Button } from "@/components/ui/button";
+
 import { money } from "@/lib/format";
 
 type Props = {
@@ -131,10 +133,11 @@ export function PagamentoPendente({
             {pixCode}
           </p>
 
-          <button
+          <Button
             type="button"
+            size="pill"
             onClick={copiar}
-            className="mt-3 flex w-full items-center justify-center gap-2 rounded-full bg-amber-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-amber-700"
+            className="mt-3 w-full bg-amber-600 text-white hover:bg-amber-700"
           >
             {copiado ? (
               <>
@@ -145,7 +148,7 @@ export function PagamentoPendente({
                 <Copy className="size-4" /> Copiar código Pix
               </>
             )}
-          </button>
+          </Button>
         </div>
       )}
 

@@ -39,7 +39,13 @@ function DialogOverlay({
     <DialogPrimitive.Overlay
       data-slot="dialog-overlay"
       className={cn(
-        "fixed inset-0 z-50 bg-black/50 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0",
+        /*
+         * A cortina da Fornalha: stone-900/40 com desfoque leve, e não o
+         * preto/50 do padrão. O tema é quente — preto puro sobre o creme
+         * #faf7f2 dá um cinza sujo, e era o desfoque que fazia o cardápio
+         * atrás parecer fundo em vez de conteúdo escurecido.
+         */
+        "fixed inset-0 z-50 bg-stone-900/40 backdrop-blur-[2px] data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0",
         className
       )}
       {...props}

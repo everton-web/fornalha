@@ -16,6 +16,9 @@ import {
   Trash2,
 } from "lucide-react";
 
+import { Campo, CampoTexto } from "@/components/campo";
+import { Button } from "@/components/ui/button";
+
 import { formatPhone, isValidPhone, money, onlyDigits } from "@/lib/format";
 import type { DeliveryType, PaymentMethod, Tenant } from "@/lib/types";
 
@@ -271,34 +274,40 @@ export function CheckoutForm({
 
               <div className="flex shrink-0 flex-col items-end gap-2">
                 <div className="flex items-center gap-1 rounded-full border border-line p-0.5">
-                  <button
+                  <Button
                     type="button"
+                    variant="ghost"
+                    size="icon-xs"
                     onClick={() => setQuantity(item.uid, item.quantity - 1)}
-                    className="grid size-7 place-items-center rounded-full hover:bg-stone-100"
+                    className="size-7 rounded-full"
                     aria-label="Diminuir"
                   >
                     <Minus className="size-3.5" />
-                  </button>
+                  </Button>
                   <span className="w-5 text-center text-sm font-semibold">
                     {item.quantity}
                   </span>
-                  <button
+                  <Button
                     type="button"
+                    variant="ghost"
+                    size="icon-xs"
                     onClick={() => setQuantity(item.uid, item.quantity + 1)}
-                    className="grid size-7 place-items-center rounded-full hover:bg-stone-100"
+                    className="size-7 rounded-full"
                     aria-label="Aumentar"
                   >
                     <Plus className="size-3.5" />
-                  </button>
+                  </Button>
                 </div>
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
+                  size="xs"
                   onClick={() => remove(item.uid)}
-                  className="flex items-center gap-1 text-xs text-muted-foreground hover:text-red-600"
+                  className="px-0 text-xs text-muted-foreground hover:bg-transparent hover:text-red-600"
                 >
                   <Trash2 className="size-3.5" />
                   Remover
-                </button>
+                </Button>
               </div>
             </li>
           ))}
@@ -359,14 +368,13 @@ export function CheckoutForm({
 
         {deliveryType === "delivery" && (
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            <label className="block sm:col-span-2">
-              <span className="mb-1 block text-xs font-medium text-stone-500">CEP</span>
-              <input
+            <div className="block sm:col-span-2">
+              <Campo
+                label="CEP"
                 value={customer.zip}
                 onChange={(e) => aoDigitarCep(e.target.value)}
                 placeholder="00000-000"
                 inputMode="numeric"
-                className="w-full rounded-xl border border-line bg-background px-3 py-2.5 text-sm outline-none focus:border-stone-400"
               />
               {cepState.status === "buscando" && (
                 <span className="mt-1 block text-xs text-muted-foreground">Buscando endereço…</span>
@@ -390,7 +398,7 @@ export function CheckoutForm({
                   {cepState.message}
                 </span>
               )}
-            </label>
+            </div>
 
             <Field
               className="sm:col-span-2"
@@ -515,13 +523,14 @@ export function CheckoutForm({
       />
 
       <Card title="Observações do pedido">
-        <textarea
+        <CampoTexto
+          label={<span className="sr-only">Observações do pedido</span>}
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           rows={2}
           maxLength={300}
           placeholder="Alguma informação para a cozinha ou o entregador?"
-          className="w-full resize-none rounded-xl border border-line bg-background px-3 py-2.5 text-sm outline-none focus:border-stone-400"
+          className="resize-none"
         />
       </Card>
 
@@ -562,12 +571,12 @@ export function CheckoutForm({
 
       <div className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-surface/95 p-3 backdrop-blur">
         <div className="mx-auto max-w-3xl">
-          <button
+          <Button
             type="button"
+            size="pill"
             onClick={submit}
             disabled={pending || !isOpen || foraDaArea}
-            className="flex w-full items-center justify-between gap-3 rounded-full px-5 py-3.5 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-50"
-            style={{ background: "var(--brand)", color: "var(--brand-ink)" }}
+            className="w-full justify-between py-3.5 disabled:cursor-not-allowed"
           >
             <span>
               {pending
@@ -577,7 +586,7 @@ export function CheckoutForm({
                   : "Pizzaria fechada"}
             </span>
             <span>{money(total)}</span>
-          </button>
+          </Button>
         </div>
       </div>
     </div>
@@ -666,10 +675,11 @@ function Choice({
   subtitle: string;
 }) {
   return (
-    <button
+    <Button
       type="button"
+      variant="ghost"
       onClick={onClick}
-      className="flex items-center gap-3 rounded-2xl border px-3.5 py-3 text-left transition"
+      className="h-auto justify-start gap-3 rounded-2xl border px-3.5 py-3 text-left font-normal whitespace-normal hover:bg-transparent"
       style={
         selected
           ? {
@@ -693,7 +703,7 @@ function Choice({
         <span className="block text-sm font-semibold leading-tight">{title}</span>
         <span className="block truncate text-xs text-muted-foreground">{subtitle}</span>
       </span>
-    </button>
+    </Button>
   );
 }
 
@@ -715,19 +725,21 @@ function Field({
   optional?: boolean;
 }) {
   return (
-    <label className={`block ${className}`}>
-      <span className="mb-1 block text-xs font-medium text-stone-500">
-        {label}
-        {optional && <span className="font-normal text-muted-foreground"> (opcional)</span>}
-      </span>
-      <input
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        inputMode={inputMode}
-        className="w-full rounded-xl border border-line bg-background px-3 py-2.5 text-sm outline-none focus:border-stone-400"
-      />
-    </label>
+    <Campo
+      className={className}
+      label={
+        <>
+          {label}
+          {optional && (
+            <span className="font-normal text-muted-foreground"> (opcional)</span>
+          )}
+        </>
+      }
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      placeholder={placeholder}
+      inputMode={inputMode}
+    />
   );
 }
 

@@ -4,6 +4,8 @@ import { useState, useTransition } from "react";
 import Link from "next/link";
 import { ArrowLeft, Eye, ShieldCheck } from "lucide-react";
 
+import { Button } from "@/components/ui/button";
+
 import { entrarNaDemo } from "./actions";
 
 export default function DemoPage() {
@@ -41,8 +43,9 @@ export default function DemoPage() {
         disparado por qualquer prefetch do navegador. Aqui só acontece porque
         alguém clicou.
       */}
-      <button
+      <Button
         type="button"
+        size="pill"
         disabled={pendente}
         onClick={() =>
           iniciar(async () => {
@@ -52,11 +55,11 @@ export default function DemoPage() {
             if (r && !r.ok) setErro(r.error);
           })
         }
-        className="mt-6 inline-flex items-center justify-center gap-2 rounded-full bg-brand px-6 py-3 text-sm font-semibold text-brand-ink transition hover:opacity-90 disabled:opacity-50"
+        className="mt-6 px-6"
       >
         <Eye className="size-4" />
         {pendente ? "Abrindo…" : "Entrar no painel de demonstração"}
-      </button>
+      </Button>
 
       {erro && <p className="mt-3 text-sm font-medium text-red-600">{erro}</p>}
 

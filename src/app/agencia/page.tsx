@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { LogOut } from "lucide-react";
 
+import { Button } from "@/components/ui/button";
+
 import { signOut } from "@/app/admin/actions";
 import { listarPizzarias } from "@/lib/agencia";
 import { requirePlatformAdmin } from "@/lib/auth";
@@ -28,14 +30,16 @@ export default async function AgenciaPage() {
             <p className="truncate text-xs text-muted-foreground">{conta.email}</p>
           </div>
           <form action={signOut} className="ml-auto">
-            <button
+            <Button
               type="submit"
-              className="grid size-9 place-items-center rounded-full border border-line transition hover:border-stone-300"
+              variant="outline"
+              size="icon"
+              className="rounded-full"
               aria-label="Sair"
               title="Sair"
             >
               <LogOut className="size-4" />
-            </button>
+            </Button>
           </form>
         </div>
       </header>

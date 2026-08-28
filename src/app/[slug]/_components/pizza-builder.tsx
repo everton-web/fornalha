@@ -1,7 +1,15 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Check, Minus, Plus, X } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 import { money } from "@/lib/format";
 import { pizzaBasePrice } from "@/lib/pricing";
@@ -38,16 +46,6 @@ export function PizzaBuilder({
   const [addonIds, setAddonIds] = useState<string[]>([]);
   const [quantity, setQuantity] = useState(1);
   const [notes, setNotes] = useState("");
-
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
-    document.addEventListener("keydown", onKey);
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = "";
-    };
-  }, [onClose]);
 
   const size = menu.sizes.find((s) => s.id === sizeId) ?? menu.sizes[0];
   const maxFlavors = size?.max_flavors ?? 1;
@@ -106,37 +104,50 @@ export function PizzaBuilder({
     onClose();
   }
 
+  /*
+   * Dialog do Radix no lugar do modal à mão.
+   *
+   * O que era feito aqui: uma <div> por cima da página, um <button> gigante
+   * de fundo para fechar no clique fora, e um useEffect que ouvia Escape e
+   * travava a rolagem do body. Funcionava, e faltava o resto — o foco não
+   * ficava preso dentro do modal, então tabular saía por baixo dele e mexia
+   * na página atrás; o leitor de tela não anunciava que uma janela abriu; e
+   * ao fechar o foco não voltava para o sabor que a pessoa clicou.
+   *
+   * Nada disso aparece num screenshot, e é por isso que passou tanto tempo.
+   */
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center">
-      <button
-        type="button"
-        aria-label="Fechar"
-        onClick={onClose}
-        className="absolute inset-0 bg-stone-900/40 backdrop-blur-[2px]"
-      />
-
-      <div className="animate-sheet relative flex max-h-[92vh] w-full max-w-lg flex-col rounded-t-3xl bg-surface shadow-2xl sm:rounded-3xl">
+    <Dialog open onOpenChange={(aberto) => !aberto && onClose()}>
+      <DialogContent
+        showCloseButton={false}
+        className="flex max-h-[92vh] w-full max-w-lg translate-y-0 flex-col gap-0 rounded-t-3xl border-0 bg-surface p-0 shadow-2xl top-auto bottom-0 sm:top-1/2 sm:bottom-auto sm:-translate-y-1/2 sm:rounded-3xl"
+      >
         <header className="flex items-center gap-3 border-b border-line px-5 py-4">
-          <h2 className="flex-1 text-lg font-bold">Montar pizza</h2>
-          <button
+          <DialogTitle className="flex-1 text-lg font-bold">
+            Montar pizza
+          </DialogTitle>
+          <Button
             type="button"
+            variant="ghost"
+            size="icon"
             onClick={onClose}
-            className="grid size-9 place-items-center rounded-full hover:bg-stone-100"
+            className="rounded-full"
             aria-label="Fechar"
           >
             <X className="size-5" />
-          </button>
+          </Button>
         </header>
 
         <div className="flex-1 space-y-6 overflow-y-auto px-5 py-5">
           <Group title="Tamanho">
             <div className="grid grid-cols-3 gap-2">
               {menu.sizes.map((s) => (
-                <button
+                <Button
                   key={s.id}
                   type="button"
+                  variant="ghost"
                   onClick={() => changeSize(s.id)}
-                  className="rounded-2xl border p-3 text-center transition"
+                  className="h-auto flex-col rounded-2xl border p-3 text-center font-normal whitespace-normal hover:bg-transparent"
                   style={
                     s.id === sizeId
                       ? {
@@ -151,7 +162,7 @@ export function PizzaBuilder({
                     {s.slices ? `${s.slices} fatias · ` : ""}
                     até {s.max_flavors} sabor{s.max_flavors > 1 ? "es" : ""}
                   </span>
-                </button>
+                </Button>
               ))}
             </div>
           </Group>
@@ -174,11 +185,12 @@ export function PizzaBuilder({
 
                 return (
                   <li key={f.id}>
-                    <button
+                    <Button
                       type="button"
+                      variant="ghost"
                       disabled={unavailable}
                       onClick={() => toggleFlavor(f.id)}
-                      className="flex w-full items-center gap-3 rounded-xl border p-3 text-left transition disabled:opacity-40"
+                      className="h-auto w-full justify-start gap-3 rounded-xl border p-3 text-left font-normal whitespace-normal hover:bg-transparent disabled:opacity-40"
                       style={
                         selected
                           ? {
@@ -222,7 +234,7 @@ export function PizzaBuilder({
                       <span className="shrink-0 text-sm text-muted-foreground">
                         {unavailable ? "—" : money(price)}
                       </span>
-                    </button>
+                    </Button>
                   </li>
                 );
               })}
@@ -233,11 +245,12 @@ export function PizzaBuilder({
             <Group title="Borda">
               <div className="grid grid-cols-2 gap-2">
                 {menu.crusts.map((c) => (
-                  <button
+                  <Button
                     key={c.id}
                     type="button"
+                    variant="ghost"
                     onClick={() => setCrustId(c.id)}
-                    className="rounded-xl border px-3 py-2.5 text-left text-sm transition"
+                    className="h-auto justify-start rounded-xl border px-3 py-2.5 text-left text-sm font-normal whitespace-normal hover:bg-transparent"
                     style={
                       c.id === crustId
                         ? {
@@ -251,7 +264,7 @@ export function PizzaBuilder({
                     <span className="text-xs text-muted-foreground">
                       {c.price > 0 ? `+ ${money(c.price)}` : "Grátis"}
                     </span>
-                  </button>
+                  </Button>
                 ))}
               </div>
             </Group>
@@ -263,9 +276,10 @@ export function PizzaBuilder({
                 {menu.addons.map((a) => {
                   const selected = addonIds.includes(a.id);
                   return (
-                    <button
+                    <Button
                       key={a.id}
                       type="button"
+                      variant="ghost"
                       onClick={() =>
                         setAddonIds((prev) =>
                           selected
@@ -285,7 +299,7 @@ export function PizzaBuilder({
                       }
                     >
                       {a.name} · + {money(a.price)}
-                    </button>
+                    </Button>
                   );
                 })}
               </div>
@@ -293,44 +307,49 @@ export function PizzaBuilder({
           )}
 
           <Group title="Observações">
-            <textarea
+            <Textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={2}
               maxLength={200}
               placeholder="Ex: sem cebola, bem assada, cortar em 8 pedaços"
-              className="w-full resize-none rounded-xl border border-line bg-background px-3 py-2.5 text-sm outline-none focus:border-stone-400"
+              className="resize-none"
+              aria-label="Observações da pizza"
             />
           </Group>
         </div>
 
         <footer className="flex items-center gap-3 border-t border-line px-5 py-4">
           <div className="flex items-center gap-1 rounded-full border border-line p-1">
-            <button
+            <Button
               type="button"
+              variant="ghost"
+              size="icon-sm"
               onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-              className="grid size-8 place-items-center rounded-full hover:bg-stone-100"
+              className="size-8 rounded-full"
               aria-label="Diminuir"
             >
               <Minus className="size-4" />
-            </button>
+            </Button>
             <span className="w-6 text-center text-sm font-semibold">{quantity}</span>
-            <button
+            <Button
               type="button"
+              variant="ghost"
+              size="icon-sm"
               onClick={() => setQuantity((q) => Math.min(20, q + 1))}
-              className="grid size-8 place-items-center rounded-full hover:bg-stone-100"
+              className="size-8 rounded-full"
               aria-label="Aumentar"
             >
               <Plus className="size-4" />
-            </button>
+            </Button>
           </div>
 
-          <button
+          <Button
             type="button"
+            size="pill"
             onClick={submit}
             disabled={chosen.length === 0}
-            className="flex flex-1 items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-40"
-            style={{ background: "var(--brand)", color: "var(--brand-ink)" }}
+            className="flex-1 disabled:cursor-not-allowed"
           >
             {chosen.length === 0 ? (
               "Escolha um sabor"
@@ -341,10 +360,10 @@ export function PizzaBuilder({
                 {money(unitPrice * quantity)}
               </>
             )}
-          </button>
+          </Button>
         </footer>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 
